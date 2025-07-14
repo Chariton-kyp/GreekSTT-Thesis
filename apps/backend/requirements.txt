@@ -1,0 +1,2 @@
+# Production requirements - base dependencies only
+-r requirements-base.txt

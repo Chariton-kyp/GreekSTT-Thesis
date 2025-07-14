@@ -1,0 +1,180 @@
+// ========== BROWSER AUTOFILL OVERRIDES ==========
+// Handles Chrome/Safari autofill styling to maintain consistent appearance
+// Prevents browser default yellow/blue backgrounds on autofilled inputs
+// Fixes text color inconsistencies and removes spell-check underlines
+
+/* Chrome autofill styling override - Light mode */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px white inset !important;
+  -webkit-text-fill-color: #374151 !important;
+  color: #374151 !important;
+  background-color: white !important;
+  background-image: none !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+  -webkit-transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* Dark mode autofill styling */
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #1f2937 inset !important;
+  -webkit-text-fill-color: #f9fafb !important;
+  color: #f9fafb !important;
+  background-color: #1f2937 !important;
+  background-image: none !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+  -webkit-transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* PrimeNG input autofill styling - Light mode */
+.p-inputtext:-webkit-autofill,
+.p-inputtext:-webkit-autofill:hover,
+.p-inputtext:-webkit-autofill:focus,
+.p-inputtext:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px white inset !important;
+  -webkit-text-fill-color: #374151 !important;
+  color: #374151 !important;
+  background-color: white !important;
+  background-image: none !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+  -webkit-transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* PrimeNG input autofill styling - Dark mode */
+.dark .p-inputtext:-webkit-autofill,
+.dark .p-inputtext:-webkit-autofill:hover,
+.dark .p-inputtext:-webkit-autofill:focus,
+.dark .p-inputtext:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #1f2937 inset !important;
+  -webkit-text-fill-color: #f9fafb !important;
+  color: #f9fafb !important;
+  background-color: #1f2937 !important;
+  background-image: none !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+  -webkit-transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* PrimeNG password component autofill styling - Light mode */
+.p-password input:-webkit-autofill,
+.p-password input:-webkit-autofill:hover,
+.p-password input:-webkit-autofill:focus,
+.p-password input:-webkit-autofill:active,
+.p-password .p-inputtext:-webkit-autofill,
+.p-password .p-inputtext:-webkit-autofill:hover,
+.p-password .p-inputtext:-webkit-autofill:focus,
+.p-password .p-inputtext:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px white inset !important;
+  -webkit-text-fill-color: #374151 !important;
+  color: #374151 !important;
+  background-color: white !important;
+  background-image: none !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+  -webkit-transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* PrimeNG password component autofill styling - Dark mode */
+.dark .p-password input:-webkit-autofill,
+.dark .p-password input:-webkit-autofill:hover,
+.dark .p-password input:-webkit-autofill:focus,
+.dark .p-password input:-webkit-autofill:active,
+.dark .p-password .p-inputtext:-webkit-autofill,
+.dark .p-password .p-inputtext:-webkit-autofill:hover,
+.dark .p-password .p-inputtext:-webkit-autofill:focus,
+.dark .p-password .p-inputtext:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #1f2937 inset !important;
+  -webkit-text-fill-color: #f9fafb !important;
+  color: #f9fafb !important;
+  background-color: #1f2937 !important;
+  background-image: none !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+  -webkit-transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* ========== ADDITIONAL AUTOFILL & TEXT DECORATION FIXES ========== */
+
+/* Remove text decoration and spell-check underlines on all inputs */
+input,
+.p-inputtext,
+.p-password input,
+textarea,
+.p-inputtextarea {
+  text-decoration: none !important;
+  -webkit-text-decoration: none !important;
+  text-decoration-line: none !important;
+  -webkit-text-decoration-line: none !important;
+  text-decoration-color: transparent !important;
+  -webkit-text-decoration-color: transparent !important;
+  text-decoration-style: none !important;
+  -webkit-text-decoration-style: none !important;
+  text-underline-offset: 0 !important;
+  -webkit-text-underline-offset: 0 !important;
+}
+
+/* Force consistent text rendering for autofilled inputs */
+input:-webkit-autofill *,
+.p-inputtext:-webkit-autofill *,
+.p-password input:-webkit-autofill * {
+  color: inherit !important;
+  -webkit-text-fill-color: inherit !important;
+  text-decoration: none !important;
+  -webkit-text-decoration: none !important;
+}
+
+/* Override any webkit text decoration containers */
+input::-webkit-textfield-decoration-container,
+.p-inputtext::-webkit-textfield-decoration-container,
+.p-password input::-webkit-textfield-decoration-container {
+  color: inherit !important;
+  -webkit-text-fill-color: inherit !important;
+  text-decoration: none !important;
+  -webkit-text-decoration: none !important;
+  background: transparent !important;
+}
+
+/* Ensure consistent behavior in dark mode */
+.dark input::-webkit-textfield-decoration-container,
+.dark .p-inputtext::-webkit-textfield-decoration-container,
+.dark .p-password input::-webkit-textfield-decoration-container {
+  color: #f9fafb !important;
+  -webkit-text-fill-color: #f9fafb !important;
+  text-decoration: none !important;
+  -webkit-text-decoration: none !important;
+  background: transparent !important;
+}
+
+/* Disable spellcheck attributes and styling globally for email/password fields */
+input[type="email"],
+input[type="password"],
+.p-inputtext[type="email"],
+.p-inputtext[type="password"],
+.p-password input {
+  spellcheck: false !important;
+  -webkit-text-decoration: none !important;
+  text-decoration: none !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+/* Additional text color consistency fixes */
+input:-webkit-autofill::first-line,
+.p-inputtext:-webkit-autofill::first-line,
+.p-password input:-webkit-autofill::first-line {
+  color: #374151 !important;
+  -webkit-text-fill-color: #374151 !important;
+}
+
+.dark input:-webkit-autofill::first-line,
+.dark .p-inputtext:-webkit-autofill::first-line,
+.dark .p-password input:-webkit-autofill::first-line {
+  color: #f9fafb !important;
+  -webkit-text-fill-color: #f9fafb !important;
+}

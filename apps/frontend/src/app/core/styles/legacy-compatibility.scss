@@ -1,0 +1,293 @@
+// ========== LEGACY COMPATIBILITY LAYER ==========
+// Essential legacy styles for backward compatibility - heavily optimized
+// These styles ensure older PrimeNG components work with our design system
+
+/* PrimeNG Select dropdown panel styling */
+/* Select/Dropdown input field styling to match other inputs */
+.p-select,
+.p-dropdown {
+  background: #ffffff !important;
+  border: 1px solid rgba(6, 182, 212, 0.3) !important;
+}
+
+.p-select:hover,
+.p-dropdown:hover {
+  background: #ffffff !important;
+  border-color: rgba(6, 182, 212, 0.4) !important;
+}
+
+.p-select:focus,
+.p-dropdown:focus {
+  background: #ffffff !important;
+  border-color: rgba(6, 182, 212, 0.8) !important;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1) !important;
+}
+
+.p-select-overlay {
+  background: white !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Force reset hover state for options */
+.p-select-option:not(:hover) {
+  background: transparent !important;
+  color: #374151 !important;
+  transition: all 0.15s ease !important;
+}
+
+/* Dropdown placeholder styling to match other form controls */
+.p-select-label.p-placeholder,
+.p-dropdown-label.p-placeholder,
+.p-multiselect-label.p-placeholder {
+  color: rgba(6, 182, 212, 0.5) !important;
+  font-style: normal !important;
+}
+
+/* When dropdown has value, use normal text color */
+.p-select-label:not(.p-placeholder),
+.p-dropdown-label:not(.p-placeholder),
+.p-multiselect-label:not(.p-placeholder) {
+  color: #374151 !important;
+}
+
+.p-select-list-container {
+  padding: 0.5rem 0 !important;
+}
+
+.p-select-option {
+  padding: 0.75rem 1rem !important;
+  color: #374151 !important;
+  transition: all 0.15s ease !important;
+  border-radius: 0.375rem !important;
+  margin: 0 0.5rem !important;
+}
+
+.p-select-option:hover {
+  background: rgba(6, 182, 212, 0.1) !important;
+  color: #0891b2 !important;
+}
+
+.p-select-option-selected,
+.p-select-option-selected.p-focus {
+  background: rgba(6, 182, 212, 0.15) !important;
+  color: #0891b2 !important;
+}
+
+/* Dark mode Select styling */
+/* Dark mode Select/Dropdown input field styling */
+.dark .p-select,
+.dark .p-dropdown {
+  background: transparent !important;
+  border-color: rgba(34, 211, 238, 0.4) !important;
+}
+
+.dark .p-select:hover,
+.dark .p-dropdown:hover {
+  background: transparent !important;
+  border-color: rgba(34, 211, 238, 0.5) !important;
+}
+
+.dark .p-select:focus,
+.dark .p-dropdown:focus {
+  background: transparent !important;
+  border-color: rgba(34, 211, 238, 0.8) !important;
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.1) !important;
+}
+
+.dark .p-select-overlay {
+  background: #1f2937 !important;
+  border: 1px solid #374151 !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Force reset hover state for options - dark mode */
+.dark .p-select-option:not(:hover) {
+  background: transparent !important;
+  color: #f9fafb !important;
+  transition: all 0.15s ease !important;
+}
+
+/* Dark mode dropdown placeholder styling */
+.dark .p-select-label.p-placeholder,
+.dark .p-dropdown-label.p-placeholder,
+.dark .p-multiselect-label.p-placeholder {
+  color: rgba(34, 211, 238, 0.30) !important;
+  font-style: normal !important;
+}
+
+/* Dark mode when dropdown has value */
+.dark .p-select-label:not(.p-placeholder),
+.dark .p-dropdown-label:not(.p-placeholder),
+.dark .p-multiselect-label:not(.p-placeholder) {
+  color: #f9fafb !important;
+}
+
+.dark .p-select-option {
+  color: #f9fafb !important;
+}
+
+.dark .p-select-option:hover {
+  background: rgba(6, 182, 212, 0.2) !important;
+  color: #22d3ee !important;
+}
+
+.dark .p-select-option-selected,
+.dark .p-select-option-selected.p-focus {
+  background: rgba(6, 182, 212, 0.25) !important;
+  color: #22d3ee !important;
+}
+
+/* Legacy dropdown support */
+.p-dropdown-panel {
+  background: white !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.p-dropdown-panel .p-dropdown-items {
+  padding: 0.5rem 0 !important;
+}
+
+.p-dropdown-panel .p-dropdown-item {
+  padding: 0.75rem 1rem !important;
+  color: #374151 !important;
+  transition: all 0.15s ease !important;
+  border-radius: 0.375rem !important;
+  margin: 0 0.5rem !important;
+}
+
+.p-dropdown-panel .p-dropdown-item:hover {
+  background: rgba(6, 182, 212, 0.1) !important;
+  color: #0891b2 !important;
+}
+
+.p-dropdown-panel .p-dropdown-item.p-highlight {
+  background: rgba(6, 182, 212, 0.15) !important;
+  color: #0891b2 !important;
+}
+
+/* Dark mode legacy dropdown styling */
+.dark .p-dropdown-panel {
+  background: #1f2937 !important;
+  border: 1px solid #374151 !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15) !important;
+}
+
+.dark .p-dropdown-panel .p-dropdown-item {
+  color: #f9fafb !important;
+}
+
+.dark .p-dropdown-panel .p-dropdown-item:hover {
+  background: rgba(6, 182, 212, 0.2) !important;
+  color: #22d3ee !important;
+}
+
+.dark .p-dropdown-panel .p-dropdown-item.p-highlight {
+  background: rgba(6, 182, 212, 0.25) !important;
+  color: #22d3ee !important;
+}
+
+/* Multiselect panel styling */
+.p-multiselect-panel {
+  background: white !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.p-multiselect-panel .p-multiselect-items {
+  padding: 0.5rem 0 !important;
+}
+
+.p-multiselect-panel .p-multiselect-item {
+  padding: 0.75rem 1rem !important;
+  color: #374151 !important;
+  transition: all 0.15s ease !important;
+  border-radius: 0.375rem !important;
+  margin: 0 0.5rem !important;
+}
+
+.p-multiselect-panel .p-multiselect-item:hover {
+  background: rgba(6, 182, 212, 0.1) !important;
+  color: #0891b2 !important;
+}
+
+.p-multiselect-panel .p-multiselect-item.p-highlight {
+  background: rgba(6, 182, 212, 0.15) !important;
+  color: #0891b2 !important;
+}
+
+/* Dark mode multiselect styling */
+.dark .p-multiselect-panel {
+  background: #1f2937 !important;
+  border: 1px solid #374151 !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15) !important;
+}
+
+.dark .p-multiselect-panel .p-multiselect-item {
+  color: #f9fafb !important;
+}
+
+.dark .p-multiselect-panel .p-multiselect-item:hover {
+  background: rgba(6, 182, 212, 0.2) !important;
+  color: #22d3ee !important;
+}
+
+.dark .p-multiselect-panel .p-multiselect-item.p-highlight {
+  background: rgba(6, 182, 212, 0.25) !important;
+  color: #22d3ee !important;
+}
+
+/* Autocomplete panel styling */
+.p-autocomplete-panel {
+  background: white !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.p-autocomplete-panel .p-autocomplete-items {
+  padding: 0.5rem 0 !important;
+}
+
+.p-autocomplete-panel .p-autocomplete-item {
+  padding: 0.75rem 1rem !important;
+  color: #374151 !important;
+  transition: all 0.15s ease !important;
+  border-radius: 0.375rem !important;
+  margin: 0 0.5rem !important;
+}
+
+.p-autocomplete-panel .p-autocomplete-item:hover {
+  background: rgba(6, 182, 212, 0.1) !important;
+  color: #0891b2 !important;
+}
+
+.p-autocomplete-panel .p-autocomplete-item.p-highlight {
+  background: rgba(6, 182, 212, 0.15) !important;
+  color: #0891b2 !important;
+}
+
+/* Dark mode autocomplete styling */
+.dark .p-autocomplete-panel {
+  background: #1f2937 !important;
+  border: 1px solid #374151 !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15) !important;
+}
+
+.dark .p-autocomplete-panel .p-autocomplete-item {
+  color: #f9fafb !important;
+}
+
+.dark .p-autocomplete-panel .p-autocomplete-item:hover {
+  background: rgba(6, 182, 212, 0.2) !important;
+  color: #22d3ee !important;
+}
+
+.dark .p-autocomplete-panel .p-autocomplete-item.p-highlight {
+  background: rgba(6, 182, 212, 0.25) !important;
+  color: #22d3ee !important;
+}

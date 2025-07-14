@@ -1,0 +1,35 @@
+<div class="empty-state">
+  <div class="empty-icon">
+    <i [class]="iconClass"></i>
+  </div>
+  
+  <div class="empty-content">
+    <h3 class="empty-title">{{ title }}</h3>
+    @if (subtitle) {
+      <p class="empty-subtitle">{{ subtitle }}</p>
+    }
+  </div>
+  
+  @if (actionLabel && actionHandler) {
+    <div class="empty-action">
+      <p-button 
+        [label]="actionLabel"
+        [icon]="actionIcon"
+        (click)="actionHandler()"
+        severity="primary">
+      </p-button>
+    </div>
+  }
+  
+  @if (secondaryActionLabel && secondaryActionHandler) {
+    <div class="empty-secondary-action">
+      <p-button 
+        [label]="secondaryActionLabel"
+        [icon]="secondaryActionIcon"
+        (click)="secondaryActionHandler()"
+        severity="secondary"
+        [text]="true">
+      </p-button>
+    </div>
+  }
+</div>

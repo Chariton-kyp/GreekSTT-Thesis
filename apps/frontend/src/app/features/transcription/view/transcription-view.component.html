@@ -1,0 +1,931 @@
+<!-- Enhanced Professional Transcription View -->
+<div class="transcription-view-container">
+  @if (transcription() && !isLoading()) {
+    <!-- Header Section -->
+    <div class="transcription-header">
+      <div class="header-content">
+        <div class="header-top">
+          <div class="title-section">
+            <h1>{{ transcription()?.title || 'Μεταγραφή' }}</h1>
+            <div class="metadata">
+              <app-status-badge [status]="transcription()?.status || 'pending'"></app-status-badge>
+              <span class="separator">•</span>
+              <span>{{ getModelDisplayName(transcription()?.model_used) }}</span>
+              <span class="separator">•</span>
+              <span>{{ transcription()?.duration_seconds | duration }}</span>
+              <span class="separator">•</span>
+              <span>{{ transcription()?.created_at | greekDate:'dateTime' }}</span>
+            </div>
+          </div>
+          
+          <div class="header-actions">
+            <p-button 
+              icon="pi pi-arrow-left" 
+              label="Πίσω"
+              [outlined]="true"
+              size="small"
+              (onClick)="goBack()">
+            </p-button>
+            
+            @if (isCompleted()) {
+              <p-splitButton 
+                icon="pi pi-download" 
+                label="Εξαγωγή"
+                (onClick)="exportTranscription('txt')"
+                [model]="exportMenuItems"
+                size="small">
+              </p-splitButton>
+              
+              <!-- Delete Button -->
+              <p-button 
+                icon="pi pi-trash" 
+                [rounded]="true"
+                size="small"
+                (onClick)="confirmDeleteTranscription()"
+                pTooltip="Διαγραφή μεταγραφής"
+                tooltipPosition="top"
+                styleClass="delete-transcription-btn">
+              </p-button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+      <!-- Main Content Area -->
+      <div class="main-content">
+        <!-- Compact Modern Audio Player -->
+        @if (transcription()?.audio_file) {
+          <div class="modern-audio-player">
+            <div class="player-container">
+              @if (!audioUrl()) {
+                <!-- Compact Loading State -->
+                <div class="player-loading">
+                  <div class="loading-waves">
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                  </div>
+                  <span>Φόρτωση...</span>
+                </div>
+              } @else {
+                <!-- Audio Element -->
+                <audio 
+                  #audioPlayer
+                  [src]="audioUrl()"
+                  [playbackRate]="selectedPlaybackSpeed()"
+                  class="hidden"
+                  preload="metadata"
+                  crossorigin="anonymous"
+                  controls="false"
+                  (loadstart)="onAudioLoadStart()"
+                  (loadedmetadata)="onAudioLoadedMetadata()"
+                  (error)="onAudioError($event)"
+                  (timeupdate)="onTimeUpdate($event)"
+                  (play)="onPlayEvent($event)"
+                  (pause)="onPauseEvent($event)"
+                  (ended)="onEndedEvent($event)"
+                  (waiting)="onAudioWaiting($event)"
+                  (canplay)="onAudioCanPlay($event)">
+                </audio>
+
+                <!-- Compact Player Layout -->
+                <div class="player-row">
+                  <!-- Track Info -->
+                  <div class="track-info">
+                    <div class="track-title">{{ transcription()?.audio_file?.filename }}</div>
+                    <div class="track-meta">{{ transcription()?.audio_file?.file_size | fileSize }}</div>
+                  </div>
+
+                  <!-- Progress Bar (Full Width) -->
+                  <div class="progress-container">
+                    <div class="time-display">{{ currentPlaybackTime() | duration }}</div>
+                    <div class="progress-bar">
+                      <p-slider 
+                        [ngModel]="currentPlaybackTime()"
+                        name="playbackTime"
+                        [min]="0"
+                        [max]="effectiveAudioDuration()"
+                        [step]="0.1"
+                        (onChange)="seekToTime($event.value || 0)"
+                        styleClass="modern-progress-slider"
+                        [disabled]="!audioUrl()">
+                      </p-slider>
+                    </div>
+                    <div class="time-display">{{ effectiveAudioDuration() | duration }}</div>
+                  </div>
+
+                  <!-- Controls -->
+                  <div class="player-controls">
+                    <!-- Primary Controls -->
+                    <div class="main-controls">
+                      <button 
+                        class="control-btn skip-btn"
+                        (click)="skipBackward()"
+                        [disabled]="!audioUrl()"
+                        title="Πίσω 10s">
+                        <i class="pi pi-step-backward"></i>
+                      </button>
+                      
+                      <button 
+                        class="control-btn play-btn"
+                        [class.playing]="isPlaying()"
+                        (click)="togglePlayAll()"
+                        [disabled]="!audioUrl()"
+                        [title]="isPlaying() ? 'Παύση' : 'Αναπαραγωγή'">
+                        <i [class]="isPlaying() ? 'pi pi-pause' : 'pi pi-play'"></i>
+                      </button>
+                      
+                      <button 
+                        class="control-btn stop-btn"
+                        (click)="stopAudio()"
+                        [disabled]="!audioUrl() || (!isPlaying() && currentPlaybackTime() === 0)"
+                        title="Διακοπή">
+                        <i class="pi pi-stop"></i>
+                      </button>
+                      
+                      <button 
+                        class="control-btn skip-btn"
+                        (click)="skipForward()"
+                        [disabled]="!audioUrl()"
+                        title="Μπροστά 10s">
+                        <i class="pi pi-step-forward"></i>
+                      </button>
+                    </div>
+
+                    <!-- Secondary Controls -->
+                    <div class="secondary-controls">
+                      <!-- Speed Control -->
+                      <div class="control-group">
+                        <p-select
+                          [options]="playbackSpeeds"
+                          [(ngModel)]="_selectedPlaybackSpeed"
+                          name="playbackSpeed"
+                          optionLabel="label"
+                          optionValue="value"
+                          appendTo="body"
+                          (onChange)="changePlaybackSpeed($event)"
+                          styleClass="compact-select"
+                          [disabled]="!audioUrl()">
+                        </p-select>
+                      </div>
+
+                      <!-- Volume Control -->
+                      <div class="control-group volume-group">
+                        <button 
+                          class="volume-btn"
+                          [class.muted]="isAudioMuted()"
+                          (click)="toggleMute()"
+                          [disabled]="!audioUrl()"
+                          [title]="isAudioMuted() ? 'Άρση σίγασης' : 'Σίγαση'">
+                          <i [class]="isAudioMuted() ? 'pi pi-volume-off' : 'pi pi-volume-up'"></i>
+                        </button>
+                        <div class="volume-slider">
+                          <p-slider
+                            [(ngModel)]="_audioVolume"
+                            name="audioVolume"
+                            [min]="0"
+                            [max]="1"
+                            [step]="0.05"
+                            (onChange)="changeVolume($event.value || 0)"
+                            styleClass="compact-volume-slider"
+                            [disabled]="!audioUrl() || isAudioMuted()">
+                          </p-slider>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Transcription Content Card -->
+        <p-card styleClass="transcription-content-card">
+          <ng-template pTemplate="header">
+            <div class="transcription-card-header">
+              <div class="header-main">
+                <div class="header-title">
+                  <i class="pi pi-file-edit"></i>
+                  <h2>Κείμενο Μεταγραφής</h2>
+                </div>
+                
+                <div class="header-actions">
+                  <p-button 
+                    icon="pi pi-cog" 
+                    [rounded]="true"
+                    [text]="true"
+                    (onClick)="displaySettingsMenu.toggle($event)"
+                    pTooltip="Ρυθμίσεις κειμένου"
+                    severity="secondary"
+                    size="small">
+                  </p-button>
+                  <p-menu #displaySettingsMenu [model]="displayMenuItems()" [popup]="true" appendTo="body" styleClass="settings-menu"></p-menu>
+                </div>
+              </div>
+              
+              <!-- Model Tabs (integrated in header) -->
+              @if (isComparisonMode() && hasComparisonData()) {
+                <div class="model-tabs-container">
+                  <div class="tab-list" role="tablist">
+                    <button 
+                      class="tab-item"
+                      [class.active]="activeModelTab() === 'whisper'"
+                      (click)="setActiveModelTab('whisper')"
+                      role="tab"
+                      [attr.aria-selected]="activeModelTab() === 'whisper'">
+                      <i class="pi pi-microphone"></i>
+                      <span>Whisper</span>
+                    </button>
+                    <button 
+                      class="tab-item"
+                      [class.active]="activeModelTab() === 'wav2vec2'"
+                      (click)="setActiveModelTab('wav2vec2')"
+                      role="tab"
+                      [attr.aria-selected]="activeModelTab() === 'wav2vec2'">
+                      <i class="pi pi-sitemap"></i>
+                      <span>Wav2Vec2</span>
+                    </button>
+                    <button 
+                      class="tab-item"
+                      [class.active]="activeModelTab() === 'comparison'"
+                      (click)="setActiveModelTab('comparison')"
+                      role="tab"
+                      [attr.aria-selected]="activeModelTab() === 'comparison'">
+                      <i class="pi pi-chart-bar"></i>
+                      <span>Σύγκριση</span>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </ng-template>
+          
+          <ng-template pTemplate="content">
+            <div class="transcription-display view-mode">
+              <!-- Comparison Mode Display -->
+              @if (isComparisonMode() && hasComparisonData() && activeModelTab() === 'comparison') {
+                <div class="comparison-display">
+                  <div class="models-side-by-side">
+                    <!-- Whisper Results -->
+                    <div class="model-result whisper-result">
+                      <div class="model-header">
+                        <h4><i class="pi pi-microphone mr-2"></i>Whisper</h4>
+                        @if (getModelMetrics('whisper')) {
+                          <div class="model-metrics">
+                            <span class="metric">WER: {{ getModelMetrics('whisper').wer || 'N/A' }}%</span>
+                            <span class="metric">Ταχύτητα: {{ getModelMetrics('whisper').speed || 'N/A' }}s</span>
+                          </div>
+                        }
+                      </div>
+                      <div class="text-content" [ngClass]="getFontSizeClass()">
+                        <p>{{ whisperResult()?.text || whisperResult()?.transcription || 'Δεν υπάρχει αποτέλεσμα' }}</p>
+                      </div>
+                    </div>
+                    
+                    <!-- Wav2Vec2 Results -->
+                    <div class="model-result wav2vec-result">
+                      <div class="model-header">
+                        <h4><i class="pi pi-sitemap mr-2"></i>Wav2Vec2</h4>
+                        @if (getModelMetrics('wav2vec2')) {
+                          <div class="model-metrics">
+                            <span class="metric">WER: {{ getModelMetrics('wav2vec2').wer || 'N/A' }}%</span>
+                            <span class="metric">Ταχύτητα: {{ getModelMetrics('wav2vec2').speed || 'N/A' }}s</span>
+                          </div>
+                        }
+                      </div>
+                      <div class="text-content" [ngClass]="getFontSizeClass()">
+                        <p>{{ wav2vecResult()?.text || wav2vecResult()?.transcription || 'Δεν υπάρχει αποτέλεσμα' }}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Comparison Summary or WER Prompt -->
+                  @if (transcription()?.has_evaluation && transcription()?.whisper_wer !== null && transcription()?.wav2vec_wer !== null) {
+                    <div class="comparison-summary">
+                      <h4><i class="pi pi-chart-bar mr-2"></i>Συγκριτική Ανάλυση</h4>
+                      <div class="comparison-stats">
+                        <div class="stat-item">
+                          <span class="stat-label">Καλύτερη Ακρίβεια:</span>
+                          <span class="stat-value">{{ getBestPerformingModelDisplay() }}</span>
+                        </div>
+                        <div class="stat-item">
+                          <span class="stat-label">Ταχύτερο Μοντέλο:</span>
+                          <span class="stat-value">{{ getBetterSpeedModel() || 'N/A' }}</span>
+                        </div>
+                        <div class="stat-item">
+                          <span class="stat-label">Βαθμολογία Ακρίβειας:</span>
+                          <span class="stat-value">{{ transcription()?.academic_accuracy_score || 0 }}%</span>
+                        </div>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="comparison-placeholder">
+                      <div class="placeholder-content">
+                        <i class="pi pi-info-circle"></i>
+                        <p>Οι συγκριτικές μετρήσεις θα εμφανιστούν μετά τον υπολογισμό ακρίβειας</p>
+                      </div>
+                    </div>
+                  }
+                </div>
+              } @else if (isComparisonMode() && (activeModelTab() === 'whisper' || activeModelTab() === 'wav2vec2')) {
+                <!-- Single Model View in Comparison Mode -->
+                <div class="single-model-view">
+                  <div class="model-header">
+                    <h4>
+                      <i class="pi {{ activeModelTab() === 'whisper' ? 'pi-microphone' : 'pi-sitemap' }} mr-2"></i>
+                      {{ getModelDisplayName(activeModelTab()) }}
+                    </h4>
+                    @if (hasActiveModelMetrics()) {
+                      <div class="model-metrics">
+                        <span class="metric">WER: {{ getActiveModelWER() }}%</span>
+                        <span class="metric">Ταχύτητα: {{ getActiveModelSpeed() }}s</span>
+                      </div>
+                    }
+                  </div>
+                  <div class="text-content" [ngClass]="getFontSizeClass()">
+                    <p>{{ getCurrentDisplayText() }}</p>
+                  </div>
+                </div>
+              } @else {
+                <!-- Regular Single Model View -->
+                @if (viewMode() === 'text' && hasSegments()) {
+                  <div class="text-content" [ngClass]="getFontSizeClass()">
+                    @for (segment of segments(); track $index) {
+                      <p class="segment" 
+                         [class.active]="isSegmentActive($index)"
+                         [attr.data-segment-index]="$index"
+                         (click)="seekToSegment(segment)">
+                        {{ segment.text }}
+                      </p>
+                    }
+                  </div>
+                } @else if (viewMode() === 'segments' && hasSegments()) {
+                  <div class="segments-view">
+                    @for (segment of segments(); track $index; let i = $index) {
+                      <div class="segment-item" 
+                           [class.active]="isSegmentActive(i)"
+                           [class.segment-item]="true">
+                        <div class="segment-header">
+                          <span class="time-info">
+                            {{ formatTimestamp(segment.start_time) }} - {{ formatTimestamp(segment.end_time) }}
+                          </span>
+                          <div class="segment-actions">
+                            <p-button 
+                              [icon]="playingSegment() === i ? 'pi pi-pause' : 'pi pi-play'"
+                              [rounded]="true"
+                              [text]="true"
+                              size="small"
+                              (onClick)="toggleSegmentPlay(i)"
+                              pTooltip="Αναπαραγωγή segment">
+                            </p-button>
+                          </div>
+                        </div>
+                        <p class="segment-text" (click)="seekToSegment(segment)">
+                          {{ segment.text }}
+                        </p>
+                      </div>
+                    }
+                  </div>
+                } @else if (transcription()?.text) {
+                  <div class="text-content" [ngClass]="getFontSizeClass()">
+                    <p>{{ transcription()?.text }}</p>
+                  </div>
+                } @else {
+                  <div class="empty-state">
+                    <i class="pi pi-file-o"></i>
+                    <h3>Δεν υπάρχει κείμενο μεταγραφής</h3>
+                    <p>Το κείμενο θα εμφανιστεί μόλις ολοκληρωθεί η επεξεργασία</p>
+                  </div>
+                }
+              }
+            </div>
+          </ng-template>
+        </p-card>
+
+        <!-- WER/CER Calculator Section -->
+        @if (isCompleted()) {
+        <div class="wer-calculator-container">
+          <div class="wer-calculator-header" (click)="toggleWERCalculator()">
+            <h3 class="wer-calculator-title">
+              <i class="pi pi-calculator"></i>
+              Υπολογιστής WER/CER
+            </h3>
+            <p-button [icon]="showWERCalculator() ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" [text]="true" [rounded]="true"
+              (onClick)="toggleWERCalculator(); $event.stopPropagation()" pTooltip="Εμφάνιση/Απόκρυψη υπολογιστή ακρίβειας"
+              styleClass="wer-toggle-btn">
+            </p-button>
+          </div>
+        
+          @if (showWERCalculator()) {
+          <div class="wer-calculator-panel">
+            <!-- Ground Truth Upload Section -->
+            <div class="ground-truth-section mb-4">
+              <h3 class="text-lg font-medium mb-3">Σωστό Κείμενο (Ground Truth)</h3>
+              <p class="text-sm text-gray-600 mb-3">
+                Ανεβάστε ένα .txt αρχείο ή επικολλήστε το σωστό κείμενο για υπολογισμό ακρίβειας:
+              </p>
+        
+              <div class="flex flex-column gap-3">
+                <!-- File Upload -->
+                <p-fileUpload mode="basic" name="groundTruthFile" accept=".txt" [maxFileSize]="1000000"
+                  chooseLabel="Επιλογή .txt αρχείου" (onSelect)="uploadGroundTruth($event)" [auto]="false" styleClass="w-full">
+                </p-fileUpload>
+        
+                <!-- Text Area -->
+                <textarea [value]="groundTruthText()" (input)="updateGroundTruthText($event)" name="groundTruthText"
+                  placeholder="Ή επικολλήστε το σωστό κείμενο εδώ..." rows="4" class="w-full ground-truth-textarea">
+                                  </textarea>
+        
+                @if (groundTruthText()) {
+                <p-message severity="info" [closable]="false">
+                  <span>Σωστό κείμενο: {{ groundTruthText().length }} χαρακτήρες, ~{{ getGroundTruthWordCount() }} λέξεις</span>
+                </p-message>
+                }
+              </div>
+            </div>
+        
+            <!-- Calculation Actions -->
+            <div class="calculation-actions mb-4">
+              <div class="flex flex-wrap gap-3">
+                <p-button label="Υπολογισμός WER/CER" icon="pi pi-calculator" (onClick)="calculateWER()"
+                  [loading]="isCalculatingWER()" [disabled]="!canCalculateWER()" severity="primary" size="small">
+                </p-button>
+        
+                @if (transcription()?.has_evaluation) {
+                <p-button label="Εκκαθάριση" icon="pi pi-times" (onClick)="clearWERResults()" severity="secondary" size="small"
+                  [text]="true">
+                </p-button>
+                }
+              </div>
+            </div>
+        
+            <!-- WER Results (Single Model or Both Models) -->
+            @if (transcription()?.has_evaluation) {
+            <div class="wer-result mb-4">
+              <p-card [header]="getWERResultCardHeader()" styleClass="wer-result-card">
+                <div class="wer-content">
+                  
+                  <!-- Comparison Mode: Both Models - Using Backend Data -->
+                  @if (transcription()?.has_evaluation && transcription()?.whisper_wer !== null && transcription()?.wav2vec_wer !== null) {
+                    <!-- Both Models Summary -->
+                    <div class="comparison-summary mb-4 p-4 rounded" style="background: var(--surface-hover); border: 1px solid var(--surface-border);">
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Whisper Results -->
+                        <div class="model-results">
+                          <h4 class="text-lg font-semibold mb-3 text-blue-600">Whisper</h4>
+                          <div class="grid grid-cols-2 gap-4">
+                            <div class="metric-item">
+                              <div class="metric-label text-sm font-semibold text-gray-800 dark:text-gray-200">WER</div>
+                              <div class="metric-value text-xl font-bold text-blue-600">
+                                {{ (transcription()?.whisper_wer || 0).toFixed(1) }}%
+                              </div>
+                              <div class="metric-description text-xs text-gray-600 dark:text-gray-300">
+                                {{ getWERInterpretation(transcription()?.whisper_wer || 0).description }}
+                              </div>
+                            </div>
+                            <div class="metric-item">
+                              <div class="metric-label text-sm font-semibold text-gray-800 dark:text-gray-200">CER</div>
+                              <div class="metric-value text-xl font-bold text-blue-600">
+                                {{ (transcription()?.whisper_cer || 0).toFixed(1) }}%
+                              </div>
+                              <div class="metric-description text-xs text-gray-600 dark:text-gray-300">Character Error Rate</div>
+                            </div>
+                            <div class="metric-item">
+                              <div class="metric-label text-sm font-semibold text-gray-800 dark:text-gray-200">Ακρίβεια Λέξεων</div>
+                              <div class="metric-value text-xl font-bold text-green-600">
+                                {{ transcription()?.whisper_accuracy || 0 }}%
+                              </div>
+                            </div>
+                            <div class="metric-item">
+                              <div class="metric-label text-sm font-semibold text-gray-800 dark:text-gray-200">Ταχύτητα</div>
+                              <div class="metric-value text-xl font-bold text-orange-600">
+                                {{ (transcription()?.whisper_processing_time || 0).toFixed(2) }}s
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Wav2Vec2 Results -->
+                        <div class="model-results">
+                          <h4 class="text-lg font-semibold mb-3 text-purple-600">Wav2Vec2</h4>
+                          <div class="grid grid-cols-2 gap-4">
+                            <div class="metric-item">
+                              <div class="metric-label text-sm font-semibold text-gray-800 dark:text-gray-200">WER</div>
+                              <div class="metric-value text-xl font-bold text-purple-600">
+                                {{ (transcription()?.wav2vec_wer || 0).toFixed(1) }}%
+                              </div>
+                              <div class="metric-description text-xs text-gray-600 dark:text-gray-300">
+                                {{ getWERInterpretation(transcription()?.wav2vec_wer || 0).description }}
+                              </div>
+                            </div>
+                            <div class="metric-item">
+                              <div class="metric-label text-sm font-semibold text-gray-800 dark:text-gray-200">CER</div>
+                              <div class="metric-value text-xl font-bold text-purple-600">
+                                {{ (transcription()?.wav2vec_cer || 0).toFixed(1) }}%
+                              </div>
+                              <div class="metric-description text-xs text-gray-600 dark:text-gray-300">Character Error Rate</div>
+                            </div>
+                            <div class="metric-item">
+                              <div class="metric-label text-sm font-semibold text-gray-800 dark:text-gray-200">Ακρίβεια Λέξεων</div>
+                              <div class="metric-value text-xl font-bold text-green-600">
+                                {{ transcription()?.wav2vec_accuracy || 0 }}%
+                              </div>
+                            </div>
+                            <div class="metric-item">
+                              <div class="metric-label text-sm font-semibold text-gray-800 dark:text-gray-200">Ταχύτητα</div>
+                              <div class="metric-value text-xl font-bold text-orange-600">
+                                {{ (transcription()?.wav2vec_processing_time || 0).toFixed(2) }}s
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Best Model Indicator -->
+                      <div class="mt-4 p-3 rounded text-center" style="background: var(--primary-color-50); border: 1px solid var(--primary-color-200);">
+                        <div class="text-lg font-semibold text-primary">
+                          Καλύτερο Μοντέλο: {{ getBestPerformingModelDisplay() }}
+                        </div>
+                        <div class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Ταχύτερο Μοντέλο: {{ transcription()?.faster_model === 'whisper' ? 'Whisper' : 'Wav2Vec2' }} | 
+                          Βαθμολογία Ακρίβειας: {{ transcription()?.academic_accuracy_score || 0 }}%
+                        </div>
+                      </div>
+                    </div>
+                  } @else {
+                    <!-- Single Model Summary -->
+                    <div class="wer-summary mb-4 p-4 rounded" style="background: var(--surface-hover); border: 1px solid var(--surface-border);">
+                      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div class="metric-item">
+                        <div class="metric-label text-sm font-medium text-gray-600">WER</div>
+                        <div class="metric-value text-2xl font-bold"
+                          [ngStyle]="{'color': getWERInterpretation(werResult()!.wer).color}">
+                          {{ werResult()?.werPercentage }}%
+                        </div>
+                        <div class="metric-description text-xs text-gray-500">
+                          {{ getWERInterpretation(werResult()!.wer).description }}
+                        </div>
+                      </div>
+        
+                      <div class="metric-item">
+                        <div class="metric-label text-sm font-medium text-gray-600">CER</div>
+                        <div class="metric-value text-2xl font-bold text-blue-600">
+                          {{ werResult()?.cerPercentage }}%
+                        </div>
+                        <div class="metric-description text-xs text-gray-500">Character Error Rate</div>
+                      </div>
+        
+                      <div class="metric-item">
+                        <div class="metric-label text-sm font-medium text-gray-600">Ακρίβεια Λέξεων</div>
+                        <div class="metric-value text-2xl font-bold text-green-600">
+                          {{ (werResult()!.accuracy * 100).toFixed(1) }}%
+                        </div>
+                        <div class="metric-description text-xs text-gray-500">Word Accuracy</div>
+                      </div>
+        
+                      <div class="metric-item">
+                        <div class="metric-label text-sm font-medium text-gray-600">Ακρίβεια Χαρακτήρων</div>
+                        <div class="metric-value text-2xl font-bold text-green-600">
+                          {{ (werResult()!.charAccuracy * 100).toFixed(1) }}%
+                        </div>
+                        <div class="metric-description text-xs text-gray-500">Character Accuracy</div>
+                      </div>
+                    </div>
+                  </div>
+        
+                  <!-- Detailed Metrics -->
+                  <div class="detailed-metrics grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Word-level errors -->
+                    <div class="error-breakdown">
+                      <h4 class="text-sm font-semibold mb-3">Ανάλυση Σφαλμάτων (Λέξεις)</h4>
+                      <div class="space-y-2">
+                        <div class="flex justify-between">
+                          <span>Σύνολο λέξεων:</span>
+                          <span class="font-medium">{{ werResult()?.wordCount }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                          <span>Σωστές λέξεις:</span>
+                          <span class="font-medium text-green-600">{{ werResult()?.correctWords }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                          <span>Αντικαταστάσεις:</span>
+                          <span class="font-medium text-red-600">{{ werResult()?.substitutions }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                          <span>Διαγραφές:</span>
+                          <span class="font-medium text-orange-600">{{ werResult()?.deletions }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                          <span>Εισαγωγές:</span>
+                          <span class="font-medium text-blue-600">{{ werResult()?.insertions }}</span>
+                        </div>
+                      </div>
+                    </div>
+        
+                    <!-- Greek-specific metrics -->
+                    <div class="greek-metrics">
+                      <h4 class="text-sm font-semibold mb-3">Ελληνικά Χαρακτηριστικά</h4>
+                      <div class="space-y-2">
+                        <div class="flex justify-between">
+                          <span>Ελληνικοί χαρακτήρες:</span>
+                          <span class="font-medium">{{ werResult()?.greekCharacterCount }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                          <span>Ακρίβεια ελληνικών:</span>
+                          <span class="font-medium text-green-600">{{ werResult()?.greekCharacterAccuracy }}%</span>
+                        </div>
+                        <div class="flex justify-between">
+                          <span>Σφάλματα τόνων:</span>
+                          <span class="font-medium text-red-600">{{ werResult()?.diacriticErrors }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                          <span>Ακρίβεια τόνων:</span>
+                          <span class="font-medium text-green-600">{{ werResult()?.diacriticAccuracy }}%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  }
+                </div>
+              </p-card>
+            </div>
+            }
+        
+          </div>
+          }
+        </div>       
+        }
+
+        <!-- Enhanced Comparison Charts Section -->
+        @if (isCompleted() && hasChartData()) {
+          <div class="comparison-charts-container">
+            <div class="charts-header" (click)="toggleCharts()">
+              <h3 class="charts-title">
+                <i class="pi pi-chart-line"></i>
+                {{ chartTitle() }}
+              </h3>
+              <p-button 
+                [icon]="showCharts() ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+                [text]="true"
+                [rounded]="true"
+                (onClick)="toggleCharts(); $event.stopPropagation()"
+                pTooltip="Εμφάνιση/Απόκρυψη γραφημάτων"
+                styleClass="charts-toggle-btn">
+              </p-button>
+            </div>
+            
+            @if (showCharts()) {
+              <div class="charts-content">
+                <!-- Chart Toggle Controls -->
+                <div class="chart-controls">
+                  <div class="flex flex-wrap gap-2">
+                    <p-button 
+                      label="Ανανέωση Γραφημάτων"
+                      icon="pi pi-refresh"
+                      size="small"
+                      severity="secondary"
+                      (onClick)="updateChartData()"
+                      [text]="true">
+                    </p-button>
+                    
+                    @if (transcription()?.has_evaluation && transcription()?.whisper_wer !== null && transcription()?.wav2vec_wer !== null) {
+                      <p-chip label="Σύγκριση WER/CER" icon="pi pi-chart-bar"></p-chip>
+                    }
+                    
+                    @if (transcription()?.whisper_processing_time || transcription()?.wav2vec_processing_time) {
+                      <p-chip label="Χρόνος Επεξεργασίας" icon="pi pi-clock"></p-chip>
+                    }
+                    
+                    @if (transcription()?.whisper_confidence || transcription()?.wav2vec_confidence) {
+                      <p-chip label="Εμπιστοσύνη" icon="pi pi-shield"></p-chip>
+                    }
+                  </div>
+                </div>
+
+                <!-- Professional Academic Charts -->
+                <app-comparison-charts 
+                  [data]="chartData()"
+                  [showWER]="true"
+                  [showPerformance]="true"
+                  [showProcessingTime]="!!(transcription()?.whisper_processing_time || transcription()?.wav2vec_processing_time)"
+                  [showConfidence]="!!(transcription()?.whisper_confidence || transcription()?.wav2vec_confidence)"
+                  [showErrorBreakdown]="!!(transcription()?.has_evaluation && transcription()?.whisper_wer !== null && transcription()?.wav2vec_wer !== null)"
+                  [showGreekMetrics]="!!(transcription()?.has_evaluation && transcription()?.whisper_wer !== null && transcription()?.wav2vec_wer !== null)">
+                </app-comparison-charts>
+
+                <!-- Chart Export and Actions -->
+                <div class="chart-actions pt-3 border-t">
+                  <div class="flex justify-content-between align-items-center">
+                    <div class="chart-info">
+                      <span class="text-sm text-gray-600 mr-4">
+                        <i class="pi pi-info-circle mr-1"></i>
+                        Γραφήματα βασισμένα σε δεδομένα από {{ (transcription()?.has_evaluation && transcription()?.whisper_wer !== null && transcription()?.wav2vec_wer !== null) ? 'σύγκριση μοντέλων' : 'μεμονωμένη ανάλυση' }}
+                      </span>
+                    </div>
+                    <div class="chart-actions-buttons">
+                      <p-button 
+                        label="Ανανέωση"
+                        icon="pi pi-refresh"
+                        size="small"
+                        severity="secondary"
+                        (onClick)="updateChartData()"
+                        [text]="true">
+                      </p-button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <!-- Performance Metrics -->
+        @if (isCompleted()) {
+          <div class="info-card performance-metrics">
+            <h3><i class="pi pi-chart-line mr-2"></i>Μετρικές Επίδοσης</h3>
+            <div class="info-list">
+              @if (transcription()?.has_evaluation) {
+                <!-- WER/CER Results Section -->
+                <div class="wer-cer-section">
+                  <h4 class="section-title">
+                    <i class="pi pi-check-circle mr-1"></i>Αξιολόγηση Ακρίβειας
+                  </h4>
+                  
+                  @if (transcription()?.has_evaluation) {
+                    <!-- Whisper Metrics (if available) -->
+                    @if (transcription()?.whisper_wer !== null && transcription()?.whisper_wer !== undefined) {
+                      <div class="info-item metric-item">
+                        <span class="label">WER (Whisper)</span>
+                        <span class="value" [class.good]="(transcription()?.whisper_wer || 0) <= 5" 
+                              [class.average]="(transcription()?.whisper_wer || 0) > 5 && (transcription()?.whisper_wer || 0) <= 15"
+                              [class.poor]="(transcription()?.whisper_wer || 0) > 15">
+                          {{ (transcription()?.whisper_wer || 0).toFixed(1) }}%
+                        </span>
+                      </div>
+                      
+                      <div class="info-item metric-item">
+                        <span class="label">CER (Whisper)</span>
+                        <span class="value" [class.good]="(transcription()?.whisper_cer || 0) <= 2" 
+                              [class.average]="(transcription()?.whisper_cer || 0) > 2 && (transcription()?.whisper_cer || 0) <= 8"
+                              [class.poor]="(transcription()?.whisper_cer || 0) > 8">
+                          {{ (transcription()?.whisper_cer || 0).toFixed(1) }}%
+                        </span>
+                      </div>
+                      
+                      <div class="info-item metric-item">
+                        <span class="label">Ακρίβεια (Whisper)</span>
+                        <span class="value" [class.good]="(transcription()?.whisper_accuracy || 0) >= 90" 
+                              [class.average]="(transcription()?.whisper_accuracy || 0) >= 70 && (transcription()?.whisper_accuracy || 0) < 90"
+                              [class.poor]="(transcription()?.whisper_accuracy || 0) < 70">
+                          {{ transcription()?.whisper_accuracy || 0 }}%
+                        </span>
+                      </div>
+                    }
+                    
+                    <!-- Wav2Vec2 Metrics (if available) -->
+                    @if (transcription()?.wav2vec_wer !== null && transcription()?.wav2vec_wer !== undefined) {
+                      <div class="info-item metric-item">
+                        <span class="label">WER (Wav2Vec2)</span>
+                        <span class="value" [class.good]="(transcription()?.wav2vec_wer || 0) <= 5" 
+                              [class.average]="(transcription()?.wav2vec_wer || 0) > 5 && (transcription()?.wav2vec_wer || 0) <= 15"
+                              [class.poor]="(transcription()?.wav2vec_wer || 0) > 15">
+                          {{ (transcription()?.wav2vec_wer || 0).toFixed(1) }}%
+                        </span>
+                      </div>
+                      
+                      <div class="info-item metric-item">
+                        <span class="label">CER (Wav2Vec2)</span>
+                        <span class="value" [class.good]="(transcription()?.wav2vec_cer || 0) <= 2" 
+                              [class.average]="(transcription()?.wav2vec_cer || 0) > 2 && (transcription()?.wav2vec_cer || 0) <= 8"
+                              [class.poor]="(transcription()?.wav2vec_cer || 0) > 8">
+                          {{ (transcription()?.wav2vec_cer || 0).toFixed(1) }}%
+                        </span>
+                      </div>
+                      
+                      <div class="info-item metric-item">
+                        <span class="label">Ακρίβεια (Wav2Vec2)</span>
+                        <span class="value" [class.good]="(transcription()?.wav2vec_accuracy || 0) >= 90" 
+                              [class.average]="(transcription()?.wav2vec_accuracy || 0) >= 70 && (transcription()?.wav2vec_accuracy || 0) < 90"
+                              [class.poor]="(transcription()?.wav2vec_accuracy || 0) < 70">
+                          {{ transcription()?.wav2vec_accuracy || 0 }}%
+                        </span>
+                      </div>
+                    }
+                    
+                    <!-- Best Model (only if BOTH models have been evaluated - comparison mode) -->
+                    @if (transcription()?.best_performing_model && 
+                         transcription()?.whisper_wer !== null && transcription()?.whisper_wer !== undefined &&
+                         transcription()?.wav2vec_wer !== null && transcription()?.wav2vec_wer !== undefined) {
+                      <div class="info-item metric-item">
+                        <span class="label">Καλύτερο Μοντέλο</span>
+                        <span class="value best-model">
+                          {{ getBestPerformingModelDisplay() }}
+                        </span>
+                      </div>
+                    }
+                  }
+                </div>
+              }
+              
+              @if (transcription()?.metadata && transcription()!.metadata!['wer']) {
+                <div class="info-item">
+                  <span class="label">WER</span>
+                  <span class="value">{{ transcription()!.metadata!['wer'] }}%</span>
+                </div>
+              }
+              
+              <div class="info-item">
+                <span class="label">Χρόνος Επεξεργασίας</span>
+                <span class="value">{{ getReliableProcessingTime() }}</span>
+              </div>
+              
+              <div class="info-item">
+                <span class="label">Ταχύτητα</span>
+                <span class="value">{{ getProcessingSpeedLabel(getReliableProcessingTimeInSeconds()) }}</span>
+              </div>
+              
+              <div class="info-item">
+                <span class="label">Λέξεις</span>
+                <span class="value">{{ wordCount() }}</span>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- File Information -->
+        @if (transcription()?.audio_file) {
+          <div class="info-card file-info">
+            <h3><i class="pi pi-file-audio mr-2"></i>Πληροφορίες Αρχείου</h3>
+            <div class="info-list">
+              <div class="info-item">
+                <span class="label">Όνομα</span>
+                <span class="value">{{ transcription()?.audio_file?.filename }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Μέγεθος</span>
+                <span class="value">{{ transcription()?.audio_file?.file_size | fileSize }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Διάρκεια</span>
+                <span class="value">{{ transcription()?.duration_seconds | duration }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Τύπος</span>
+                <span class="value">{{ transcription()?.audio_file?.mime_type }}</span>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Academic Notes -->
+        @if (transcription()?.academicNotes) {
+          <div class="info-card academic-notes">
+            <h3><i class="pi pi-book mr-2"></i>Ακαδημαϊκές Σημειώσεις</h3>
+            <div class="notes-content">
+              <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                {{ transcription()?.academicNotes }}
+              </p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <div class="loading-content">
+        <p-progressSpinner></p-progressSpinner>
+        <h3>Φόρτωση μεταγραφής...</h3>
+        <p>Παρακαλώ περιμένετε</p>
+      </div>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error() && !isLoading()) {
+    <div class="error-container">
+      <div class="error-content">
+        <i class="pi pi-exclamation-triangle error-icon"></i>
+        <h3>Σφάλμα φόρτωσης</h3>
+        <p>{{ error() }}</p>
+        <p-button 
+          label="Δοκιμή ξανά" 
+          icon="pi pi-refresh"
+          (onClick)="goBack()">
+        </p-button>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- confirmDialog provided by app.component.html -->
+<p-confirmDialog></p-confirmDialog>

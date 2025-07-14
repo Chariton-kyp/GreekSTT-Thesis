@@ -1,0 +1,48 @@
+{
+  "name": "asr-service",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/asr-service",
+  "tags": ["scope:asr", "type:app"],
+  "targets": {
+    "serve": {
+      "executor": "@nx/node:execute",
+      "options": {
+        "command": "cd apps/asr-service && python -m uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload",
+        "env": {
+          "ENVIRONMENT": "development",
+          "PYTHONPATH": "apps/asr-service"
+        }
+      }
+    },
+    "build": {
+      "executor": "@nx/node:package",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/asr-service",
+        "main": "apps/asr-service/app/main.py",
+        "assets": [
+          "apps/asr-service/requirements.txt",
+          "apps/asr-service/app",
+          "apps/asr-service/models"
+        ]
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/asr-service/jest.config.ts"
+      }
+    },
+    "docker-build": {
+      "executor": "@nx/node:execute",
+      "options": {
+        "command": "docker build -t greekstt-asr-service -f apps/asr-service/Dockerfile ."
+      }
+    }
+  }
+}

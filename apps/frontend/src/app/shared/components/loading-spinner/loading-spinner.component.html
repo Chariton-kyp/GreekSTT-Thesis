@@ -1,0 +1,27 @@
+@if (isVisible()) {
+  <div class="loading-overlay" [class.global]="isGlobal">
+    <div class="loading-content">
+      <p-progressSpinner 
+        [style]="{ width: size, height: size }" 
+        strokeWidth="3"
+        animationDuration="1s">
+      </p-progressSpinner>
+      
+      @if (message()) {
+        <p class="loading-message">{{ message() }}</p>
+      }
+      
+      @if (progress() > 0) {
+        <div class="loading-progress">
+          <div class="progress-bar">
+            <div 
+              class="progress-fill" 
+              [style.width.%]="progress()">
+            </div>
+          </div>
+          <span class="progress-text">{{ progress() }}%</span>
+        </div>
+      }
+    </div>
+  </div>
+}

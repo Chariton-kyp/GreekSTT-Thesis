@@ -1,0 +1,302 @@
+// ========== GLOBAL MENU OVERRIDES ==========
+// Centralized menu styling for consistent appearance across the application
+
+// ========== MAIN MENU STYLING ==========
+// Base styling for menus (simpler approach without extra borders)
+.p-menu {
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  min-width: 220px !important;
+  
+  // Submenu headers (labels) styling - make them stand out more
+  .p-submenu-header {
+    background: #f8f9fa !important; // Light gray background for headers
+    color: #374151 !important; // Darker text color
+    font-weight: 600 !important; // Bold font
+    font-size: 0.75rem !important; // Smaller font size
+    text-transform: uppercase !important; // Uppercase text
+    letter-spacing: 0.025em !important; // Letter spacing
+    padding: 0.75rem 1rem 0.5rem 1rem !important; // More padding
+    margin: 0 !important;
+    border: none !important;
+    
+    .p-submenu-header-text {
+      color: #374151 !important;
+      font-weight: 600 !important;
+    }
+    
+    .p-submenu-header-icon {
+      color: #6b7280 !important; // Lighter icon color
+      margin-right: 0.5rem !important;
+    }
+  }
+  
+  .p-menu-list {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+    background: #ffffff !important; // Solid white background for light mode
+    padding: 0.5rem 0 !important;
+    z-index: 9999 !important; // Ensure menu appears above other components
+    
+    .p-menuitem {
+      margin: 0 0.5rem !important;
+      border-radius: 6px !important;
+      
+      .p-menuitem-link {
+        padding: 0.75rem 1rem !important;
+        color: #000000 !important; // Black text in light mode
+        font-weight: 500 !important;
+        border-radius: 6px !important;
+        transition: all 0.2s ease !important;
+        
+        &:hover {
+          background: #0891b2 !important;
+          color: #ffffff !important;
+        }
+        
+        .p-menuitem-icon {
+          margin-right: 0.75rem !important;
+          color: #000000 !important; // Same as text color in light mode
+          font-size: 0.875rem !important;
+        }
+        
+        .p-menuitem-text {
+          font-size: 0.875rem !important;
+          color: #000000 !important; // Black text in light mode
+        }
+      }
+      
+      // Selected item styling με cyan background
+      &.menu-item-selected {
+        .p-menuitem-link {
+          background: #06b6d4 !important; // Solid cyan background
+          color: #ffffff !important; // White text for contrast
+          
+          &:hover {
+            background: #0891b2 !important; // Darker cyan on hover
+            color: #ffffff !important;
+          }
+          
+          .p-menuitem-icon {
+            color: #ffffff !important; // White icon when selected
+          }
+          
+          .p-menuitem-text {
+            color: #ffffff !important; // White text when selected
+          }
+        }
+      }
+    }
+    
+    .p-menu-separator {
+      margin: 0.75rem 0 !important;
+      border-top: 1px solid #e5e7eb !important;
+    }
+  }
+}
+
+// ========== SUBMENU STYLING ==========
+// Styling for submenu panels - no extra padding to avoid double panel look
+.p-submenu-list {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  background: #ffffff !important; // Solid white background for light mode
+  padding: 0 !important; // Remove padding to avoid double panel appearance
+  z-index: 9999 !important; // Ensure submenu appears above other components
+  
+  .p-menuitem {
+    margin: 0 !important; // Remove margin to avoid gaps
+    border-radius: 0 !important; // Remove border radius on items to fill panel
+    
+    .p-menuitem-link {
+      padding: 0.75rem 1rem !important;
+      color: #000000 !important; // Black text in light mode
+      font-weight: 500 !important;
+      border-radius: 0 !important; // Remove border radius to fill panel
+      transition: all 0.2s ease !important;
+      
+      &:hover {
+        background: #0891b2 !important;
+        color: #ffffff !important;
+      }
+      
+      .p-menuitem-icon {
+        margin-right: 0.75rem !important;
+        color: #000000 !important; // Same as text color in light mode
+        font-size: 0.875rem !important;
+      }
+      
+      .p-menuitem-text {
+        font-size: 0.875rem !important;
+        color: #000000 !important; // Black text in light mode
+      }
+    }
+    
+    // First and last items get border radius for clean panel edges
+    &:first-child .p-menuitem-link {
+      border-top-left-radius: 8px !important;
+      border-top-right-radius: 8px !important;
+    }
+    
+    &:last-child .p-menuitem-link {
+      border-bottom-left-radius: 8px !important;
+      border-bottom-right-radius: 8px !important;
+    }
+    
+    &.menu-item-selected {
+      .p-menuitem-link {
+        background: #06b6d4 !important; // Solid cyan background
+        color: #ffffff !important; // White text for contrast
+        
+        &:hover {
+          background: #0891b2 !important; // Darker cyan on hover
+          color: #ffffff !important;
+        }
+        
+        .p-menuitem-icon {
+          color: #ffffff !important; // White icon when selected
+        }
+        
+        .p-menuitem-text {
+          color: #ffffff !important; // White text when selected
+        }
+      }
+    }
+  }
+}
+
+// ========== DARK MODE STYLING ==========
+[data-theme="dark"],
+.dark {
+  .p-menu {
+    .p-menu-list {
+      border-color: #374151 !important;
+      background: #1f2937 !important;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+      z-index: 9999 !important; // Ensure menu appears above other components in dark mode
+      
+      .p-menuitem {
+        .p-menuitem-link {
+          color: #ffffff !important; // White text in dark mode
+          
+          &:hover {
+            background: #22d3ee !important;
+            color: #1f2937 !important;
+          }
+          
+          .p-menuitem-icon {
+            color: #ffffff !important; // Same as text color in dark mode
+          }
+          
+          .p-menuitem-text {
+            color: #ffffff !important; // White text in dark mode
+          }
+        }
+        
+        &.menu-item-selected {
+          .p-menuitem-link {
+            background: #22d3ee !important; // Solid cyan background in dark mode
+            color: #1f2937 !important; // Dark text for contrast
+            
+            &:hover {
+              background: #06b6d4 !important; // Darker cyan on hover
+              color: #1f2937 !important;
+            }
+            
+            .p-menuitem-icon {
+              color: #1f2937 !important; // Dark icon when selected in dark mode
+            }
+            
+            .p-menuitem-text {
+              color: #1f2937 !important; // Dark text when selected in dark mode
+            }
+          }
+        }
+      }
+      
+      .p-menu-separator {
+        border-color: #374151 !important;
+      }
+    }
+    
+    // Submenu headers in dark mode - darker background to stand out
+    .p-submenu-header {
+      background: #374151 !important; // Darker background for headers in dark mode
+      color: #d1d5db !important; // Light text color
+      
+      .p-submenu-header-text {
+        color: #d1d5db !important;
+      }
+      
+      .p-submenu-header-icon {
+        color: #9ca3af !important; // Lighter icon color
+      }
+    }
+  }
+  
+  // Submenu panels in dark mode - clean panel styling
+  .p-submenu-list {
+    border-color: #374151 !important;
+    background: #1f2937 !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+    padding: 0 !important; // Remove padding to avoid double panel appearance
+    z-index: 9999 !important; // Ensure submenu appears above other components in dark mode
+    
+    .p-menuitem {
+      margin: 0 !important; // Remove margin to avoid gaps
+      border-radius: 0 !important; // Remove border radius on items to fill panel
+      
+      .p-menuitem-link {
+        color: #ffffff !important; // White text in dark mode
+        border-radius: 0 !important; // Remove border radius to fill panel
+        
+        &:hover {
+          background: #22d3ee !important;
+          color: #1f2937 !important;
+        }
+        
+        .p-menuitem-icon {
+          color: #ffffff !important; // Same as text color in dark mode
+        }
+        
+        .p-menuitem-text {
+          color: #ffffff !important; // White text in dark mode
+        }
+      }
+      
+      // First and last items get border radius for clean panel edges in dark mode
+      &:first-child .p-menuitem-link {
+        border-top-left-radius: 8px !important;
+        border-top-right-radius: 8px !important;
+      }
+      
+      &:last-child .p-menuitem-link {
+        border-bottom-left-radius: 8px !important;
+        border-bottom-right-radius: 8px !important;
+      }
+      
+      &.menu-item-selected {
+        .p-menuitem-link {
+          background: #22d3ee !important; // Solid cyan background in dark mode
+          color: #1f2937 !important; // Dark text for contrast
+          
+          &:hover {
+            background: #06b6d4 !important; // Darker cyan on hover
+            color: #1f2937 !important;
+          }
+          
+          .p-menuitem-icon {
+            color: #1f2937 !important; // Dark icon when selected in dark mode
+          }
+          
+          .p-menuitem-text {
+            color: #1f2937 !important; // Dark text when selected in dark mode
+          }
+        }
+      }
+    }
+  }
+}

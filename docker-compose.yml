@@ -1,0 +1,200 @@
+# GreekSTT Research Platform - Simplified Docker Compose Configuration
+# Focused on ASR models comparison without LLM service
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16
+    container_name: greekstt_db
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-greekstt-research}
+      - TZ=Europe/Athens
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - greekstt_network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-postgres}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for analytics caching (simplified for thesis)
+  redis:
+    image: redis:7-alpine
+    container_name: greekstt_redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    networks:
+      - greekstt_network
+    command: redis-server --maxmemory 128mb --maxmemory-policy allkeys-lru --save ""
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  # MailHog for email demo
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: greekstt_mailhog
+    restart: unless-stopped
+    ports:
+      - '1025:1025' # SMTP
+      - '8025:8025' # Web UI
+    networks:
+      - greekstt_network
+
+  # PgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: greekstt_pgadmin
+    restart: unless-stopped
+    ports:
+      - '5050:80'
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL:-admin@greekstt.research}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD:-admin}
+      - PGADMIN_CONFIG_SERVER_MODE=False
+      - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - greekstt_network
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Flask Backend API with debugging capabilities
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: greekstt_backend
+    restart: unless-stopped
+    ports:
+      - '5001:5000' # Flask app
+      - '5678:5678' # Debugpy port
+    environment:
+      FLASK_APP: 'run.py'
+      FLASK_ENV: 'development'
+      FLASK_DEBUG: '1'
+      RUNNING_UNDER_DEBUGPY: 'true'
+      ASR_SERVICE_URL: 'http://asr-service:8001' # Points to ASR service
+      AI_SERVICE_TIMEOUT: '3600'
+      POSTGRES_HOST: 'db'
+      POSTGRES_PORT: '5432'
+      POSTGRES_DB: ${POSTGRES_DB:-greekstt-research}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      REDIS_HOST: 'redis'
+      REDIS_PORT: '6379'
+      REDIS_DB: '0'
+      EMAIL_MODE: 'academic_demo'
+      SMTP_HOST: 'mailhog'
+      SMTP_PORT: '1025'
+      FROM_EMAIL: 'noreply@greekstt-research.local'
+      FROM_NAME: 'GreekSTT Research Platform'
+      PYDEVD_DISABLE_FILE_VALIDATION: '1'
+      PYTHONPATH: '/app'
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./apps/backend:/app:delegated
+      - backend_uploads:/app/uploads
+      # Mount host system info for real metrics
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/host/root:ro
+    networks:
+      - greekstt_network
+    entrypoint: ['/bin/sh', '-c']
+    command: ['python -m debugpy --listen 0.0.0.0:5678 run.py']
+
+  # ASR Service - Whisper and wav2vec2 with debugging
+  asr-service:
+    build:
+      context: ./apps/asr-service
+      dockerfile: Dockerfile
+      target: development
+    container_name: greekstt_asr
+    restart: unless-stopped
+    ports:
+      - '8001:8001' # ASR Service API
+      - '5680:5680' # ASR Debugpy port
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app
+      - CUDA_VISIBLE_DEVICES=0
+      - NVIDIA_VISIBLE_DEVICES=0
+      - CUDA_MODULE_LOADING=LAZY
+      # Memory allocation settings
+      - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512,expandable_segments:True
+      # Model storage for ASR models
+      - HF_HOME=/app/models
+      - TRANSFORMERS_CACHE=/app/models/transformers_cache
+      - HF_HUB_CACHE=/app/models/hf_hub_cache
+      - TORCH_HOME=/app/models/torch_cache
+      - WHISPER_CACHE_DIR=/app/models/whisper
+      - WAV2VEC2_CACHE_DIR=/app/models/wav2vec2
+      # Optimization settings
+      - TRANSFORMERS_OFFLINE=0
+      - HF_HUB_ENABLE_HF_TRANSFER=0
+      - PYTHONWARNINGS=ignore
+      - TRANSFORMERS_VERBOSITY=error
+      - TOKENIZERS_PARALLELISM=false
+      # CUDA optimizations
+      - CUDA_LAUNCH_BLOCKING=0
+      - TORCH_CUDA_FOUND_EFFICIENT_ATTENTION=1
+      # cuDNN library path fix for faster-whisper
+      - LD_LIBRARY_PATH=/usr/local/lib/python3.11/site-packages/ctranslate2.libs:/usr/lib/x86_64-linux-gnu:/usr/local/cuda/lib64
+      # Development settings
+      - ENVIRONMENT=development
+      - DEBUG_MODE=1
+    env_file:
+      - .env
+    volumes:
+      - ./apps/asr-service:/app:delegated
+      - asr_models:/app/models:delegated
+      - type: tmpfs
+        target: /tmp
+        tmpfs:
+          size: 8G
+    networks:
+      - greekstt_network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    shm_size: '2gb'
+    ipc: host
+    stdin_open: true
+    tty: true
+    command: python -m debugpy --listen 0.0.0.0:5680 -m uvicorn app.main:app --host 0.0.0.0 --port 8001 --workers 1
+
+volumes:
+  postgres_data:
+  redis_data:
+  pgadmin_data:
+  backend_uploads:
+  # ASR model storage volume
+  asr_models:
+    driver: local
+    name: greekstt_asr_models
+
+networks:
+  greekstt_network:
+    driver: bridge

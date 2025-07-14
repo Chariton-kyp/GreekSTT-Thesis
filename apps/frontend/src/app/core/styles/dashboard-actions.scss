@@ -1,0 +1,182 @@
+// ========== ELEGANT DASHBOARD ACTION COLOR SYSTEM ==========
+// Minimal, semantic color system for all dashboard actions
+
+/* Status Badges - Clean semantic colors */
+.status-badge.success,
+.col-status .status-badge.success {
+  color: #10b981 !important;
+  background: rgba(16, 185, 129, 0.1) !important;
+  border: 1px solid rgba(16, 185, 129, 0.2) !important;
+}
+
+.status-badge.error {
+  color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+  border: 1px solid rgba(239, 68, 68, 0.2) !important;
+}
+
+.status-badge.processing {
+  color: #f59e0b !important;
+  background: rgba(245, 158, 11, 0.1) !important;
+  border: 1px solid rgba(245, 158, 11, 0.2) !important;
+}
+
+.status-badge.warning {
+  color: #f59e0b !important;
+  background: rgba(245, 158, 11, 0.1) !important;
+  border: 1px solid rgba(245, 158, 11, 0.2) !important;
+}
+
+/* Primary Action Buttons - Use brand cyan for main actions */
+.view-action-btn,
+.p-button.view-action-btn,
+button.view-action-btn {
+  color: var(--color-accent-primary) !important;
+
+  .p-button-icon,
+  .p-button-label {
+    color: var(--color-accent-primary) !important;
+  }
+
+  &:hover {
+    color: var(--color-accent-hover) !important;
+    background: rgba(6, 182, 212, 0.1) !important;
+
+    .p-button-icon,
+    .p-button-label {
+      color: var(--color-accent-hover) !important;
+    }
+  }
+}
+
+/* Secondary Action Buttons - Subtle gray for less important actions */
+.menu-action-btn,
+.p-button.menu-action-btn,
+button.menu-action-btn {
+  color: #64748b !important;
+
+  .p-button-icon,
+  .p-button-label {
+    color: #64748b !important;
+  }
+
+  &:hover {
+    color: #475569 !important;
+    background: rgba(100, 116, 139, 0.1) !important;
+
+    .p-button-icon,
+    .p-button-label {
+      color: #475569 !important;
+    }
+  }
+}
+
+/* Danger Action Buttons - Clean red for destructive actions */
+.delete-action-btn,
+.p-button.delete-action-btn,
+button.delete-action-btn {
+  color: #ef4444 !important;
+
+  .p-button-icon,
+  .p-button-label {
+    color: #ef4444 !important;
+  }
+
+  &:hover {
+    color: #dc2626 !important;
+    background: rgba(239, 68, 68, 0.1) !important;
+
+    .p-button-icon,
+    .p-button-label {
+      color: #dc2626 !important;
+    }
+  }
+}
+
+/* Dark Mode - Elegant contrast adjustments */
+.dark {
+
+  /* Status badges dark mode */
+  .status-badge.success {
+    color: #34d399 !important;
+    background: rgba(52, 211, 153, 0.15) !important;
+    border-color: rgba(52, 211, 153, 0.25) !important;
+  }
+
+  .status-badge.error {
+    color: #f87171 !important;
+    background: rgba(248, 113, 113, 0.15) !important;
+    border-color: rgba(248, 113, 113, 0.25) !important;
+  }
+
+  .status-badge.processing,
+  .status-badge.warning {
+    color: #fbbf24 !important;
+    background: rgba(251, 191, 36, 0.15) !important;
+    border-color: rgba(251, 191, 36, 0.25) !important;
+  }
+
+  /* Action buttons dark mode */
+  .view-action-btn,
+  .p-button.view-action-btn,
+  button.view-action-btn {
+    color: #22d3ee !important;
+
+    .p-button-icon,
+    .p-button-label {
+      color: #22d3ee !important;
+    }
+
+    &:hover {
+      color: #67e8f9 !important;
+      background: rgba(34, 211, 238, 0.15) !important;
+
+      .p-button-icon,
+      .p-button-label {
+        color: #67e8f9 !important;
+      }
+    }
+  }
+
+  .menu-action-btn,
+  .p-button.menu-action-btn,
+  button.menu-action-btn {
+    color: #94a3b8 !important;
+
+    .p-button-icon,
+    .p-button-label {
+      color: #94a3b8 !important;
+    }
+
+    &:hover {
+      color: #cbd5e1 !important;
+      background: rgba(148, 163, 184, 0.15) !important;
+
+      .p-button-icon,
+      .p-button-label {
+        color: #cbd5e1 !important;
+      }
+    }
+  }
+
+  .delete-action-btn,
+  .p-button.delete-action-btn,
+  button.delete-action-btn {
+    color: #f87171 !important;
+
+    .p-button-icon,
+    .p-button-label {
+      color: #f87171 !important;
+    }
+
+    &:hover {
+      color: #fca5a5 !important;
+      background: rgba(248, 113, 113, 0.15) !important;
+
+      .p-button-icon,
+      .p-button-label {
+        color: #fca5a5 !important;
+      }
+    }
+  }
+}

@@ -1,0 +1,129 @@
+<div class="space-y-6">
+  <!-- Profile Header Card -->
+  <p-card>
+    <ng-template pTemplate="header">
+      <div class="flex items-center space-x-4 p-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <p-avatar
+          [label]="userInitials()"
+          size="xlarge"
+          styleClass="bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 font-bold"
+          shape="circle">
+        </p-avatar>
+        <div class="text-gray-900 dark:text-white">
+          <h2 class="text-2xl font-bold">{{ fullName() || 'Χρήστης' }}</h2>
+          <p class="text-gray-600 dark:text-gray-400 flex items-center">
+            <i class="pi pi-envelope mr-2"></i>
+            {{ currentUser()?.email_display || 'Μη διαθέσιμο' }}
+          </p>
+          <div class="mt-2 flex items-center space-x-2">
+            <p-tag
+              value="Ακαδημαϊκή Πλατφόρμα"
+              severity="info"
+              [rounded]="true">
+            </p-tag>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="content">
+      <div class="bg-white dark:bg-gray-900 p-6">
+        <div class="space-y-6">
+          <!-- Account Status -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                <i class="pi pi-user mr-2 text-indigo-600 dark:text-indigo-400"></i>
+                Πληροφορίες Λογαριασμού
+              </h3>
+              
+              <div class="space-y-3">
+                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Κατάσταση Email</span>
+                  <p-tag
+                    [value]="verificationStatus().text"
+                    [severity]="verificationStatus().severity"
+                    [icon]="verificationStatus().icon">
+                  </p-tag>
+                </div>
+                
+                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Όνομα χρήστη</span>
+                  <span class="text-sm text-gray-900 dark:text-white font-medium">
+                    {{ currentUser()?.username || 'Μη διαθέσιμο' }}
+                  </span>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Τηλέφωνο</span>
+                  <span class="text-sm text-gray-900 dark:text-white font-medium">
+                    {{ currentUser()?.phone_display || 'Μη διαθέσιμο' }}
+                  </span>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Οργανισμός</span>
+                  <span class="text-sm text-gray-900 dark:text-white font-medium">
+                    {{ currentUser()?.organization || 'Μη διαθέσιμο' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                <i class="pi pi-calendar mr-2 text-indigo-600 dark:text-indigo-400"></i>
+                Ιστορικό Λογαριασμού
+              </h3>
+              
+              <div class="space-y-3">
+                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Μέλος από</span>
+                  <span class="text-sm text-gray-900 dark:text-white font-medium">
+                    {{ memberSince() }}
+                  </span>
+                </div>
+                
+                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Τελευταία σύνδεση</span>
+                  <span class="text-sm text-gray-900 dark:text-white font-medium">
+                    {{ lastLoginDate() }}
+                  </span>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Κατάσταση</span>
+                  <p-tag
+                    value="Ενεργός"
+                    severity="success"
+                    icon="pi pi-check-circle">
+                  </p-tag>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
+        <p-button
+          label="Ρυθμίσεις"
+          icon="pi pi-cog"
+          severity="secondary"
+          [outlined]="true"
+          routerLink="settings"
+          styleClass="w-full sm:w-auto">
+        </p-button>
+        <p-button
+          label="Οδηγός Χρήσης"
+          icon="pi pi-question-circle"
+          severity="info"
+          routerLink="help"
+          styleClass="w-full sm:w-auto">
+        </p-button>
+      </div>
+    </ng-template>
+  </p-card>
+</div>

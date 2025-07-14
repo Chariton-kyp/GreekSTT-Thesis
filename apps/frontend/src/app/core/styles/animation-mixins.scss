@@ -1,0 +1,383 @@
+// ========== PERFORMANCE-OPTIMIZED ANIMATION MIXINS ==========
+// GPU-accelerated animations that avoid layout thrashing
+// All animations use transform3d and compositor-only properties
+
+// ========== HARDWARE ACCELERATION ==========
+@mixin hw-accelerate {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+@mixin remove-hw-accelerate {
+  will-change: auto;
+  transform: none;
+}
+
+// ========== TRANSITION MIXINS ==========
+@mixin smooth-transition($property: transform, $duration: var(--transition-fast), $easing: ease) {
+  transition: #{$property} #{$duration} #{$easing};
+  @include hw-accelerate;
+}
+
+@mixin transition-all($duration: var(--transition-fast)) {
+  transition: transform #{$duration} ease, opacity #{$duration} ease, box-shadow #{$duration} ease;
+  @include hw-accelerate;
+}
+
+// ========== HOVER EFFECT MIXINS ==========
+@mixin hover-lift($distance: 2px, $shadow: var(--shadow-lg), $scale: none) {
+  @include smooth-transition(transform);
+  
+  &:hover:not(:disabled):not([disabled]) {
+    @if $scale {
+      transform: translateY(-#{$distance}) #{$scale} translateZ(0);
+    } @else {
+      transform: translateY(-#{$distance}) translateZ(0);
+    }
+    
+    @if $shadow {
+      box-shadow: #{$shadow};
+    }
+  }
+}
+
+@mixin hover-scale($scale: var(--hover-scale), $shadow: none) {
+  @include smooth-transition(transform);
+  
+  &:hover:not(:disabled):not([disabled]) {
+    transform: #{$scale} translateZ(0);
+    
+    @if $shadow {
+      box-shadow: #{$shadow};
+    }
+  }
+}
+
+@mixin hover-grow($scale: 1.05) {
+  @include smooth-transition(transform);
+  
+  &:hover:not(:disabled):not([disabled]) {
+    transform: scale(#{$scale}) translateZ(0);
+  }
+}
+
+// ========== BUTTON ANIMATION MIXINS ==========
+@mixin button-hover-effects($lift: 1px, $shadow: var(--button-primary-shadow-hover), $scale: none) {
+  @include hover-lift($lift, $shadow, $scale);
+  
+  &:active {
+    transform: translateY(0) scale(0.98) translateZ(0);
+    transition-duration: 0.1s;
+  }
+  
+  &:focus-visible {
+    outline: 2px solid var(--color-accent-primary);
+    outline-offset: 2px;
+  }
+}
+
+@mixin button-press-effect($scale: var(--active-scale)) {
+  &:active {
+    transform: #{$scale} translateZ(0);
+    transition-duration: 0.1s;
+  }
+}
+
+// ========== CARD ANIMATION MIXINS ==========
+@mixin card-hover-effects($lift: var(--hover-lift), $shadow: var(--card-shadow-hover)) {
+  @include smooth-transition(transform, var(--transition-medium));
+  
+  &:hover {
+    transform: #{$lift} translateZ(0);
+    box-shadow: #{$shadow};
+  }
+}
+
+@mixin card-float-animation($duration: 6s) {
+  @include hw-accelerate;
+  animation: cardFloat #{$duration} ease-in-out infinite;
+}
+
+// ========== LOADING/SPINNER MIXINS ==========
+@mixin spin-animation($duration: 1s) {
+  @include hw-accelerate;
+  animation: spinOptimized #{$duration} linear infinite;
+}
+
+@mixin pulse-animation($duration: 2s) {
+  @include hw-accelerate;
+  animation: pulseOptimized #{$duration} ease-in-out infinite;
+}
+
+@mixin loading-dots($duration: 1.4s) {
+  @include hw-accelerate;
+  animation: loadingDots #{$duration} ease-in-out infinite;
+}
+
+// ========== MODAL/OVERLAY ANIMATION MIXINS ==========
+@mixin fade-in($duration: var(--transition-medium)) {
+  @include hw-accelerate;
+  animation: fadeInOptimized #{$duration} ease-out;
+}
+
+@mixin slide-up($duration: var(--transition-medium), $distance: 2rem) {
+  @include hw-accelerate;
+  animation: slideUpOptimized #{$duration} ease-out;
+  --slide-distance: #{$distance};
+}
+
+@mixin slide-down($duration: var(--transition-medium), $distance: 2rem) {
+  @include hw-accelerate;
+  animation: slideDownOptimized #{$duration} ease-out;
+  --slide-distance: #{$distance};
+}
+
+@mixin zoom-in($duration: var(--transition-medium)) {
+  @include hw-accelerate;
+  animation: zoomInOptimized #{$duration} ease-out;
+}
+
+// ========== ENTRANCE ANIMATION MIXINS ==========
+@mixin stagger-fade-in($delay: 0.1s, $duration: var(--transition-medium)) {
+  @include hw-accelerate;
+  opacity: 0;
+  transform: translate3d(0, 1rem, 0);
+  animation: staggerFadeIn #{$duration} ease-out forwards;
+  
+  @for $i from 1 through 10 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$delay * ($i - 1)};
+    }
+  }
+}
+
+@mixin bounce-in($duration: 0.6s) {
+  @include hw-accelerate;
+  animation: bounceInOptimized #{$duration} cubic-bezier(0.215, 0.610, 0.355, 1.000);
+}
+
+// ========== UTILITY MIXINS ==========
+@mixin shake-animation($duration: 0.5s) {
+  @include hw-accelerate;
+  animation: shakeOptimized #{$duration} ease-in-out;
+}
+
+@mixin glow-effect($color: var(--color-accent-primary), $intensity: 0.5) {
+  box-shadow: 0 0 20px rgba(#{red($color)}, #{green($color)}, #{blue($color)}, #{$intensity});
+  transition: box-shadow var(--transition-medium) ease;
+}
+
+@mixin ripple-effect($color: var(--color-accent-primary)) {
+  position: relative;
+  overflow: hidden;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, transparent 20%, #{$color} 20%, #{$color} 80%, transparent 80%);
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+  }
+  
+  &:active::after {
+    transform: translate(-50%, -50%) scale(4);
+    opacity: 0.3;
+    transition-duration: 0s;
+  }
+}
+
+// ========== GPU-ACCELERATED KEYFRAMES ==========
+// All keyframes use transform3d for optimal performance
+
+@keyframes fadeInOptimized {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes slideUpOptimized {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--slide-distance, 2rem), 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes slideDownOptimized {
+  from {
+    opacity: 0;
+    transform: translate3d(0, calc(-1 * var(--slide-distance, 2rem)), 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes zoomInOptimized {
+  from {
+    opacity: 0;
+    transform: scale3d(0.8, 0.8, 1);
+  }
+  to {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+@keyframes spinOptimized {
+  from {
+    transform: rotate(0deg) translateZ(0);
+  }
+  to {
+    transform: rotate(360deg) translateZ(0);
+  }
+}
+
+@keyframes pulseOptimized {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1) translateZ(0);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05) translateZ(0);
+  }
+}
+
+@keyframes bounceInOptimized {
+  0% {
+    opacity: 0;
+    transform: scale3d(0.3, 0.3, 1);
+  }
+  20% {
+    transform: scale3d(1.1, 1.1, 1);
+  }
+  40% {
+    transform: scale3d(0.9, 0.9, 1);
+  }
+  60% {
+    opacity: 1;
+    transform: scale3d(1.03, 1.03, 1);
+  }
+  80% {
+    transform: scale3d(0.97, 0.97, 1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+@keyframes staggerFadeIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 1rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes shakeOptimized {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translate3d(-5px, 0, 0);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translate3d(5px, 0, 0);
+  }
+}
+
+@keyframes cardFloat {
+  0%, 100% {
+    transform: translateY(0) translateZ(0);
+  }
+  50% {
+    transform: translateY(-5px) translateZ(0);
+  }
+}
+
+@keyframes loadingDots {
+  0%, 80%, 100% {
+    transform: scale(0) translateZ(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1) translateZ(0);
+    opacity: 1;
+  }
+}
+
+// ========== PERFORMANCE OPTIMIZATION CLASSES ==========
+// Use these classes for consistent performance
+
+.hw-accelerated {
+  @include hw-accelerate;
+}
+
+.smooth-transition {
+  @include smooth-transition();
+}
+
+.hover-lift {
+  @include hover-lift();
+}
+
+.hover-scale {
+  @include hover-scale();
+}
+
+.fade-in {
+  @include fade-in();
+}
+
+.slide-up {
+  @include slide-up();
+}
+
+.spin {
+  @include spin-animation();
+}
+
+.pulse {
+  @include pulse-animation();
+}
+
+// ========== REDUCED MOTION SUPPORT ==========
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  // Disable transforms for reduced motion
+  .hover-lift:hover,
+  .hover-scale:hover,
+  .card-hover:hover {
+    transform: none !important;
+  }
+}

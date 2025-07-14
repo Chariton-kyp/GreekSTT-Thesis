@@ -1,0 +1,865 @@
+:host {
+  display: block;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+// ========== HERO TEXT GRADIENT OVERRIDES ==========
+// Fix gradient text visibility in dark mode
+.hero-title,
+.gradient-text {
+  // Light mode - use blue gradient
+  background: linear-gradient(135deg, #1e40af, #3b82f6, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  // Dark mode - use brighter cyan/white gradient
+  :host-context(.dark) & {
+    background: linear-gradient(135deg, #ffffff, #06b6d4, #67e8f9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+// Subtitle text - use solid bright color for better readability
+.hero-subtitle,
+.hero-description,
+.lead-text {
+  // Light mode - normal gradient
+  background: linear-gradient(135deg, #1e40af, #3b82f6, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  // Dark mode - use solid bright cyan for maximum readability
+  :host-context(.dark) & {
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    -webkit-text-fill-color: unset !important;
+    background-clip: unset !important;
+    color: #67e8f9 !important;
+    text-shadow: 0 0 10px rgba(103, 232, 249, 0.3) !important;
+  }
+}
+
+// Only target the main hero title (not stats or other content)
+.hero-section h1.text-transparent,
+.hero-content h1.text-transparent {
+  :host-context(.dark) & {
+    background: linear-gradient(135deg, #ffffff, #06b6d4, #67e8f9) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+  }
+}
+
+// Only target the specific subtitle span that was hard to read
+:host-context(.dark) span.text-cyan-600.dark\:text-cyan-400 {
+  color: #67e8f9 !important;
+  text-shadow: 0 0 10px rgba(103, 232, 249, 0.3) !important;
+}
+
+// Dynamic Hero Background with Animation
+.hero-dynamic-bg {
+  background: linear-gradient(-45deg, 
+    theme('colors.blue.50'), 
+    theme('colors.cyan.50'), 
+    theme('colors.cyan.100'), 
+    theme('colors.blue.100')
+  );
+  background-size: 400% 400%;
+  animation: gradientShift 8s ease infinite;
+  position: relative;
+  overflow-x: hidden; // Prevent horizontal scrolling
+  
+  // Add subtle static pattern overlay
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.03;
+    background-image: radial-gradient(circle at 20% 50%, theme('colors.blue.400') 1px, transparent 1px),
+                      radial-gradient(circle at 80% 50%, theme('colors.cyan.400') 1px, transparent 1px);
+    background-size: 60px 60px, 80px 80px;
+    pointer-events: none;
+  }
+  
+  // Dark mode enhanced animated background
+  :host-context(.dark) & {
+    background: linear-gradient(-45deg, 
+      theme('colors.gray.900'), 
+      theme('colors.blue.900'), 
+      theme('colors.cyan.900'), 
+      theme('colors.gray.800')
+    );
+    background-size: 400% 400%;
+    
+    &::before {
+      opacity: 0.06;
+      background-image: radial-gradient(circle at 20% 50%, theme('colors.blue.500') 1px, transparent 1px),
+                        radial-gradient(circle at 80% 50%, theme('colors.cyan.500') 1px, transparent 1px);
+    }
+  }
+}
+
+// Legacy hero gradient for backwards compatibility
+.hero-gradient {
+  background: linear-gradient(135deg, 
+    theme('colors.blue.50') 0%, 
+    theme('colors.blue.100') 100%
+  );
+  
+  :host-context(.dark) & {
+    background: linear-gradient(135deg, 
+      theme('colors.gray.900') 0%, 
+      theme('colors.gray.800') 100%
+    );
+  }
+}
+
+// Enhanced Feature Cards with Microanimations
+.feature-card {
+  @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-2;
+  @apply cursor-pointer;
+  
+  // Subtle bounce animation on page load (staggered)
+  animation: fadeInUp 0.6s ease-out forwards;
+  
+  &:nth-child(1) { animation-delay: 0.1s; }
+  &:nth-child(2) { animation-delay: 0.2s; }
+  &:nth-child(3) { animation-delay: 0.3s; }
+  
+  // Enhanced hover state for entire card
+  &:hover {
+    @apply bg-white/50 dark:bg-gray-800/50;
+    backdrop-filter: blur(8px);
+    border-radius: 1rem;
+    padding: 1rem;
+    margin: -1rem;
+    
+    .feature-icon-container {
+      @apply shadow-2xl;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .feature-icon {
+      animation: iconBounce 0.6s ease-in-out;
+    }
+  }
+}
+
+.feature-icon-container {
+  position: relative;
+  overflow: hidden;
+  
+  // Pulse animation on hover
+  &:hover {
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      animation: rippleEffect 0.6s ease-out;
+    }
+  }
+}
+
+.feature-icon {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    transform: rotate(10deg) scale(1.1);
+  }
+}
+
+// Testimonial Cards with Animations
+.testimonial-card {
+  @apply transition-all duration-300 hover:shadow-2xl hover:-translate-y-1;
+  @apply cursor-pointer;
+  
+  // Staggered animation on load
+  animation: fadeInUp 0.6s ease-out forwards;
+  
+  &:hover {
+    @apply bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-700;
+    backdrop-filter: blur(8px);
+    transform: translateY(-4px) scale(1.02);
+  }
+}
+
+// Carousel Styling
+.testimonial-carousel {
+  .p-carousel-content {
+    @apply rounded-xl overflow-hidden;
+  }
+  
+  .p-carousel-indicators {
+    @apply flex justify-center mt-6;
+    
+    .p-carousel-indicator {
+      @apply mx-1;
+      
+      button {
+        @apply w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600;
+        @apply transition-all duration-300;
+        @apply border-0;
+        
+        &:hover {
+          @apply bg-cyan-400 dark:bg-cyan-500;
+          @apply transform scale-110;
+        }
+      }
+      
+      &.p-highlight button {
+        @apply bg-cyan-500 dark:bg-cyan-400;
+        @apply transform scale-125;
+      }
+    }
+  }
+  
+  .p-carousel-next,
+  .p-carousel-prev {
+    @apply bg-white/80 dark:bg-gray-800/80;
+    @apply backdrop-blur-sm;
+    @apply text-gray-700 dark:text-gray-300;
+    @apply transition-all duration-300;
+    @apply border-0 rounded-full;
+    @apply w-12 h-12;
+    @apply flex items-center justify-center;
+    
+    &:hover {
+      @apply bg-cyan-500 text-white;
+      @apply transform scale-110;
+      @apply shadow-lg;
+    }
+    
+    &:focus-visible {
+      @apply outline-2 outline-cyan-500 outline-offset-2;
+    }
+  }
+}
+
+// Consistent Grid Layouts and Visual Hierarchy
+.landing-grid {
+  @apply grid gap-8;
+  
+  // Standard responsive grid classes with consistent spacing
+  &.grid-1-3 {
+    @apply grid-cols-1 md:grid-cols-3;
+  }
+  
+  &.grid-1-2 {
+    @apply grid-cols-1 md:grid-cols-2;
+  }
+  
+  &.grid-1-4 {
+    @apply grid-cols-1 md:grid-cols-4;
+  }
+  
+  // Consistent section spacing
+  .grid-section {
+    @apply py-16;
+    
+    &.hero {
+      @apply py-20;
+    }
+    
+    &.compact {
+      @apply py-12;
+    }
+  }
+  
+  // Standardized card containers
+  .landing-card {
+    @apply bg-white dark:bg-gray-800;
+    @apply rounded-xl p-6 shadow-lg;
+    @apply border border-gray-200 dark:border-gray-700;
+    @apply transition-all duration-300;
+    
+    // Consistent heights for all cards in a grid
+    @apply h-full flex flex-col;
+    
+    &:hover {
+      @apply shadow-xl transform -translate-y-1;
+    }
+    
+    .card-content {
+      @apply flex-grow;
+    }
+    
+    .card-footer {
+      @apply mt-auto pt-4;
+    }
+  }
+}
+
+// Section-specific card styling consistency
+.features-grid .landing-card {
+  @apply text-center;
+  
+  .card-icon {
+    @apply w-16 h-16 mx-auto mb-6 rounded-xl;
+    @apply flex items-center justify-center;
+    @apply shadow-lg;
+  }
+  
+  .card-title {
+    @apply text-xl font-semibold mb-3;
+    @apply text-gray-900 dark:text-white;
+  }
+  
+  .card-description {
+    @apply text-gray-600 dark:text-gray-300 leading-relaxed;
+  }
+}
+
+.use-cases-grid .landing-card {
+  @apply text-center;
+  
+  .card-header {
+    @apply mb-6;
+    
+    .profession-icon {
+      @apply w-20 h-20 mx-auto mb-4 rounded-2xl;
+      @apply flex items-center justify-center text-3xl;
+    }
+  }
+}
+
+// Pricing Cards with Popular Badge Animation
+.pricing-featured-card {
+  @apply relative transform scale-105;
+  animation: featuredCardPulse 3s ease-in-out infinite;
+  
+  &:hover {
+    @apply shadow-2xl;
+    transform: scale(1.08) translateY(-2px);
+  }
+  
+  .popular-badge {
+    animation: popularBadgeGlow 2s ease-in-out infinite alternate;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    
+    &:hover {
+      animation: popularBadgeBounce 0.6s ease-in-out;
+    }
+  }
+}
+
+.pricing-grid .landing-card {
+  @apply text-center relative;
+  
+  &.featured {
+    @apply border-blue-500 border-2;
+    @apply scale-105 shadow-2xl;
+    
+    .featured-badge {
+      @apply absolute -top-4 left-1/2 transform -translate-x-1/2;
+      @apply bg-blue-500 text-white px-4 py-1 rounded-full;
+      @apply text-sm font-medium;
+    }
+  }
+  
+  .price {
+    @apply text-3xl font-bold mb-4;
+    @apply text-gray-900 dark:text-white;
+  }
+  
+  .features-list {
+    @apply space-y-3 text-sm mb-8;
+    @apply text-gray-600 dark:text-gray-300;
+    
+    .feature-item {
+      @apply flex items-center;
+      
+      .check-icon {
+        @apply text-green-500 mr-2;
+      }
+    }
+  }
+}
+
+.stats-grid {
+  @apply text-center;
+  
+  .stat-card {
+    @apply cursor-pointer;
+    
+    .stat-number {
+      @apply text-3xl font-bold mb-2;
+      @apply bg-gradient-to-r bg-clip-text text-transparent;
+      @apply transition-transform duration-300 group-hover:scale-110;
+    }
+    
+    .stat-label {
+      @apply text-gray-600 dark:text-gray-300 mt-2;
+    }
+  }
+}
+
+// Minimal hover effects for professional look
+.professional-card {
+  @apply transition-all duration-200 hover:shadow-md;
+}
+
+// Subtle button hover
+.professional-button {
+  @apply transition-all duration-200 hover:shadow-sm;
+}
+
+// Legacy FAQ styling for backwards compatibility
+.faq-item {
+  @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+  @apply hover:border-cyan-200 dark:hover:border-cyan-600;
+  
+  &:hover {
+    @apply bg-gradient-to-r from-white to-cyan-50 dark:from-gray-800 dark:to-cyan-900/30;
+    
+    h3 {
+      @apply text-cyan-700 dark:text-cyan-300;
+    }
+  }
+}
+
+// Call to action section
+.cta-section {
+  @apply relative overflow-hidden;
+  
+  &::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20;
+    background-size: 200% 200%;
+    animation: gradientShift 3s ease infinite;
+  }
+  
+  .cta-content {
+    @apply relative z-10;
+  }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  25% { background-position: 100% 50%; }
+  50% { background-position: 100% 100%; }
+  75% { background-position: 0% 100%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes primaryButtonGlow {
+  0% { 
+    box-shadow: 0 12px 35px rgba(59, 130, 246, 0.4), 0 0 20px rgba(59, 130, 246, 0.2);
+  }
+  100% { 
+    box-shadow: 0 12px 35px rgba(59, 130, 246, 0.6), 0 0 25px rgba(59, 130, 246, 0.4);
+  }
+}
+
+@keyframes iconBounce {
+  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+  25% { transform: translateY(-8px) rotate(5deg) scale(1.1); }
+  50% { transform: translateY(-4px) rotate(-5deg) scale(1.05); }
+  75% { transform: translateY(-2px) rotate(3deg) scale(1.08); }
+}
+
+@keyframes rippleEffect {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  100% {
+    width: 120px;
+    height: 120px;
+    opacity: 0;
+  }
+}
+
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes featuredCardPulse {
+  0%, 100% { 
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+  }
+  50% { 
+    box-shadow: 0 12px 35px rgba(59, 130, 246, 0.5);
+  }
+}
+
+@keyframes popularBadgeGlow {
+  0% {
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    transform: scale(1);
+  }
+  100% {
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+    transform: scale(1.05);
+  }
+}
+
+@keyframes popularBadgeBounce {
+  0%, 100% { 
+    transform: scale(1); 
+  }
+  25% { 
+    transform: scale(1.1) rotate(-2deg); 
+  }
+  50% { 
+    transform: scale(1.15) rotate(2deg); 
+  }
+  75% { 
+    transform: scale(1.1) rotate(-1deg); 
+  }
+}
+
+// Footer enhancements
+footer {
+  .footer-link {
+    @apply transition-colors duration-200;
+  }
+  
+  .social-icon {
+    @apply transition-all duration-300 hover:scale-125;
+  }
+}
+
+// Smooth scroll behavior
+html {
+  scroll-behavior: smooth;
+}
+
+// Section fade-in animations
+section {
+  @apply opacity-0 translate-y-8;
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+section:nth-child(2) { animation-delay: 0.1s; }
+section:nth-child(3) { animation-delay: 0.2s; }
+section:nth-child(4) { animation-delay: 0.3s; }
+section:nth-child(5) { animation-delay: 0.4s; }
+section:nth-child(6) { animation-delay: 0.5s; }
+
+@keyframes fadeInUp {
+  to {
+    @apply opacity-100 translate-y-0;
+  }
+}
+
+// Custom scrollbar for better UX
+:host {
+  scrollbar-width: thin;
+  scrollbar-color: theme('colors.blue.400') transparent;
+}
+
+:host::-webkit-scrollbar {
+  width: 8px;
+}
+
+:host::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+:host::-webkit-scrollbar-thumb {
+  background-color: theme('colors.blue.400');
+  border-radius: 4px;
+}
+
+:host::-webkit-scrollbar-thumb:hover {
+  background-color: theme('colors.blue.500');
+}
+
+// Landing page specific styles moved from global styles.scss
+
+// Landing page layout fixes
+.min-h-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+// Footer styles
+footer {
+  margin-bottom: 0 !important;
+  padding-bottom: 2rem !important;
+  
+  & > div:last-child {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+}
+
+// Landing page specific button styles
+.theme-toggle-modern {
+  /* Inherits all styling from button-overrides.scss unified theme toggle */
+  /* Additional landing page specific enhancements */
+  
+  /* Enhanced glow effect for landing page */
+  &:hover:not(:disabled) {
+    box-shadow: 
+      0 0 25px rgba(6, 182, 212, 0.4),
+      0 4px 20px rgba(6, 182, 212, 0.3),
+      0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Dark mode enhanced glow for landing */
+  :host-context(.dark) &:hover:not(:disabled),
+  .dark &:hover:not(:disabled) {
+    box-shadow: 
+      0 0 30px rgba(34, 211, 238, 0.5),
+      0 4px 20px rgba(34, 211, 238, 0.4),
+      0 8px 25px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.login-btn-modern {
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-width: 2px;
+  color: #374151 !important;
+  border-color: #374151 !important;
+  
+  :host-context(.dark) & {
+    color: #e5e7eb !important;
+    border-color: #e5e7eb !important;
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    color: #1f2937 !important;
+    border-color: #1f2937 !important;
+    background: rgba(59, 130, 246, 0.05) !important;
+    
+    :host-context(.dark) & {
+      color: #f9fafb !important;
+      border-color: #f9fafb !important;
+      background: rgba(59, 130, 246, 0.1) !important;
+    }
+  }
+  
+  &:focus-visible {
+    outline: 3px solid rgba(59, 130, 246, 0.5) !important;
+    outline-offset: 2px !important;
+  }
+}
+
+.register-btn-modern {
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-width: 2px;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+  }
+  
+  &:focus-visible {
+    outline: 3px solid rgba(59, 130, 246, 0.6) !important;
+    outline-offset: 2px !important;
+  }
+}
+
+// Hero CTA Primary - Most Prominent Button
+.hero-cta-primary {
+  padding: 1.25rem 2.5rem !important;
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8, #2563eb) !important;
+  border: none !important;
+  box-shadow: 0 12px 35px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3) !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  background-size: 200% 200% !important;
+  animation: primaryButtonGlow 2s ease-in-out infinite alternate !important;
+  
+  // Glow effect for dark mode
+  :host-context(.dark) & {
+    box-shadow: 0 12px 35px rgba(59, 130, 246, 0.6), 0 0 25px rgba(59, 130, 246, 0.4) !important;
+  }
+  
+  // Shimmer effect
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+    pointer-events: none;
+  }
+  
+  &:hover {
+    transform: translateY(-4px) scale(1.05) !important;
+    box-shadow: 0 20px 50px rgba(59, 130, 246, 0.7), 0 0 30px rgba(59, 130, 246, 0.5) !important;
+    background: linear-gradient(135deg, #1d4ed8, #1e40af, #1e3a8a) !important;
+    
+    :host-context(.dark) & {
+      box-shadow: 0 20px 50px rgba(59, 130, 246, 0.8), 0 0 35px rgba(59, 130, 246, 0.6) !important;
+    }
+    
+    &::before {
+      left: 100%;
+    }
+  }
+  
+  &:active {
+    transform: translateY(-2px) scale(1.03) !important;
+  }
+  
+  &:focus-visible {
+    outline: 3px solid rgba(59, 130, 246, 0.6) !important;
+    outline-offset: 3px !important;
+  }
+}
+
+.hero-cta-secondary {
+  padding: 1rem 2rem !important;
+  font-size: 1.125rem !important;
+  font-weight: 600 !important;
+  border-width: 2px !important;
+  backdrop-filter: blur(8px) !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  color: #374151 !important;
+  border-color: #374151 !important;
+  
+  :host-context(.dark) & {
+    color: #e5e7eb !important;
+    border-color: #e5e7eb !important;
+  }
+  
+  &:hover {
+    transform: translateY(-3px) scale(1.02) !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15) !important;
+    background: rgba(59, 130, 246, 0.1) !important;
+    color: #1f2937 !important;
+    border-color: #3b82f6 !important;
+    
+    :host-context(.dark) & {
+      color: #f9fafb !important;
+      border-color: #60a5fa !important;
+    }
+  }
+  
+  &:focus-visible {
+    outline: 3px solid rgba(59, 130, 246, 0.5) !important;
+    outline-offset: 2px !important;
+  }
+}
+
+// CTA Section buttons
+.demo-cta-btn {
+  padding: 0.875rem 2rem !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border-radius: 0.75rem !important;
+  border-width: 2px !important;
+  border-color: #374151 !important;
+  color: #374151 !important;
+  background: transparent !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+  
+  :host-context(.dark) & {
+    border-color: #e5e7eb !important;
+    color: #e5e7eb !important;
+  }
+  
+  &:hover {
+    transform: translateY(-2px) scale(1.05) !important;
+    background: rgba(59, 130, 246, 0.1) !important;
+    border-color: #3b82f6 !important;
+    color: #1d4ed8 !important;
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2) !important;
+    
+    :host-context(.dark) & {
+      background: rgba(96, 165, 250, 0.1) !important;
+      border-color: #60a5fa !important;
+      color: #93c5fd !important;
+    }
+  }
+}
+
+.register-cta-btn {
+  padding: 0.875rem 2rem !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border-radius: 0.75rem !important;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+  border: none !important;
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4) !important;
+  color: #ffffff !important;
+  
+  &:hover {
+    transform: translateY(-2px) scale(1.05) !important;
+    background: linear-gradient(135deg, #1d4ed8, #1e40af) !important;
+    box-shadow: 0 12px 35px rgba(59, 130, 246, 0.6) !important;
+    color: #ffffff !important;
+  }
+  
+  .p-button-label {
+    color: #ffffff !important;
+  }
+}
+
+// Responsive adjustments for landing buttons
+@media (max-width: 640px) {
+  .hero-cta-primary,
+  .hero-cta-secondary {
+    padding: 0.875rem 1.5rem !important;
+    font-size: 1rem !important;
+  }
+  
+  .login-btn-modern,
+  .register-btn-modern {
+    padding: 0.75rem 1.25rem !important;
+    font-size: 0.875rem !important;
+  }
+}
+
+// Responsive design improvements
+@media (max-width: 768px) {
+  .hero-title {
+    @apply text-3xl md:text-5xl;
+  }
+  
+  .section-title {
+    @apply text-2xl md:text-3xl;
+  }
+  
+  .scroll-to-top-btn {
+    @apply bottom-4 right-4 p-2;
+    
+    i {
+      @apply text-base;
+    }
+  }
+}

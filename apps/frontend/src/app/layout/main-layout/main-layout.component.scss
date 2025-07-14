@@ -1,0 +1,46 @@
+:host {
+  display: block;
+  height: 100vh;
+}
+
+.app-layout {
+  display: grid;
+  grid-template-areas: 
+    "header header"
+    "sidebar main";
+  grid-template-columns: 250px 1fr;
+  grid-template-rows: 60px 1fr;
+  height: 100vh;
+}
+
+.header {
+  grid-area: header;
+  // TODO: Add header styles in Phase 2
+}
+
+.sidebar {
+  grid-area: sidebar;
+  // TODO: Add sidebar styles in Phase 2
+}
+
+.main-content {
+  grid-area: main;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+// Mobile responsive
+@media (max-width: 768px) {
+  .app-layout {
+    grid-template-areas: 
+      "header"
+      "main";
+    grid-template-columns: 1fr;
+    grid-template-rows: 60px 1fr;
+  }
+  
+  .sidebar {
+    display: none;
+    // TODO: Add mobile sidebar toggle in Phase 2
+  }
+}

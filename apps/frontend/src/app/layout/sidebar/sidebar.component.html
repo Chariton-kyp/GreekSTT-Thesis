@@ -1,0 +1,181 @@
+<aside [class]="getSidebarClasses()">
+  <!-- Sidebar Header -->
+  <div class="flex items-center justify-center h-16 px-4 border-b border-gray-200 dark:border-gray-700">
+    <app-logo 
+      [size]="isCollapsed() && !isMobile() ? 'sm' : 'md'" 
+      [iconOnly]="isCollapsed() && !isMobile()"
+      [isClickable]="true" 
+      navigateTo="/">
+    </app-logo>
+  </div>
+
+  <!-- Navigation -->
+  <nav [class]="getNavClasses()">
+    @for (item of visibleNavItems(); track item.label) {
+      <div class="relative mb-1">
+        <!-- Main nav item without children -->
+        @if (!item.children) {
+          <a
+            [routerLink]="item.route"
+            routerLinkActive="bg-cyan-50 dark:bg-cyan-900/20 border-r-2 border-cyan-500 text-cyan-700 dark:text-cyan-300"
+            [class]="getNavItemClasses()"
+            [title]="isCollapsed() && !isMobile() ? item.label : ''"
+          >
+            <span [class]="getIconClasses()">{{ item.icon }}</span>
+            @if (!isCollapsed() || isMobile()) {
+              <span class="transition-opacity duration-300">{{ item.label }}</span>
+            }
+            @if (item.badge && (!isCollapsed() || isMobile())) {
+              <span class="ml-auto bg-cyan-100 dark:bg-cyan-900 text-cyan-800 dark:text-cyan-200 text-xs px-2 py-1 rounded-full">
+                {{ item.badge }}
+              </span>
+            }
+          </a>
+        }
+
+        <!-- Expandable nav item (expanded sidebar) -->
+        @if (item.children && (!isCollapsed() || isMobile())) {
+          <div class="space-y-1">
+            <button
+              (click)="toggleSection(item.label)"
+              [class]="getNavItemClasses()"
+            >
+              <span [class]="getIconClasses()">{{ item.icon }}</span>
+              @if (!isCollapsed() || isMobile()) {
+                <span class="transition-opacity duration-300">{{ item.label }}</span>
+              }
+              @if (!isCollapsed() || isMobile()) {
+                <svg 
+                  class="ml-auto h-4 w-4 transform transition-transform duration-150"
+                  [class.rotate-90]="isExpanded(item.label)"
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              }
+            </button>
+
+            <!-- Sub-items (expanded sidebar) -->
+            @if (isExpanded(item.label) && (!isCollapsed() || isMobile())) {
+              <div class="ml-6 space-y-1">
+                @for (child of item.children; track child.label) {
+                  <a
+                    [routerLink]="child.route"
+                    routerLinkActive="bg-cyan-50 dark:bg-cyan-900/20 border-r-2 border-cyan-500 text-cyan-700 dark:text-cyan-300"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 hover:text-cyan-700 dark:hover:text-cyan-300 transition-colors duration-150"
+                  >
+                    <span class="mr-3 h-4 w-4">{{ child.icon }}</span>
+                    {{ child.label }}
+                    @if (child.badge) {
+                      <span class="ml-auto bg-cyan-100 dark:bg-cyan-900 text-cyan-800 dark:text-cyan-200 text-xs px-2 py-1 rounded-full">
+                        {{ child.badge }}
+                      </span>
+                    }
+                  </a>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Collapsed expandable nav item with simple hover menu -->
+        @if (item.children && isCollapsed() && !isMobile()) {
+          <div class="relative group">
+        <!-- Main collapsed button -->
+        <button
+          [class]="getNavItemClasses()"
+          [title]="item.label"
+        >
+          <span [class]="getIconClasses()">{{ item.icon }}</span>
+        </button>
+        
+        <!-- Simple hover submenu -->
+        <div class="fixed left-[68px] bg-white dark:bg-gray-800 rounded-md shadow-xl border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[9999] pointer-events-none group-hover:pointer-events-auto min-w-[220px]" 
+             [style.top.px]="getSubmenuPosition()">
+          <!-- Connecting arrow -->
+          <div class="absolute -left-2 top-4 w-4 h-4 bg-white dark:bg-gray-800 border-l border-t border-gray-200 dark:border-gray-600 transform rotate-45"></div>
+          <!-- Invisible bridge to prevent menu from disappearing -->
+          <div class="absolute -left-4 top-0 w-4 h-full"></div>
+          <div class="py-2">
+            <!-- Header -->
+            <div class="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-600">
+              {{ item.label }}
+            </div>
+            <!-- Menu items -->
+            @for (child of item.children; track child.label) {
+              <a
+                [routerLink]="child.route"
+                routerLinkActive="bg-cyan-50 dark:bg-cyan-900/20 border-r-2 border-cyan-500 text-cyan-700 dark:text-cyan-300"
+                [routerLinkActiveOptions]="{ exact: true }"
+                class="flex items-center px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 hover:text-cyan-700 dark:hover:text-cyan-300 transition-colors duration-150"
+              >
+                <span class="text-base mr-3">{{ child.icon }}</span>
+                <span class="flex-1">{{ child.label }}</span>
+                @if (child.badge) {
+                  <span class="ml-auto bg-cyan-100 dark:bg-cyan-900 text-cyan-800 dark:text-cyan-200 text-xs px-2 py-1 rounded-full">
+                    {{ child.badge }}
+                  </span>
+                }
+              </a>
+            }
+          </div>
+        </div>
+          </div>
+        }
+      </div>
+    }
+  </nav>
+
+  <!-- Academic Info (expanded) -->
+  <div *ngIf="!isCollapsed() || isMobile()" class="mt-auto p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+    <div class="space-y-3">
+      <!-- Academic Status -->
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Κατάσταση</span>
+        <span class="text-sm text-cyan-600 dark:text-cyan-400 font-medium">
+          {{ usageText() }}
+        </span>
+      </div>
+
+      <!-- Academic Disclaimer -->
+      <div class="text-xs text-gray-500 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 p-2 rounded border-l-2 border-blue-400">
+        <div class="flex items-start">
+          <span class="mr-1">🎓</span>
+          <span>Δοκιμαστική έκδοση - Δείτε πώς λειτουργούν τα μοντέλα</span>
+        </div>
+      </div>
+
+      <!-- Research Links -->
+      <div class="space-y-1">
+        <a href="/app/transcriptions" 
+           class="w-full bg-cyan-600 hover:bg-cyan-700 text-white text-sm font-medium py-2 px-3 rounded-md transition-colors duration-150 flex items-center justify-center">
+          <span class="mr-2">📊</span>
+          Σύγκριση Μοντέλων
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Academic Info (collapsed) -->
+  <div *ngIf="isCollapsed() && !isMobile()" class="mt-auto p-2 border-t border-gray-200 dark:border-gray-700">
+    <div class="flex flex-col items-center space-y-2">
+      <!-- Academic indicator -->
+      <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center" 
+           [title]="'Δοκιμαστική Έκδοση - ' + usageText()">
+        <span class="text-xs">🎓</span>
+      </div>
+      
+      <!-- Compare models button for collapsed -->
+      <button 
+        routerLink="/app/transcriptions"
+        class="w-8 h-8 bg-cyan-600 hover:bg-cyan-700 text-white text-xs rounded-md transition-colors duration-150 flex items-center justify-center"
+        title="Σύγκριση Μοντέλων"
+      >
+        <span class="text-xs">📊</span>
+      </button>
+    </div>
+  </div>
+</aside>

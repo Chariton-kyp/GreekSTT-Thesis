@@ -1,0 +1,31 @@
+{
+  "importSorter.generalConfiguration.sortOnBeforeSave": true,
+  "importSorter.importStringConfiguration.maximumNumberOfImportExpressionsPerLine.count": 80,
+  "importSorter.importStringConfiguration.quoteMark": "single",
+  "importSorter.sortConfiguration.removeUnusedImports": true,
+  "importSorter.sortConfiguration.removeUnusedDefaultImports": true,
+  "importSorter.sortConfiguration.customOrderingRules.rules": [
+    {
+      "type": "importMember",
+      "regex": "^$",
+      "orderLevel": 10,
+      "disableSort": true
+    },
+    {
+      "regex": "^[@]",
+      "orderLevel": 20
+    },
+    {
+      "regex": "(rxjs)",
+      "orderLevel": 30
+    },
+    {
+      "regex": "(mmbuddy)",
+      "orderLevel": 40
+    },
+    {
+      "regex": ".*^[.]",
+      "orderLevel": 50
+    }
+  ]
+}

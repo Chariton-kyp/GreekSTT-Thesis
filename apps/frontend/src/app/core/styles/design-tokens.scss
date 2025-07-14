@@ -1,0 +1,180 @@
+// ========== GREEKSTT RESEARCH PLATFORM DESIGN TOKENS ==========
+// Central design token system using CSS custom properties
+// This file establishes the foundation for consistent theming across the application
+
+:root {
+  // ========== COLOR SYSTEM ==========
+  // Primary Palette (Blue-Gray) - Matches Tailwind config
+  --color-primary-50: #f8fafc;
+  --color-primary-100: #f1f5f9;
+  --color-primary-200: #e2e8f0;
+  --color-primary-300: #cbd5e1;
+  --color-primary-400: #94a3b8;
+  --color-primary-500: #64748b;
+  --color-primary-600: #475569;
+  --color-primary-700: #334155;
+  --color-primary-800: #1e293b;
+  --color-primary-900: #0f172a;
+  --color-primary-950: #020617;
+
+  // Accent Colors - Cyan focus
+  --color-accent-primary: #06b6d4;
+  --color-accent-hover: #0891b2;
+  --color-accent-light: #67e8f9;
+  --color-accent-dark: #0e7490;
+
+  // Semantic Colors
+  --color-success: var(--color-accent-primary);
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: var(--color-accent-primary);
+
+  // ========== SURFACE SYSTEM ==========
+  --surface-ground: #f9fafb;
+  --surface-card: #ffffff;
+  --surface-border: #e5e7eb;
+  --surface-hover: #f3f4f6;
+  --surface-overlay: rgba(0, 0, 0, 0.5);
+
+  // ========== TEXT SYSTEM ==========
+  --text-primary: var(--color-primary-900);
+  --text-secondary: var(--color-primary-600);
+  --text-tertiary: var(--color-primary-400);
+  --text-inverse: #ffffff;
+  --text-muted: var(--color-primary-500);
+
+  // ========== SPACING SYSTEM ==========
+  --spacing-xs: 0.25rem;    // 4px
+  --spacing-sm: 0.5rem;     // 8px
+  --spacing-md: 1rem;       // 16px
+  --spacing-lg: 1.5rem;     // 24px
+  --spacing-xl: 2rem;       // 32px
+  --spacing-2xl: 3rem;      // 48px
+  --spacing-3xl: 4rem;      // 64px
+
+  // ========== BORDER RADIUS SYSTEM ==========
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  // ========== SHADOW SYSTEM ==========
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.15);
+  --shadow-2xl: 0 32px 64px rgba(0, 0, 0, 0.3);
+
+  // ========== TRANSITION SYSTEM ==========
+  --transition-fast: 0.15s ease;
+  --transition-medium: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  --transition-bounce: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  // ========== ANIMATION EFFECTS ==========
+  --hover-lift: translateY(-2px);
+  --hover-lift-sm: translateY(-1px);
+  --hover-lift-lg: translateY(-4px);
+  --hover-scale: scale(1.02);
+  --hover-scale-sm: scale(1.01);
+  --hover-scale-lg: scale(1.05);
+  --active-scale: scale(0.98);
+  --active-scale-sm: scale(0.99);
+
+  // ========== TYPOGRAPHY SYSTEM ==========
+  --font-family-primary: 'Roboto', 'Noto Sans Greek', sans-serif;
+  --font-family-mono: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+
+  --font-size-xs: 0.75rem;    // 12px
+  --font-size-sm: 0.875rem;   // 14px
+  --font-size-base: 1rem;     // 16px
+  --font-size-lg: 1.125rem;   // 18px
+  --font-size-xl: 1.25rem;    // 20px
+  --font-size-2xl: 1.5rem;    // 24px
+  --font-size-3xl: 1.875rem;  // 30px
+  --font-size-4xl: 2.25rem;   // 36px
+
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  // ========== Z-INDEX SYSTEM ==========
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-toast: 1080;
+
+  // ========== MENU SYSTEM ==========
+  --p-menu-item-text-color: var(--text-primary);
+  --p-menu-item-icon-color: var(--text-primary);
+  --p-menu-item-text-hover-color: var(--text-primary); // Keep same color on hover
+  --p-menu-item-icon-hover-color: var(--text-primary); // Keep same color on hover
+  --p-menu-item-hover-bg: rgba(6, 182, 212, 0.1);
+}
+
+// ========== DARK THEME OVERRIDES ==========
+[data-theme="dark"], 
+.dark {
+  // Surface System - Dark
+  --surface-ground: #111827;
+  --surface-card: #1f2937;
+  --surface-border: #374151;
+  --surface-hover: #374151;
+  --surface-overlay: rgba(0, 0, 0, 0.8);
+
+  // Text System - Dark
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-tertiary: #9ca3af;
+  --text-muted: #6b7280;
+
+  // Shadows - Dark (more pronounced)
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.5);
+  --shadow-2xl: 0 32px 64px rgba(0, 0, 0, 0.6);
+
+  // Menu System - Dark
+  --p-menu-item-text-color: var(--text-primary);
+  --p-menu-item-icon-color: var(--text-primary);
+  --p-menu-item-text-hover-color: var(--text-primary); // Keep same color on hover
+  --p-menu-item-icon-hover-color: var(--text-primary); // Keep same color on hover
+  --p-menu-item-hover-bg: rgba(34, 211, 238, 0.2);
+}
+
+// ========== ACCESSIBILITY & MOTION ==========
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: 0s;
+    --transition-medium: 0s;
+    --transition-slow: 0s;
+    --transition-bounce: 0s;
+  }
+}
+
+// ========== HIGH CONTRAST MODE ==========
+@media (prefers-contrast: high) {
+  :root {
+    --surface-border: var(--color-primary-900);
+    --text-secondary: var(--color-primary-900);
+  }
+  
+  [data-theme="dark"], .dark {
+    --surface-border: var(--color-primary-50);
+    --text-secondary: var(--color-primary-50);
+  }
+}

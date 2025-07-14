@@ -1,0 +1,270 @@
+// ========== NAVIGATION & LINK OVERRIDES ==========
+// Consistent navigation and link styling across the application
+
+/* ========== SPECIFIC NAVIGATION ANCHOR STYLES ========== */
+/* Only apply cyan hover to actual navigation links - be very specific */
+
+/* Footer navigation links only */
+footer a[href],
+footer a[routerLink] {
+  color: var(--text-tertiary);
+  transition: color var(--transition-fast);
+
+  &:hover {
+    color: var(--color-accent-primary);
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-accent-primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+}
+
+/* Authentication page links only */
+.auth-layout a[href],
+.auth-layout a[routerLink],
+/* Specific auth component links */
+a[routerLink="/auth/login"],
+a[routerLink="/auth/register"],
+a[routerLink="/auth/forgot-password"] {
+  transition: color var(--transition-fast);
+
+  &:hover {
+    color: var(--color-accent-primary);
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-accent-primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+}
+
+/* Header navigation links only */
+header a[href]:not(.p-button),
+header a[routerLink]:not(.p-button),
+nav a[href]:not(.p-button),
+nav a[routerLink]:not(.p-button) {
+  transition: color var(--transition-fast);
+
+  &:hover {
+    color: var(--color-accent-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-accent-primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+}
+
+/* Links that are explicitly marked as cyan */
+a.text-cyan-600,
+a.text-cyan-500,
+a.text-cyan-400 {
+  color: var(--color-accent-primary);
+
+  &:hover {
+    color: var(--color-accent-hover);
+  }
+}
+
+/* ========== ELEGANT SIDEBAR & NAVBAR COLOR SYSTEM ========== */
+/* Apply consistent cyan brand colors to navigation elements */
+
+/* Override the specific classes that Angular's routerLinkActive applies */
+aside nav a.bg-indigo-50 {
+  background: rgba(6, 182, 212, 0.1) !important;
+}
+
+aside nav a.border-indigo-500 {
+  border-color: var(--color-accent-primary) !important;
+}
+
+aside nav a.text-indigo-700 {
+  color: var(--color-accent-primary) !important;
+}
+
+/* Dark mode specific overrides for Angular's routerLinkActive classes */
+.dark aside nav a.text-indigo-300 {
+  color: #22d3ee !important;
+}
+
+/* Sidebar badges - only for active items that actually have these classes */
+aside nav a.bg-indigo-50 .bg-indigo-100,
+aside nav a.bg-indigo-50 .bg-indigo-900 {
+  background: rgba(6, 182, 212, 0.2) !important;
+}
+
+aside nav a.text-indigo-700 .text-indigo-800,
+aside nav a.text-indigo-700 .text-indigo-200 {
+  color: var(--color-accent-primary) !important;
+}
+
+/* Sidebar usage section - upgrade buttons and progress */
+aside .bg-indigo-500,
+aside .bg-indigo-600,
+aside .bg-indigo-700 {
+  background: var(--color-accent-primary) !important;
+}
+
+aside button[class*="bg-indigo"]:hover {
+  background: var(--color-accent-hover) !important;
+}
+
+aside .text-indigo-600,
+aside .text-indigo-400 {
+  color: var(--color-accent-primary) !important;
+}
+
+/* Header/Navbar - Fix focus rings and avatar */
+header .bg-indigo-500 {
+  background: var(--color-accent-primary) !important;
+}
+
+/* Fix notification badge focus ring in navbar */
+header button:focus-visible {
+  outline: 2px solid var(--color-accent-primary) !important;
+  outline-offset: 2px !important;
+}
+
+header input:focus {
+  border-color: var(--color-accent-primary) !important;
+  box-shadow: 0 0 0 1px var(--color-accent-primary) !important;
+}
+
+/* Remove indigo focus rings from all elements */
+*:focus {
+  --tw-ring-color: rgba(6, 182, 212, 0.5) !important;
+}
+
+/* Clean transitions for navigation */
+aside a,
+aside button,
+header button,
+header input {
+  transition: all 0.15s ease !important;
+}
+
+/* ========== CONTEXT MENU STYLING ========== */
+/* Context Menu Styling - using design tokens and low specificity */
+.transcription-context-menu.p-menu {
+  font-family: var(--font-family-primary);
+
+  .p-menu-list,
+  .p-submenu-list {
+    background: var(--menu-bg);
+    border: 1px solid var(--menu-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--menu-shadow);
+    padding: var(--spacing-sm);
+    min-width: 220px;
+    color: var(--text-primary);
+    backdrop-filter: blur(10px);
+  }
+
+  .p-submenu-list {
+    border-radius: var(--radius-md);
+    min-width: 200px;
+    box-shadow: var(--shadow-md);
+  }
+
+  .p-menuitem .p-menuitem-link {
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    font-weight: var(--font-weight-medium);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    background: transparent;
+    outline: none;
+    color: var(--text-primary);
+    transition: all 0.15s ease;
+
+    &:hover,
+    &:focus {
+      background: var(--menu-item-hover);
+      color: var(--color-accent-primary);
+    }
+
+    &:active {
+      background: var(--menu-item-active);
+      color: var(--menu-item-active-text);
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 2px var(--color-accent-primary);
+      outline: 2px solid var(--color-accent-primary);
+      outline-offset: -2px;
+      z-index: 2;
+    }
+  }
+
+  .p-menuitem-icon {
+    color: var(--text-tertiary);
+    margin-right: var(--spacing-md);
+    font-size: 1.15em;
+    transition: color 0.15s ease;
+  }
+
+  .p-menuitem-text {
+    color: var(--text-primary);
+    font-weight: var(--font-weight-medium);
+    transition: color 0.15s ease;
+  }
+
+  .p-menuitem .p-menuitem-link:hover .p-menuitem-icon,
+  .p-menuitem .p-menuitem-link:focus .p-menuitem-icon,
+  .p-menuitem .p-menuitem-link:hover .p-menuitem-text,
+  .p-menuitem .p-menuitem-link:focus .p-menuitem-text {
+    color: var(--color-accent-primary);
+  }
+
+  .p-menuitem .p-menuitem-link:active .p-menuitem-icon,
+  .p-menuitem .p-menuitem-link:active .p-menuitem-text {
+    color: var(--menu-item-active-text);
+  }
+}
+
+/* Dark theme context menu */
+[data-theme="dark"] .transcription-context-menu.p-menu,
+.dark .transcription-context-menu.p-menu {
+
+  .p-menu-list,
+  .p-submenu-list {
+    background: var(--color-primary-800);
+    border-color: var(--color-primary-600);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* ========== TOUCH DEVICE OPTIMIZATIONS ========== */
+@media (hover: none) and (pointer: coarse) {
+
+  .transcription-context-menu.p-menu .p-menuitem .p-menuitem-link:hover,
+  .transcription-context-menu.p-menu .p-menuitem .p-menuitem-link:focus {
+    background: var(--menu-item-hover);
+  }
+
+  .transcription-context-menu.p-menu .p-menuitem .p-menuitem-link:hover .p-menuitem-icon,
+  .transcription-context-menu.p-menu .p-menuitem .p-menuitem-link:focus .p-menuitem-icon,
+  .transcription-context-menu.p-menu .p-menuitem .p-menuitem-link:hover .p-menuitem-text,
+  .transcription-context-menu.p-menu .p-menuitem .p-menuitem-link:focus .p-menuitem-text {
+    color: var(--color-accent-primary);
+  }
+}
+
+/* ========== DARK MODE GRADIENT TEXT FIXES ========== */
+/* Only fix the specific hero subtitle text that was hard to read */
+[data-theme="dark"],
+.dark {
+
+  // Only target the specific problematic subtitle text
+  span.text-cyan-600.dark\:text-cyan-400 {
+    color: #67e8f9 !important;
+    text-shadow: 0 0 10px rgba(103, 232, 249, 0.3) !important;
+  }
+}

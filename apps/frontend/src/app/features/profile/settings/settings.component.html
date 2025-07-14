@@ -1,0 +1,252 @@
+<div class="space-y-6">
+  <!-- Profile Information Card -->
+  <p-card>
+    <ng-template pTemplate="header">
+      <div class="flex items-center space-x-3 p-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <i class="pi pi-user text-2xl text-indigo-600 dark:text-indigo-400"></i>
+        <div class="text-gray-900 dark:text-white">
+          <h3 class="text-xl font-bold">Προσωπικές Πληροφορίες</h3>
+          <p class="text-gray-600 dark:text-gray-400">Ενημερώστε τα στοιχεία του λογαριασμού σας</p>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="content">
+      <div class="bg-white dark:bg-gray-900 p-6">
+        <form [formGroup]="profileForm" (ngSubmit)="onUpdateProfile()" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- First Name -->
+            <div class="space-y-2">
+              <label for="first_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Όνομα *
+              </label>
+              <input
+                pInputText
+                id="first_name"
+                name="first_name"
+                formControlName="first_name"
+                placeholder="Εισάγετε το όνομά σας"
+                class="w-full"
+              />
+              <div *ngIf="profileForm.get('first_name')?.errors && profileForm.get('first_name')?.touched"
+                   class="text-sm text-red-600 dark:text-red-400">
+                <span *ngIf="profileForm.get('first_name')?.errors?.['required']">Το όνομα είναι υποχρεωτικό</span>
+                <span *ngIf="profileForm.get('first_name')?.errors?.['minlength']">Το όνομα πρέπει να έχει τουλάχιστον 2 χαρακτήρες</span>
+              </div>
+            </div>
+
+            <!-- Last Name -->
+            <div class="space-y-2">
+              <label for="last_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Επώνυμο *
+              </label>
+              <input
+                pInputText
+                id="last_name"
+                name="last_name"
+                formControlName="last_name"
+                placeholder="Εισάγετε το επώνυμό σας"
+                class="w-full"
+              />
+              <div *ngIf="profileForm.get('last_name')?.errors && profileForm.get('last_name')?.touched"
+                   class="text-sm text-red-600 dark:text-red-400">
+                <span *ngIf="profileForm.get('last_name')?.errors?.['required']">Το επώνυμο είναι υποχρεωτικό</span>
+                <span *ngIf="profileForm.get('last_name')?.errors?.['minlength']">Το επώνυμο πρέπει να έχει τουλάχιστον 2 χαρακτήρες</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="space-y-2">
+            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Email *
+            </label>
+            <input
+              pInputText
+              id="email"
+              name="email"
+              type="email"
+              formControlName="email"
+              placeholder="Εισάγετε το email σας"
+              class="w-full"
+            />
+            <div *ngIf="profileForm.get('email')?.errors && profileForm.get('email')?.touched"
+                 class="text-sm text-red-600 dark:text-red-400">
+              <span *ngIf="profileForm.get('email')?.errors?.['required']">Το email είναι υποχρεωτικό</span>
+              <span *ngIf="profileForm.get('email')?.errors?.['email']">Μη έγκυρη διεύθυνση email</span>
+            </div>
+          </div>
+
+          <!-- Optional Fields -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Phone -->
+            <div class="space-y-2">
+              <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Τηλέφωνο
+              </label>
+              <input
+                pInputText
+                id="phone"
+                name="phone"
+                formControlName="phone"
+                placeholder="Εισάγετε το τηλέφωνό σας"
+                class="w-full"
+              />
+            </div>
+
+            <!-- Organization -->
+            <div class="space-y-2">
+              <label for="organization" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Οργανισμός
+              </label>
+              <input
+                pInputText
+                id="organization"
+                name="organization"
+                formControlName="organization"
+                placeholder="Εισάγετε τον οργανισμό σας"
+                class="w-full"
+              />
+            </div>
+          </div>
+        </form>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      <div class="flex justify-end">
+        <p-button
+          type="submit"
+          [disabled]="profileForm.invalid || isUpdatingProfile()"
+          [loading]="isUpdatingProfile()"
+          [label]="isUpdatingProfile() ? 'Ενημέρωση...' : 'Ενημέρωση Στοιχείων'"
+          icon="pi pi-save"
+          severity="info"
+          size="large"
+          (click)="onUpdateProfile()">
+        </p-button>
+      </div>
+    </ng-template>
+  </p-card>
+
+  <p-divider />
+
+  <!-- Password Change Card -->
+  <p-card>
+    <ng-template pTemplate="header">
+      <div class="flex items-center space-x-3 p-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <i class="pi pi-lock text-2xl text-orange-600 dark:text-orange-400"></i>
+        <div class="text-gray-900 dark:text-white">
+          <h3 class="text-xl font-bold">Αλλαγή Κωδικού Πρόσβασης</h3>
+          <p class="text-gray-600 dark:text-gray-400">Ενημερώστε τον κωδικό πρόσβασής σας για μεγαλύτερη ασφάλεια</p>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="content">
+      <div class="bg-white dark:bg-gray-900 p-6">
+        <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="space-y-6">
+          <!-- Current Password -->
+          <div class="space-y-2">
+            <label for="currentPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Τρέχων Κωδικός Πρόσβασης *
+            </label>
+            <p-password
+              id="currentPassword"
+              name="currentPassword"
+              formControlName="currentPassword"
+              [toggleMask]="true"
+              placeholder="Εισάγετε τον τρέχοντα κωδικό"
+              inputStyleClass="w-full"
+              styleClass="w-full"
+              [feedback]="false">
+            </p-password>
+            <div *ngIf="passwordForm.get('currentPassword')?.errors && passwordForm.get('currentPassword')?.touched"
+                 class="text-sm text-red-600 dark:text-red-400">
+              <span *ngIf="passwordForm.get('currentPassword')?.errors?.['required']">Ο τρέχων κωδικός είναι υποχρεωτικός</span>
+            </div>
+          </div>
+
+          <!-- New Password -->
+          <div class="space-y-2">
+            <label for="newPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Νέος Κωδικός Πρόσβασης *
+            </label>
+            <p-password
+              id="newPassword"
+              name="newPassword"
+              formControlName="newPassword"
+              [toggleMask]="true"
+              placeholder="Εισάγετε τον νέο κωδικό"
+              inputStyleClass="w-full"
+              styleClass="w-full"
+              [feedback]="true"
+              promptLabel="Εισάγετε έναν κωδικό"
+              weakLabel="Αδύναμος"
+              mediumLabel="Μέτριος"
+              strongLabel="Ισχυρός">
+            </p-password>
+            <div *ngIf="passwordForm.get('newPassword')?.errors && passwordForm.get('newPassword')?.touched"
+                 class="text-sm text-red-600 dark:text-red-400">
+              <span *ngIf="passwordForm.get('newPassword')?.errors?.['required']">Ο νέος κωδικός είναι υποχρεωτικός</span>
+              <span *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']">Ο κωδικός πρέπει να έχει τουλάχιστον 5 χαρακτήρες</span>
+            </div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="space-y-2">
+            <label for="confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Επιβεβαίωση Νέου Κωδικού *
+            </label>
+            <p-password
+              id="confirmPassword"
+              name="confirmPassword"
+              formControlName="confirmPassword"
+              [toggleMask]="true"
+              placeholder="Επιβεβαιώστε τον νέο κωδικό"
+              inputStyleClass="w-full"
+              styleClass="w-full"
+              [feedback]="false">
+            </p-password>
+            <div *ngIf="passwordForm.get('confirmPassword')?.errors && passwordForm.get('confirmPassword')?.touched"
+                 class="text-sm text-red-600 dark:text-red-400">
+              <span *ngIf="passwordForm.get('confirmPassword')?.errors?.['required']">Η επιβεβαίωση κωδικού είναι υποχρεωτική</span>
+              <span *ngIf="passwordForm.get('confirmPassword')?.errors?.['passwordMismatch']">Οι κωδικοί δεν ταιριάζουν</span>
+            </div>
+          </div>
+
+          <!-- Password requirements info -->
+          <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+            <div class="flex items-start space-x-3">
+              <i class="pi pi-info-circle text-blue-600 dark:text-blue-400 mt-0.5"></i>
+              <div class="text-sm text-blue-800 dark:text-blue-200">
+                <p class="font-medium mb-1">Απαιτήσεις κωδικού πρόσβασης:</p>
+                <ul class="list-disc list-inside space-y-1 text-blue-700 dark:text-blue-300">
+                  <li>Τουλάχιστον 5 χαρακτήρες</li>
+                  <li>Συνδυασμός κεφαλαίων και πεζών γραμμάτων</li>
+                  <li>Τουλάχιστον έναν αριθμό</li>
+                  <li>Τουλάχιστον έναν ειδικό χαρακτήρα</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      <div class="flex justify-end">
+        <p-button
+          type="submit"
+          [disabled]="passwordForm.invalid || isChangingPassword()"
+          [loading]="isChangingPassword()"
+          [label]="isChangingPassword() ? 'Αλλαγή...' : 'Αλλαγή Κωδικού'"
+          icon="pi pi-shield"
+          severity="secondary"
+          size="large"
+          (click)="onChangePassword()">
+        </p-button>
+      </div>
+    </ng-template>
+  </p-card>
+</div>

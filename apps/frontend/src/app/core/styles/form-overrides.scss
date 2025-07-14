@@ -1,0 +1,749 @@
+// ========== COMPREHENSIVE PRIMENG FORM CONTROLS COLOR SYSTEM ==========
+// Elegant cyan styling for all form inputs to match select dropdowns
+
+/* Input Text, Password, Number, Email, etc. */
+.p-inputtext,
+.p-password input,
+.p-inputnumber-input,
+.p-inputmask,
+.p-textarea {
+  background: #ffffff !important;
+  border: 1px solid rgba(6, 182, 212, 0.3) !important;
+  color: #374151 !important;
+  transition: all 0.15s ease !important;
+  border-radius: 0.375rem !important;
+}
+
+/* Password container styling - remove border to avoid double border */
+.p-password {
+  background: transparent !important;
+  border: none !important;
+  transition: all 0.15s ease !important;
+  border-radius: 0.375rem !important;
+  padding: 0 !important;
+}
+
+.p-inputtext:hover,
+.p-password input:hover,
+.p-inputnumber-input:hover,
+.p-inputmask:hover,
+.p-textarea:hover,
+textarea.p-textarea:hover,
+textarea:hover {
+  background: #ffffff !important;
+  border-color: rgba(6, 182, 212, 0.4) !important;
+}
+
+.p-inputtext:focus,
+.p-password input:focus,
+.p-inputnumber-input:focus,
+.p-inputmask:focus,
+.p-textarea:focus,
+textarea.p-textarea:focus,
+textarea:focus {
+  border-color: rgba(6, 182, 212, 0.8) !important;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1) !important;
+  background: #ffffff !important;
+}
+
+/* When input has value - solid cyan border */
+.p-inputtext:not(:placeholder-shown),
+.p-password input:not(:placeholder-shown),
+.p-inputnumber-input:not(:placeholder-shown),
+.p-inputmask:not(:placeholder-shown),
+.p-textarea:not(:placeholder-shown),
+textarea.p-textarea:not(:placeholder-shown),
+textarea:not(:placeholder-shown),
+.p-inputtext[data-filled="true"],
+.p-inputtext.p-filled {
+  background: #ffffff !important;
+  border: 1px solid rgba(6, 182, 212, 0.5) !important;
+  color: #374151 !important;
+}
+
+/* Cyan placeholder color */
+.p-inputtext::placeholder,
+.p-password input::placeholder,
+.p-inputnumber-input::placeholder,
+.p-inputmask::placeholder,
+.p-textarea::placeholder,
+textarea.p-textarea::placeholder,
+textarea::placeholder {
+  color: rgba(6, 182, 212, 0.5) !important;
+  font-style: normal !important;
+}
+
+/* Dark mode form controls */
+.dark .p-inputtext,
+.dark .p-password input,
+.dark .p-inputnumber-input,
+.dark .p-inputmask,
+.dark .p-textarea,
+.dark textarea.p-textarea,
+.dark textarea {
+  background: transparent !important;
+  border-color: rgba(34, 211, 238, 0.4) !important;
+  color: #f9fafb !important;
+}
+
+/* Dark mode password container - no styling to avoid conflicts */
+.dark .p-password {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+.dark .p-inputtext:hover,
+.dark .p-password input:hover,
+.dark .p-inputnumber-input:hover,
+.dark .p-inputmask:hover,
+.dark .p-textarea:hover,
+.dark textarea.p-textarea:hover,
+.dark textarea:hover {
+  background: transparent !important;
+  border-color: rgba(34, 211, 238, 0.5) !important;
+}
+
+.dark .p-inputtext:focus,
+.dark .p-password input:focus,
+.dark .p-inputnumber-input:focus,
+.dark .p-inputmask:focus,
+.dark .p-textarea:focus,
+.dark textarea.p-textarea:focus,
+.dark textarea:focus {
+  border-color: rgba(34, 211, 238, 0.8) !important;
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.1) !important;
+  background: transparent !important;
+}
+
+/* Dark mode filled state */
+.dark .p-inputtext:not(:placeholder-shown),
+.dark .p-password input:not(:placeholder-shown),
+.dark .p-inputnumber-input:not(:placeholder-shown),
+.dark .p-inputmask:not(:placeholder-shown),
+.dark .p-textarea:not(:placeholder-shown),
+.dark textarea.p-textarea:not(:placeholder-shown),
+.dark textarea:not(:placeholder-shown),
+.dark .p-inputtext[data-filled="true"],
+.dark .p-inputtext.p-filled {
+  background: transparent !important;
+  border: 1px solid rgba(34, 211, 238, 0.6) !important;
+  color: #f9fafb !important;
+}
+
+/* Dark mode placeholder */
+.dark .p-inputtext::placeholder,
+.dark .p-password input::placeholder,
+.dark .p-inputnumber-input::placeholder,
+.dark .p-inputmask::placeholder,
+.dark .p-textarea::placeholder,
+.dark textarea.p-textarea::placeholder,
+.dark textarea::placeholder {
+  color: rgba(34, 211, 238, 0.30) !important;
+  font-style: normal !important;
+}
+
+/* Calendar placeholder override */
+.p-calendar input::placeholder {
+  color: rgba(6, 182, 212, 0.5) !important;
+  font-style: normal !important;
+}
+
+.dark .p-calendar input::placeholder {
+  color: rgba(34, 211, 238, 0.30) !important;
+  font-style: normal !important;
+}
+
+/* ========== ENHANCED FORM LABELS ========== */
+/* Form labels with cyan accent when input is focused - Browser compatible approach */
+
+/* Primary approach: Use :has() for labels that come before focused elements */
+label:has(+ .p-inputtext:focus),
+label:has(+ .p-password:focus-within),
+label:has(+ .p-password input:focus),
+label:has(+ .p-dropdown:focus),
+label:has(+ .p-dropdown.p-focus),
+label:has(+ .p-select:focus),
+label:has(+ .p-select.p-focus),
+label:has(+ .p-calendar:focus),
+label:has(+ .p-calendar.p-focus),
+label:has(+ .p-calendar input:focus),
+label:has(+ .p-datepicker:focus),
+label:has(+ .p-datepicker.p-focus),
+label:has(+ .p-datepicker input:focus),
+label:has(+ textarea:focus) {
+  color: var(--color-accent-primary) !important;
+  transition: color 0.15s ease;
+}
+
+/* Fallback for browsers without :has() support - use container-based targeting */
+.p-field:has(.p-inputtext:focus) label,
+.p-field:has(.p-password:focus-within) label,
+.p-field:has(.p-password input:focus) label,
+.p-field:has(.p-dropdown:focus) label,
+.p-field:has(.p-dropdown.p-focus) label,
+.p-field:has(.p-select:focus) label,
+.p-field:has(.p-select.p-focus) label,
+.p-field:has(.p-calendar:focus) label,
+.p-field:has(.p-calendar.p-focus) label,
+.p-field:has(.p-calendar input:focus) label,
+.p-field:has(.p-datepicker:focus) label,
+.p-field:has(.p-datepicker.p-focus) label,
+.p-field:has(.p-datepicker input:focus) label,
+.p-field:has(textarea:focus) label,
+div:has(.p-inputtext:focus) > label,
+div:has(.p-password:focus-within) > label,
+div:has(.p-password input:focus) > label,
+div:has(.p-dropdown:focus) > label,
+div:has(.p-dropdown.p-focus) > label,
+div:has(.p-select:focus) > label,
+div:has(.p-select.p-focus) > label,
+div:has(.p-calendar:focus) > label,
+div:has(.p-calendar.p-focus) > label,
+div:has(.p-calendar input:focus) > label,
+div:has(.p-datepicker:focus) > label,
+div:has(.p-datepicker.p-focus) > label,
+div:has(.p-datepicker input:focus) > label,
+div:has(textarea:focus) > label {
+  color: var(--color-accent-primary) !important;
+  transition: color 0.15s ease;
+}
+
+/* Dark mode focused labels - Browser compatible approach */
+
+/* Dark mode primary approach: Use :has() for labels that come before focused elements */
+.dark label:has(+ .p-inputtext:focus),
+.dark label:has(+ .p-password:focus-within),
+.dark label:has(+ .p-password input:focus),
+.dark label:has(+ .p-dropdown:focus),
+.dark label:has(+ .p-dropdown.p-focus),
+.dark label:has(+ .p-select:focus),
+.dark label:has(+ .p-select.p-focus),
+.dark label:has(+ .p-calendar:focus),
+.dark label:has(+ .p-calendar.p-focus),
+.dark label:has(+ .p-calendar input:focus),
+.dark label:has(+ .p-datepicker:focus),
+.dark label:has(+ .p-datepicker.p-focus),
+.dark label:has(+ .p-datepicker input:focus),
+.dark label:has(+ textarea:focus) {
+  color: #22d3ee !important;
+  transition: color 0.15s ease;
+}
+
+/* Dark mode fallback for browsers without :has() support - use container-based targeting */
+.dark .p-field:has(.p-inputtext:focus) label,
+.dark .p-field:has(.p-password:focus-within) label,
+.dark .p-field:has(.p-password input:focus) label,
+.dark .p-field:has(.p-dropdown:focus) label,
+.dark .p-field:has(.p-dropdown.p-focus) label,
+.dark .p-field:has(.p-select:focus) label,
+.dark .p-field:has(.p-select.p-focus) label,
+.dark .p-field:has(.p-calendar:focus) label,
+.dark .p-field:has(.p-calendar.p-focus) label,
+.dark .p-field:has(.p-calendar input:focus) label,
+.dark .p-field:has(.p-datepicker:focus) label,
+.dark .p-field:has(.p-datepicker.p-focus) label,
+.dark .p-field:has(.p-datepicker input:focus) label,
+.dark .p-field:has(textarea:focus) label,
+.dark div:has(.p-inputtext:focus) > label,
+.dark div:has(.p-password:focus-within) > label,
+.dark div:has(.p-password input:focus) > label,
+.dark div:has(.p-dropdown:focus) > label,
+.dark div:has(.p-dropdown.p-focus) > label,
+.dark div:has(.p-select:focus) > label,
+.dark div:has(.p-select.p-focus) > label,
+.dark div:has(.p-calendar:focus) > label,
+.dark div:has(.p-calendar.p-focus) > label,
+.dark div:has(.p-calendar input:focus) > label,
+.dark div:has(.p-datepicker:focus) > label,
+.dark div:has(.p-datepicker.p-focus) > label,
+.dark div:has(.p-datepicker input:focus) > label,
+.dark div:has(textarea:focus) > label {
+  color: #22d3ee !important;
+  transition: color 0.15s ease;
+}
+
+/* ========== FORM VALIDATION STATES ========== */
+/* Error state */
+.p-inputtext.ng-invalid.ng-touched,
+.p-password.ng-invalid.ng-touched input,
+.p-dropdown.ng-invalid.ng-touched,
+.p-calendar.ng-invalid.ng-touched input,
+.p-textarea.ng-invalid.ng-touched {
+  border-color: var(--form-border-error) !important;
+}
+
+.p-inputtext.ng-invalid.ng-touched:focus,
+.p-password.ng-invalid.ng-touched input:focus,
+.p-dropdown.ng-invalid.ng-touched:focus,
+.p-calendar.ng-invalid.ng-touched input:focus,
+.p-textarea.ng-invalid.ng-touched:focus {
+  box-shadow: var(--form-shadow-error) !important;
+}
+
+/* Success state */
+.p-inputtext.ng-valid.ng-touched:not(:placeholder-shown),
+.p-password.ng-valid.ng-touched input:not(:placeholder-shown),
+.p-dropdown.ng-valid.ng-touched[data-filled="true"],
+.p-calendar.ng-valid.ng-touched input:not(:placeholder-shown),
+.p-textarea.ng-valid.ng-touched:not(:placeholder-shown) {
+  border-color: var(--form-border-success) !important;
+}
+
+/* ========== SPECIFIC INPUT TYPES ========== */
+/* Search inputs */
+input[type="search"].p-inputtext {
+  padding-left: 2.5rem !important;
+}
+
+/* Number inputs - hide spinner buttons */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* File upload styling */
+input[type="file"] {
+  cursor: pointer;
+}
+
+input[type="file"]::-webkit-file-upload-button {
+  background: var(--color-accent-primary);
+  color: var(--text-inverse);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+input[type="file"]::-webkit-file-upload-button:hover {
+  background: var(--color-accent-hover);
+}
+
+/* ========== DROPDOWN/SELECT CONTROLS ========== */
+/* PrimeNG Select/Dropdown styling to match other inputs */
+.p-select,
+.p-dropdown,
+.p-multiselect {
+  background: #ffffff !important;
+  border: 1px solid rgba(6, 182, 212, 0.3) !important;
+  color: #374151 !important;
+  transition: all 0.15s ease !important;
+  border-radius: 0.375rem !important;
+}
+
+.p-select:hover,
+.p-dropdown:hover,
+.p-multiselect:hover {
+  background: #ffffff !important;
+  border-color: rgba(6, 182, 212, 0.4) !important;
+}
+
+.p-select:focus,
+.p-dropdown:focus,
+.p-multiselect:focus,
+.p-select.p-focus,
+.p-dropdown.p-focus,
+.p-multiselect.p-focus {
+  background: #ffffff !important;
+  border-color: rgba(6, 182, 212, 0.8) !important;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1) !important;
+}
+
+/* Dropdown/Select with value - solid cyan border */
+.p-select[data-filled="true"],
+.p-dropdown[data-filled="true"],
+.p-multiselect[data-filled="true"],
+.p-select.p-filled,
+.p-dropdown.p-filled,
+.p-multiselect.p-filled,
+.p-select:not(:placeholder-shown),
+.p-dropdown:not(:placeholder-shown),
+.p-multiselect:not(:placeholder-shown) {
+  background: #ffffff !important;
+  border: 1px solid rgba(6, 182, 212, 0.5) !important;
+}
+
+/* Dark mode dropdown/select */
+.dark .p-select,
+.dark .p-dropdown,
+.dark .p-multiselect {
+  background: transparent !important;
+  border-color: rgba(34, 211, 238, 0.4) !important;
+  color: #f9fafb !important;
+}
+
+.dark .p-select:hover,
+.dark .p-dropdown:hover,
+.dark .p-multiselect:hover {
+  background: transparent !important;
+  border-color: rgba(34, 211, 238, 0.5) !important;
+}
+
+.dark .p-select:focus,
+.dark .p-dropdown:focus,
+.dark .p-multiselect:focus,
+.dark .p-select.p-focus,
+.dark .p-dropdown.p-focus,
+.dark .p-multiselect.p-focus {
+  background: transparent !important;
+  border-color: rgba(34, 211, 238, 0.8) !important;
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.1) !important;
+}
+
+.dark .p-select[data-filled="true"],
+.dark .p-dropdown[data-filled="true"],
+.dark .p-multiselect[data-filled="true"],
+.dark .p-select.p-filled,
+.dark .p-dropdown.p-filled,
+.dark .p-multiselect.p-filled,
+.dark .p-select:not(:placeholder-shown),
+.dark .p-dropdown:not(:placeholder-shown),
+.dark .p-multiselect:not(:placeholder-shown) {
+  background: transparent !important;
+  border: 1px solid rgba(34, 211, 238, 0.6) !important;
+}
+
+/* ========== CALENDAR/DATE PICKER CONTROLS ========== */
+/* PrimeNG Calendar styling - ensure consistent border like other form controls */
+.p-calendar,
+.p-datepicker {
+  background: #ffffff !important;
+  border: none;
+  color: #374151 !important;
+  transition: all 0.15s ease !important;
+  border-radius: 0.375rem !important;
+}
+
+.p-calendar input,
+.p-datepicker input {
+  background: transparent !important;
+  border: 1px solid rgba(6, 182, 212, 0.3) !important;
+  color: #374151 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.p-calendar:hover,
+.p-datepicker:hover {
+  background: #ffffff !important;
+  border-color: rgba(6, 182, 212, 0.4) !important;
+}
+
+/* Calendar with value - comes before focus to ensure proper cascading */
+.p-calendar[data-filled="true"],
+.p-datepicker[data-filled="true"],
+.p-calendar.p-filled,
+.p-datepicker.p-filled {
+  background: #ffffff !important;
+  border-color: rgba(6, 182, 212, 0.5) !important;
+}
+
+.p-calendar:focus,
+.p-datepicker:focus,
+.p-calendar.p-focus,
+.p-datepicker.p-focus,
+.p-calendar:focus-within,
+.p-datepicker:focus-within {
+  background: #ffffff !important;
+  border-color: rgba(6, 182, 212, 0.8) !important;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1) !important;
+}
+
+/* Dark mode calendar */
+.dark .p-calendar,
+.dark .p-datepicker {
+  background: transparent !important;
+  border: none;
+  color: #f9fafb !important;
+}
+
+.dark .p-calendar input,
+.dark .p-datepicker input {
+  background: transparent !important;
+  border: 1px solid rgba(6, 182, 212, 0.3) !important;
+  color: #f9fafb !important;
+}
+
+.dark .p-calendar:hover,
+.dark .p-datepicker:hover {
+  background: transparent !important;
+  border-color: rgba(34, 211, 238, 0.5) !important;
+}
+
+/* Dark mode calendar with value - comes before focus */
+.dark .p-calendar[data-filled="true"],
+.dark .p-datepicker[data-filled="true"],
+.dark .p-calendar.p-filled,
+.dark .p-datepicker.p-filled {
+  background: transparent !important;
+  border: 1px solid rgba(34, 211, 238, 0.6) !important;
+}
+
+.dark .p-calendar:focus,
+.dark .p-datepicker:focus,
+.dark .p-calendar.p-focus,
+.dark .p-datepicker.p-focus,
+.dark .p-calendar:focus-within,
+.dark .p-datepicker:focus-within {
+  background: transparent !important;
+  border-color: rgba(34, 211, 238, 0.8) !important;
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.1) !important;
+}
+
+/* ========== TOGGLE/SWITCH CONTROLS ========== */
+/* PrimeNG InputSwitch/ToggleButton styling */
+.p-inputswitch,
+.p-togglebutton {
+  border: 1px solid rgba(6, 182, 212, 0.3) !important;
+  transition: all 0.15s ease !important;
+  border-radius: 0.375rem !important;
+}
+
+.p-inputswitch:hover,
+.p-togglebutton:hover {
+  border-color: rgba(6, 182, 212, 0.4) !important;
+}
+
+.p-inputswitch:focus,
+.p-togglebutton:focus,
+.p-inputswitch.p-focus,
+.p-togglebutton.p-focus {
+  border-color: rgba(6, 182, 212, 0.8) !important;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1) !important;
+}
+
+/* Checked/Active state */
+.p-inputswitch.p-inputswitch-checked,
+.p-togglebutton.p-highlight {
+  background: rgba(6, 182, 212, 0.1) !important;
+  border: 1px solid rgba(6, 182, 212, 0.8) !important;
+  color: #06b6d4 !important;
+}
+
+/* Dark mode toggle */
+.dark .p-inputswitch,
+.dark .p-togglebutton {
+  border-color: rgba(34, 211, 238, 0.4) !important;
+}
+
+.dark .p-inputswitch:hover,
+.dark .p-togglebutton:hover {
+  border-color: rgba(34, 211, 238, 0.5) !important;
+}
+
+.dark .p-inputswitch:focus,
+.dark .p-togglebutton:focus,
+.dark .p-inputswitch.p-focus,
+.dark .p-togglebutton.p-focus {
+  border-color: rgba(34, 211, 238, 0.8) !important;
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.1) !important;
+}
+
+.dark .p-inputswitch.p-inputswitch-checked,
+.dark .p-togglebutton.p-highlight {
+  background: rgba(34, 211, 238, 0.1) !important;
+  border: 1px solid rgba(34, 211, 238, 0.8) !important;
+  color: #22d3ee !important;
+}
+
+/* ========== CHECKBOX AND RADIO CONTROLS ========== */
+/* PrimeNG Checkbox styling */
+.p-checkbox .p-checkbox-box,
+.p-radiobutton .p-radiobutton-box {
+  background: #ffffff !important;
+  border: 1px solid rgba(6, 182, 212, 0.3) !important;
+  transition: all 0.15s ease !important;
+  border-radius: 0.25rem !important;
+}
+
+.p-checkbox:hover .p-checkbox-box,
+.p-radiobutton:hover .p-radiobutton-box {
+  border-color: rgba(6, 182, 212, 0.4) !important;
+  background: #ffffff !important;
+}
+
+.p-checkbox:focus .p-checkbox-box,
+.p-radiobutton:focus .p-radiobutton-box,
+.p-checkbox.p-focus .p-checkbox-box,
+.p-radiobutton.p-focus .p-radiobutton-box {
+  border-color: rgba(6, 182, 212, 0.8) !important;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1) !important;
+  background: #ffffff !important;
+}
+
+/* Checked state - transparent background with cyan tick */
+.p-checkbox.p-checkbox-checked .p-checkbox-box,
+.p-radiobutton.p-radiobutton-checked .p-radiobutton-box {
+  background: #ffffff !important;
+  border: 1px solid rgba(6, 182, 212, 0.8) !important;
+}
+
+/* Cyan checkmark/tick */
+.p-checkbox.p-checkbox-checked .p-checkbox-box .p-checkbox-icon,
+.p-checkbox.p-checkbox-checked .p-checkbox-box::after,
+.p-checkbox.p-checkbox-checked .p-checkbox-box .pi-check {
+  color: #06b6d4 !important;
+  font-weight: bold !important;
+}
+
+/* Radio button center dot */
+.p-radiobutton.p-radiobutton-checked .p-radiobutton-box::after,
+.p-radiobutton.p-radiobutton-checked .p-radiobutton-box .p-radiobutton-icon {
+  background: #06b6d4 !important;
+}
+
+/* Dark mode checkbox/radio */
+.dark .p-checkbox .p-checkbox-box,
+.dark .p-radiobutton .p-radiobutton-box {
+  background: transparent !important;
+  border-color: rgba(34, 211, 238, 0.4) !important;
+}
+
+.dark .p-checkbox:hover .p-checkbox-box,
+.dark .p-radiobutton:hover .p-radiobutton-box {
+  border-color: rgba(34, 211, 238, 0.5) !important;
+  background: transparent !important;
+}
+
+.dark .p-checkbox:focus .p-checkbox-box,
+.dark .p-radiobutton:focus .p-radiobutton-box,
+.dark .p-checkbox.p-focus .p-checkbox-box,
+.dark .p-radiobutton.p-focus .p-radiobutton-box {
+  border-color: rgba(34, 211, 238, 0.8) !important;
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.1) !important;
+  background: transparent !important;
+}
+
+/* Dark mode checked state */
+.dark .p-checkbox.p-checkbox-checked .p-checkbox-box,
+.dark .p-radiobutton.p-radiobutton-checked .p-radiobutton-box {
+  background: transparent !important;
+  border: 1px solid rgba(34, 211, 238, 0.8) !important;
+}
+
+/* Dark mode cyan checkmark/tick */
+.dark .p-checkbox.p-checkbox-checked .p-checkbox-box .p-checkbox-icon,
+.dark .p-checkbox.p-checkbox-checked .p-checkbox-box::after,
+.dark .p-checkbox.p-checkbox-checked .p-checkbox-box .pi-check {
+  color: #22d3ee !important;
+  font-weight: bold !important;
+}
+
+/* Dark mode radio button center dot */
+.dark .p-radiobutton.p-radiobutton-checked .p-radiobutton-box::after,
+.dark .p-radiobutton.p-radiobutton-checked .p-radiobutton-box .p-radiobutton-icon {
+  background: #22d3ee !important;
+}
+
+/* ========== SLIDER CONTROLS ========== */
+/* PrimeNG Slider styling */
+.p-slider {
+  border: 1px solid rgba(6, 182, 212, 0.3) !important;
+  transition: all 0.15s ease !important;
+  border-radius: 0.375rem !important;
+}
+
+.p-slider:hover {
+  border-color: rgba(6, 182, 212, 0.4) !important;
+}
+
+.p-slider:focus,
+.p-slider.p-focus {
+  border-color: rgba(6, 182, 212, 0.8) !important;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1) !important;
+}
+
+.p-slider .p-slider-handle {
+  background: #06b6d4 !important;
+  border: 2px solid #06b6d4 !important;
+}
+
+.p-slider .p-slider-range {
+  background: #06b6d4 !important;
+}
+
+/* Dark mode slider */
+.dark .p-slider {
+  border-color: rgba(34, 211, 238, 0.4) !important;
+}
+
+.dark .p-slider:hover {
+  border-color: rgba(34, 211, 238, 0.5) !important;
+}
+
+.dark .p-slider:focus,
+.dark .p-slider.p-focus {
+  border-color: rgba(34, 211, 238, 0.8) !important;
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.1) !important;
+}
+
+.dark .p-slider .p-slider-handle {
+  background: #22d3ee !important;
+  border: 2px solid #22d3ee !important;
+}
+
+.dark .p-slider .p-slider-range {
+  background: #22d3ee !important;
+}
+
+/* ========== AUTOCOMPLETE CONTROLS ========== */
+/* PrimeNG AutoComplete styling */
+.p-autocomplete {
+  background: #ffffff !important;
+  border: 1px solid rgba(6, 182, 212, 0.3) !important;
+  color: #374151 !important;
+  transition: all 0.15s ease !important;
+  border-radius: 0.375rem !important;
+}
+
+.p-autocomplete input {
+  background: transparent !important;
+  border: none !important;
+  color: #374151 !important;
+}
+
+.p-autocomplete:hover {
+  background: #ffffff !important;
+  border-color: rgba(6, 182, 212, 0.4) !important;
+}
+
+.p-autocomplete:focus,
+.p-autocomplete.p-focus,
+.p-autocomplete:focus-within {
+  background: #ffffff !important;
+  border-color: rgba(6, 182, 212, 0.8) !important;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1) !important;
+}
+
+/* Dark mode autocomplete */
+.dark .p-autocomplete {
+  background: transparent !important;
+  border-color: rgba(34, 211, 238, 0.4) !important;
+  color: #f9fafb !important;
+}
+
+.dark .p-autocomplete input {
+  background: transparent !important;
+  border: none !important;
+  color: #f9fafb !important;
+}
+
+.dark .p-autocomplete:hover {
+  background: transparent !important;
+  border-color: rgba(34, 211, 238, 0.5) !important;
+}
+
+.dark .p-autocomplete:focus,
+.dark .p-autocomplete.p-focus,
+.dark .p-autocomplete:focus-within {
+  background: transparent !important;
+  border-color: rgba(34, 211, 238, 0.8) !important;
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.1) !important;
+}

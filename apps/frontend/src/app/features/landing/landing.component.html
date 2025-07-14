@@ -1,0 +1,613 @@
+<div
+  class="min-h-screen hero-dynamic-bg flex flex-col"
+>
+  <!-- Header -->
+  <header class="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-b border-cyan-100 dark:border-gray-700">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-4 sm:py-6">
+        <div class="flex items-center">
+          <!-- Desktop logo -->
+          <div class="hidden sm:block">
+            <app-logo size="lg" [isClickable]="true" navigateTo="/"> </app-logo>
+          </div>
+          <!-- Mobile logo - smaller -->
+          <div class="block sm:hidden">
+            <app-logo size="md" [isClickable]="true" navigateTo="/"> </app-logo>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2 sm:space-x-4">
+          <p-button
+            [icon]="themeService.isDarkMode() ? 'pi pi-sun' : 'pi pi-moon'"
+            severity="secondary"
+            [text]="true"
+            [rounded]="true"
+            size="small"
+            [attr.aria-label]="themeService.isDarkMode() ? 'Αλλαγή σε φωτεινό θέμα' : 'Αλλαγή σε σκοτεινό θέμα'"
+            [attr.aria-pressed]="themeService.isDarkMode()"
+            (click)="themeService.toggleTheme()"
+            styleClass="theme-toggle-modern"
+          >
+          </p-button>
+
+          <!-- Show different buttons based on authentication status -->
+          <ng-container *ngIf="!authService.isAuthenticated()">
+            <!-- Desktop version - show full buttons -->
+            <div class="hidden sm:flex items-center space-x-3">
+              <p-button
+                label="Σύνδεση"
+                icon="pi pi-sign-in"
+                severity="secondary"
+                [outlined]="true"
+                size="small"
+                styleClass="login-btn-modern"
+                ariaLabel="Σύνδεση στη εφαρμογή"
+                (click)="onLogin()"
+              >
+              </p-button>
+
+              <p-button
+                label="Εγγραφή"
+                icon="pi pi-user-plus"
+                severity="info"
+                size="small"
+                styleClass="register-btn-modern"
+                ariaLabel="Δημιουργία νέου λογαριασμού"
+                (click)="onRegister()"
+              >
+              </p-button>
+            </div>
+
+            <!-- Mobile version - compact icons only -->
+            <div class="flex sm:hidden items-center space-x-2">
+              <p-button
+                icon="pi pi-sign-in"
+                severity="secondary"
+                [outlined]="true"
+                size="small"
+                [rounded]="true"
+                styleClass="login-btn-mobile"
+                [attr.aria-label]="'Σύνδεση'"
+                [attr.title]="'Σύνδεση'"
+                (click)="onLogin()"
+              >
+              </p-button>
+
+              <p-button
+                icon="pi pi-user-plus"
+                severity="info"
+                size="small"
+                [rounded]="true"
+                styleClass="register-btn-mobile"
+                [attr.aria-label]="'Εγγραφή'"
+                [attr.title]="'Εγγραφή'"
+                (click)="onRegister()"
+              >
+              </p-button>
+            </div>
+          </ng-container>
+
+          <!-- Show dashboard button when authenticated -->
+          <ng-container *ngIf="authService.isAuthenticated()">
+            <!-- Desktop version -->
+            <div class="hidden sm:block">
+              <p-button
+                label="Πίνακας Ελέγχου"
+                icon="pi pi-th-large"
+                severity="info"
+                size="small"
+                styleClass="dashboard-btn-modern"
+                (click)="onDashboard()"
+              >
+              </p-button>
+            </div>
+
+            <!-- Mobile version -->
+            <div class="block sm:hidden">
+              <p-button
+                icon="pi pi-th-large"
+                severity="info"
+                size="small"
+                [rounded]="true"
+                styleClass="dashboard-btn-mobile"
+                [attr.aria-label]="'Πίνακας Ελέγχου'"
+                [attr.title]="'Πίνακας Ελέγχου'"
+                (click)="onDashboard()"
+              >
+              </p-button>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content - flex-grow to push footer down -->
+  <div class="flex-grow">
+    <!-- Hero Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="text-center">
+        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+          Συγκριτική Μελέτη
+          <span class="text-cyan-600 dark:text-cyan-400 font-bold"
+            >ASR Μοντέλων για Ελληνικά</span
+          >
+        </h1>
+
+        <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+          Δοκιμάζουμε πώς λειτουργούν τα Whisper και wav2vec2 μοντέλα στα ελληνικά.
+          <span class="text-cyan-600 dark:text-cyan-400 font-medium"
+            >Ποιο είναι πιο ακριβές και γρήγορο;</span
+          >
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
+          <p-button
+            label="Πώς λειτουργεί"
+            icon="pi pi-book"
+            severity="info"
+            size="large"
+            styleClass="hero-cta-primary w-full sm:w-auto"
+            ariaLabel="Μάθετε περισσότερα για την ακαδημαϊκή έρευνα"
+            (click)="onLearnMore()"
+          >
+          </p-button>
+
+          <p-button
+            [label]="authService.isAuthenticated() ? 'Πήγαινε στο Dashboard' : 'Δοκιμάστε τώρα'"
+            [icon]="authService.isAuthenticated() ? 'pi pi-th-large' : 'pi pi-chart-bar'"
+            severity="secondary"
+            [outlined]="true"
+            size="large"
+            styleClass="hero-cta-secondary w-full sm:w-auto"
+            [ariaLabel]="authService.isAuthenticated() ? 'Μετάβαση στο Dashboard' : 'Ξεκινήστε τη σύγκριση μοντέλων'"
+            (click)="onGetStarted()"
+          >
+          </p-button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="text-center group feature-card">
+          <div
+            class="feature-icon-container w-16 h-16 bg-gradient-to-br from-cyan-100 to-cyan-200 dark:from-cyan-900 dark:to-cyan-800 rounded-xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-all duration-300 shadow-lg"
+          >
+            <i class="pi pi-microphone text-2xl text-cyan-600 dark:text-cyan-400 feature-icon"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors duration-300">Μοντέλα Whisper</h3>
+          <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+            Δοκιμή και σύγκριση μοντέλων Whisper για ελληνική αναγνώριση ομιλίας
+          </p>
+        </div>
+
+        <div class="text-center group feature-card">
+          <div
+            class="feature-icon-container w-16 h-16 bg-gradient-to-br from-emerald-100 to-emerald-200 dark:from-emerald-900 dark:to-emerald-800 rounded-xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-all duration-300 shadow-lg"
+          >
+            <i class="pi pi-shield text-2xl text-emerald-600 dark:text-emerald-400 feature-icon"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300">Μοντέλα wav2vec2</h3>
+          <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+            Δοκιμή και σύγκριση μοντέλων wav2vec2 εξειδικευμένων για ελληνικά
+          </p>
+        </div>
+
+        <div class="text-center group feature-card">
+          <div
+            class="feature-icon-container w-16 h-16 bg-gradient-to-br from-cyan-100 to-cyan-200 dark:from-cyan-900 dark:to-cyan-800 rounded-xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-all duration-300 shadow-lg"
+          >
+            <i class="pi pi-cog text-2xl text-cyan-600 dark:text-cyan-400 feature-icon"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors duration-300">Συγκριτική Ανάλυση</h3>
+          <p class="text-gray-600 dark:text-gray-300 leading-relaxed">Ανάλυση επιδόσεων και σύγκριση μετρικών ακρίβειας</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Use Cases Section -->
+    <section
+      class="bg-gradient-to-r from-blue-50 via-cyan-50 to-cyan-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            Τι δοκιμάζουμε
+          </h2>
+          <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            Συγκρίνουμε τα πιο δημοφιλή AI μοντέλα μεταγραφής στα ελληνικά
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Whisper Models -->
+          <div
+            class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+          >
+            <div
+              class="w-12 h-12 bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900 dark:to-red-800 rounded-lg flex items-center justify-center mb-4"
+            >
+              <i class="pi pi-microphone text-xl text-red-600 dark:text-red-400"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Μοντέλα Whisper</h3>
+            <ul class="text-gray-600 dark:text-gray-300 space-y-2 text-sm">
+              <li>• Το προχωρημένο Whisper μοντέλο</li>
+              <li>• Πόσο ακριβές είναι στα ελληνικά;</li>
+              <li>• Πόσο γρήγορα επεξεργάζεται;</li>
+              <li>• Τι πόρους χρειάζεται;</li>
+              <li>• Πώς συγκρίνεται με άλλα;</li>
+            </ul>
+          </div>
+
+          <!-- wav2vec2 Models -->
+          <div
+            class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+          >
+            <div
+              class="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-lg flex items-center justify-center mb-4"
+            >
+              <i class="pi pi-chart-line text-xl text-blue-600 dark:text-blue-400"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Μοντέλα wav2vec2</h3>
+            <ul class="text-gray-600 dark:text-gray-300 space-y-2 text-sm">
+              <li>• Το εξειδικευμένο wav2vec2 μοντέλο</li>
+              <li>• Πόσο καλά κατανοεί τα ελληνικά;</li>
+              <li>• Πόσο γρήγορα ανταποκρίνεται;</li>
+              <li>• Είναι ποντικά ακριβές;</li>
+            </ul>
+          </div>
+
+          <!-- Comparative Analysis -->
+          <div
+            class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+          >
+            <div
+              class="w-12 h-12 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 rounded-lg flex items-center justify-center mb-4"
+            >
+              <i class="pi pi-chart-bar text-xl text-green-600 dark:text-green-400"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Συγκριτική Ανάλυση</h3>
+            <ul class="text-gray-600 dark:text-gray-300 space-y-2 text-sm">
+              <li>• Δοκιμάζουμε και τα δύο μαζί</li>
+              <li>• Βλέπουμε ποιο είναι καλύτερο</li>
+              <li>• Παίρνουμε γραφήματα και στατιστικά</li>
+              <li>• Εξάγουμε τα αποτελέσματα</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+          <div class="group">
+            <div
+              class="text-3xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-300"
+            >
+              2
+            </div>
+            <div class="text-gray-600 dark:text-gray-300 mt-2">Μοντέλα ASR</div>
+          </div>
+          <div class="group">
+            <div
+              class="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-300"
+            >
+              3
+            </div>
+            <div class="text-gray-600 dark:text-gray-300 mt-2">Μετρικές Αξιολόγησης</div>
+          </div>
+          <div class="group">
+            <div
+              class="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-300"
+            >
+              100%
+            </div>
+            <div class="text-gray-600 dark:text-gray-300 mt-2">Ακαδημαϊκή Χρήση</div>
+          </div>
+          <div class="group">
+            <div
+              class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-300"
+            >
+              Open
+            </div>
+            <div class="text-gray-600 dark:text-gray-300 mt-2">Ανοιχτή Έρευνα</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Academic Research Section -->
+    <section
+      class="bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-slate-800 dark:via-slate-700 dark:to-slate-800"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Τι θέλουμε να μάθουμε</h2>
+          <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            Κάνουμε μια διπλωματική εργασία και θέλουμε να δούμε πόσο καλά δουλεύουν τα AI στα ελληνικά
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-xl">
+            <div class="flex items-center mb-6">
+              <div class="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-lg flex items-center justify-center">
+                <i class="pi pi-graduation-cap text-xl text-blue-600 dark:text-blue-400"></i>
+              </div>
+              <div class="ml-4">
+                <h4 class="text-xl font-semibold text-gray-900 dark:text-white">Τι θέλουμε</h4>
+              </div>
+            </div>
+            <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+              Να δούμε ποιο από τα δύο πιο δημοφιλή AI μοντέλα (Whisper εναντίον wav2vec2) 
+              δουλεύει καλύτερα στα ελληνικά - πιο γρήγορα, πιο ακριβώς.
+            </p>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-xl">
+            <div class="flex items-center mb-6">
+              <div class="w-12 h-12 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 rounded-lg flex items-center justify-center">
+                <i class="pi pi-shield text-xl text-green-600 dark:text-green-400"></i>
+              </div>
+              <div class="ml-4">
+                <h4 class="text-xl font-semibold text-gray-900 dark:text-white">Γιατί το κάνουμε</h4>
+              </div>
+            </div>
+            <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+              Είναι μέρος της διπλωματικής μας. Χρειαζόμαστε απαντήσεις σε πραγματικές ερωτήσεις: 
+              Ποιο AI είναι καλύτερο; Πόσο κοστίζει; Πόσα λάθη κάνει;
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Academic Research Features Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Χαρακτηριστικά Πλατφόρμας</h2>
+        <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          Ολοκληρωμένα εργαλεία για έρευνα στην αναγνώριση ελληνικής ομιλίας
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-xl border-2 border-blue-500">
+          <div class="text-center">
+            <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="pi pi-microphone text-2xl text-blue-600 dark:text-blue-400"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Ατομική Επεξεργασία</h3>
+            <p class="text-gray-600 dark:text-gray-300 mb-6">Χρήση Whisper ή wav2vec2 μοντέλων ξεχωριστά</p>
+            <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-300">
+              <li class="flex items-center"><i class="pi pi-check text-green-500 mr-2"></i>Whisper large-v3</li>
+              <li class="flex items-center"><i class="pi pi-check text-green-500 mr-2"></i>wav2vec2 για ελληνικά</li>
+              <li class="flex items-center"><i class="pi pi-check text-green-500 mr-2"></i>Απεριόριστη χρήση</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-xl border-2 border-orange-500 relative">
+          <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+            <span class="bg-orange-500 text-white px-4 py-1 rounded-full text-sm font-medium">Κύριο Χαρακτηριστικό</span>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 bg-orange-100 dark:bg-orange-900 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="pi pi-chart-bar text-2xl text-orange-600 dark:text-orange-400"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Σύγκριση Μοντέλων</h3>
+            <p class="text-gray-600 dark:text-gray-300 mb-6">Ταυτόχρονη επεξεργασία και ανάλυση απόδοσης</p>
+            <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-300">
+              <li class="flex items-center"><i class="pi pi-check text-green-500 mr-2"></i>WER σύγκριση</li>
+              <li class="flex items-center"><i class="pi pi-check text-green-500 mr-2"></i>Μετρήσεις ταχύτητας</li>
+              <li class="flex items-center"><i class="pi pi-check text-green-500 mr-2"></i>Ακαδημαϊκές αναλύσεις</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-xl border-2 border-green-500">
+          <div class="text-center">
+            <div class="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="pi pi-download text-2xl text-green-600 dark:text-green-400"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Εξαγωγή Δεδομένων</h3>
+            <p class="text-gray-600 dark:text-gray-300 mb-6">Εξαγωγή αποτελεσμάτων για ερευνητικά άρθρα</p>
+            <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-300">
+              <li class="flex items-center"><i class="pi pi-check text-green-500 mr-2"></i>Μετρήσεις απόδοσης</li>
+              <li class="flex items-center"><i class="pi pi-check text-green-500 mr-2"></i>Συγκριτικά στατιστικά</li>
+              <li class="flex items-center"><i class="pi pi-check text-green-500 mr-2"></i>Γραφήματα και πίνακες</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Συχνές Ερωτήσεις</h2>
+        <p class="text-lg text-gray-600 dark:text-gray-300">
+          Απαντήσεις στις πιο συχνές ερωτήσεις σχετικά με το GreekSTT Research Platform
+        </p>
+      </div>
+
+      <div class="space-y-6">
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md border border-gray-200 dark:border-gray-700 faq-item"
+        >
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            Ποια μοντέλα ASR χρησιμοποιεί η πλατφόρμα;
+          </h3>
+          <p class="text-gray-600 dark:text-gray-300">
+            Η πλατφόρμα χρησιμοποιεί δύο κορυφαία μοντέλα: Whisper large-v3 από την OpenAI και wav2vec2 
+            εξειδικευμένο για ελληνικά. Μπορείτε να τα χρησιμοποιήσετε ξεχωριστά ή να κάνετε σύγκριση της απόδοσής τους.
+          </p>
+        </div>
+
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md border border-gray-200 dark:border-gray-700 faq-item"
+        >
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Πώς λειτουργεί η σύγκριση μοντέλων;</h3>
+          <p class="text-gray-600 dark:text-gray-300">
+            Η πλατφόρμα επεξεργάζεται το ίδιο αρχείο ήχου με και τα δύο μοντέλα παράλληλα και παρέχει 
+            συγκριτικά αποτελέσματα όπως WER (Word Error Rate), ταχύτητα επεξεργασίας και ακρίβεια για 
+            ακαδημαϊκή ανάλυση.
+          </p>
+        </div>
+
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md border border-gray-200 dark:border-gray-700 faq-item"
+        >
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Είναι η πλατφόρμα κατάλληλη για έρευνα;</h3>
+          <p class="text-gray-600 dark:text-gray-300">
+            Η πλατφόρμα σχεδιάστηκε ειδικά για ακαδημαϊκή έρευνα. Παρέχει μετρήσεις απόδοσης, συγκριτικά 
+            στατιστικά και δυνατότητες εξαγωγής δεδομένων που είναι απαραίτητα για ερευνητικές εργασίες 
+            και διπλωματικές στον τομέα της αναγνώρισης ομιλίας.
+          </p>
+        </div>
+
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md border border-gray-200 dark:border-gray-700 faq-item"
+        >
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            Τι μορφές αρχείων υποστηρίζονται;
+          </h3>
+          <p class="text-gray-600 dark:text-gray-300">
+            Υποστηρίζουμε όλες τις κοινές μορφές ήχου: MP3, WAV, M4A, FLAC, OGG και άλλες. Επίσης δεχόμαστε αρχεία
+            βίντεο (MP4, AVI, MOV) για εξαγωγή ήχου. Η πλατφόρμα είναι βελτιστοποιημένη για ελληνικά αρχεία ήχου.
+          </p>
+        </div>
+
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md border border-gray-200 dark:border-gray-700 faq-item"
+        >
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Υπάρχει περιορισμός χρήσης;</h3>
+          <p class="text-gray-600 dark:text-gray-300">
+            Όχι! Η πλατφόρμα είναι διαθέσιμη χωρίς περιορισμούς για ακαδημαϊκή χρήση. Μπορείτε να επεξεργαστείτε 
+            απεριόριστα αρχεία ήχου για ερευνητικούς σκοπούς.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div [ngClass]="authService.isAuthenticated() ? 'flex justify-center' : 'grid grid-cols-1 md:grid-cols-2 gap-8'">
+        <!-- Academic Demo CTA -->
+        <div
+          class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 text-center shadow-lg hover:shadow-xl transition-all duration-300"
+          [ngClass]="authService.isAuthenticated() ? 'max-w-md' : ''"
+        >
+          <div
+            class="w-16 h-16 bg-gradient-to-br from-cyan-100 to-cyan-200 dark:from-cyan-900 dark:to-cyan-800 rounded-xl flex items-center justify-center mx-auto mb-6"
+          >
+            <i [class]="authService.isAuthenticated() ? 'pi pi-list text-2xl text-cyan-600 dark:text-cyan-400' : 'pi pi-chart-bar text-2xl text-cyan-600 dark:text-cyan-400'"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            {{ authService.isAuthenticated() ? 'Μεταγραφές & Σύγκριση' : 'Δοκιμάστε τη Σύγκριση' }}
+          </h3>
+          <p class="text-gray-600 dark:text-gray-300 mb-8">
+            {{ authService.isAuthenticated() 
+              ? 'Πηγαίνετε στη σελίδα μεταγραφών για να ξεκινήσετε τη σύγκριση μοντέλων' 
+              : 'Εξερευνήστε τη σύγκριση μοντέλων Whisper και wav2vec2 για ελληνικά' }}
+          </p>
+          <p-button
+            [label]="authService.isAuthenticated() ? 'Μεταγραφές' : 'Δοκιμή Σύγκρισης'"
+            [icon]="authService.isAuthenticated() ? 'pi pi-list' : 'pi pi-chart-bar'"
+            severity="secondary"
+            [outlined]="true"
+            styleClass="demo-cta-btn"
+            (click)="onComparisonDemo()"
+          >
+          </p-button>
+        </div>
+
+        <!-- Academic Registration CTA - Hidden when authenticated -->
+        <div
+          *ngIf="!authService.isAuthenticated()"
+          class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 text-center shadow-lg hover:shadow-xl transition-all duration-300"
+        >
+          <div
+            class="w-16 h-16 bg-gradient-to-br from-emerald-100 to-emerald-200 dark:from-emerald-900 dark:to-emerald-800 rounded-xl flex items-center justify-center mx-auto mb-6"
+          >
+            <i class="pi pi-graduation-cap text-2xl text-emerald-600 dark:text-emerald-400"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Ερευνητικός Λογαριασμός</h3>
+          <p class="text-gray-600 dark:text-gray-300 mb-8">Δημιουργήστε λογαριασμό για πλήρη πρόσβαση στα ερευνητικά εργαλεία</p>
+          <p-button
+            label="Εγγραφή για Έρευνα"
+            icon="pi pi-user-plus"
+            severity="info"
+            styleClass="register-cta-btn"
+            (click)="onRegister()"
+          >
+          </p-button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <!-- Company Info -->
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">GreekSTT Research Platform</h3>
+          <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+            Ερευνητική πλατφόρμα για σύγκριση ASR μοντέλων στην ελληνική γλώσσα.
+          </p>
+          <div class="flex space-x-4">
+            <i class="pi pi-facebook text-gray-600 dark:text-gray-400 cursor-pointer social-icon"></i>
+            <i class="pi pi-twitter text-gray-600 dark:text-gray-400 cursor-pointer social-icon"></i>
+            <i class="pi pi-linkedin text-gray-600 dark:text-gray-400 cursor-pointer social-icon"></i>
+          </div>
+        </div>
+
+        <!-- Research -->
+        <div>
+          <h4 class="font-semibold text-gray-900 dark:text-white mb-4">Έρευνα</h4>
+          <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <li><a href="#" class="footer-link">Μοντέλα ASR</a></li>
+            <li><a href="#" class="footer-link">Σύγκριση</a></li>
+            <li><a href="#" class="footer-link">Μετρικές</a></li>
+            <li><a href="#" class="footer-link">Διπλωματική</a></li>
+          </ul>
+        </div>
+
+        <!-- Support -->
+        <div>
+          <h4 class="font-semibold text-gray-900 dark:text-white mb-4">Υποστήριξη</h4>
+          <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <li><a href="#">Κέντρο Βοήθειας</a></li>
+            <li><a href="#">Επικοινωνία</a></li>
+            <li><a href="#">Κατάσταση Υπηρεσίας</a></li>
+            <li><a href="#">Οδηγοί</a></li>
+          </ul>
+        </div>
+
+        <!-- Legal -->
+        <div>
+          <h4 class="font-semibold text-gray-900 dark:text-white mb-4">Νομικά</h4>
+          <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <li><a href="#">Όροι Χρήσης</a></li>
+            <li><a href="#">Πολιτική Απορρήτου</a></li>
+            <li><a href="#">GDPR</a></li>
+            <li><a href="#">Cookies</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-200 dark:border-gray-700 pt-8 text-center text-gray-600 dark:text-gray-400">
+        <p class="text-sm">&copy; 2024 GreekSTT Research Platform. Όλα τα δικαιώματα διατηρούνται.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll to Top Button -->
+  <p-scrollTop threshold="300" icon="pi pi-arrow-up" styleClass="scroll-to-top-modern"></p-scrollTop>
+</div>

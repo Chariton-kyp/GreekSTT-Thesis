@@ -1,0 +1,227 @@
+<!-- Enhanced Professional Analytics Dashboard for Thesis -->
+<div class="analytics-dashboard-container">
+  <!-- Header Section -->
+  <div class="analytics-header">
+    <div class="header-content">
+      <div class="header-top">
+        <div class="title-section">
+          <h1>Αναλυτικά Στατιστικά Έρευνας</h1>
+          <div class="metadata">
+            <span>Προσωπικά στατιστικά και ανάλυση επίδοσης</span>
+          </div>
+        </div>
+        
+        <div class="header-actions">
+          <!-- Date Range Selector -->
+          <div class="date-range-selector">
+            <label>Περίοδος:</label>
+            <p-calendar 
+              [(ngModel)]="dateRange" 
+              [selectionMode]="'range'" 
+              [readonlyInput]="true"
+              dateFormat="dd/mm/yy"
+              [showIcon]="true"
+              [showButtonBar]="true"
+              (onSelect)="onDateRangeChange()">
+            </p-calendar>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content-container">
+    @if (isLoading()) {
+      <div class="loading-container">
+        <p-progressSpinner></p-progressSpinner>
+        <p class="loading-text">Φόρτωση αναλυτικών στοιχείων...</p>
+      </div>
+    } @else {
+      <!-- Key Metrics Cards -->
+      <div class="metrics-grid">
+        <!-- Total Transcriptions -->
+        <div class="metric-card">
+          <div class="metric-icon">
+            <i class="pi pi-microphone"></i>
+          </div>
+          <div class="metric-content">
+            <div class="metric-label">Οι Μεταγραφές μου</div>
+            <div class="metric-value">{{ totalTranscriptions() }}</div>
+            <div class="metric-change positive">
+              Προσωπικές μεταγραφές
+            </div>
+          </div>
+        </div>
+
+        <!-- Model Comparisons -->
+        <div class="metric-card">
+          <div class="metric-icon comparison">
+            <i class="pi pi-chart-bar"></i>
+          </div>
+          <div class="metric-content">
+            <div class="metric-label">Οι Συγκρίσεις μου</div>
+            <div class="metric-value">{{ totalComparisons() }}</div>
+            <div class="metric-change neutral">
+              {{ comparisonPercentage() }}% των μεταγραφών
+            </div>
+          </div>
+        </div>
+
+        <!-- Average Accuracy -->
+        <div class="metric-card">
+          <div class="metric-icon accuracy">
+            <i class="pi pi-check-circle"></i>
+          </div>
+          <div class="metric-content">
+            <div class="metric-label">Μέση Ακρίβεια*</div>
+            <div class="metric-value">{{ averageAccuracy() }}%</div>
+            <div class="metric-change neutral">
+              WER: {{ averageWER() }}%*
+            </div>
+            <div class="metric-disclaimer">
+              <i class="pi pi-info-circle"></i>
+              <span>*Μόνο από αξιολογημένες μεταγραφές ({{ evaluatedTranscriptionsCount() }})</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Processing Time -->
+        <div class="metric-card">
+          <div class="metric-icon timing">
+            <i class="pi pi-clock"></i>
+          </div>
+          <div class="metric-content">
+            <div class="metric-label">Μέσος Χρόνος Επεξεργασίας</div>
+            <div class="metric-value">{{ averageProcessingTime() }}s</div>
+            <div class="metric-change neutral">
+              RTF: {{ realtimeFactor() }}x
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="charts-section">
+        <!-- Model Performance Comparison -->
+        <p-card styleClass="analytics-chart-card">
+          <ng-template pTemplate="header">
+            <div class="chart-card-header">
+              <h3><i class="pi pi-chart-pie mr-2"></i>Σύγκριση Επίδοσης Μοντέλων</h3>
+            </div>
+          </ng-template>
+          <p-chart 
+            type="radar" 
+            [data]="modelComparisonChartData()" 
+            [options]="chartOptions()"
+            styleClass="analytics-radar-chart">
+          </p-chart>
+        </p-card>
+
+        <!-- Usage Timeline -->
+        <p-card styleClass="analytics-chart-card">
+          <ng-template pTemplate="header">
+            <div class="chart-card-header">
+              <h3><i class="pi pi-chart-line mr-2"></i>Χρονική Εξέλιξη Χρήσης</h3>
+            </div>
+          </ng-template>
+          <p-chart 
+            type="line" 
+            [data]="usageTimelineChartData()" 
+            [options]="timelineChartOptions()"
+            styleClass="analytics-line-chart">
+          </p-chart>
+        </p-card>
+      </div>
+
+
+      <!-- Detailed Performance Table -->
+      <p-card styleClass="performance-table-card">
+        <ng-template pTemplate="header">
+          <div class="performance-table-header">
+            <h3><i class="pi pi-table mr-2"></i>Αναλυτικά Στοιχεία Επίδοσης</h3>
+            <p class="performance-subtitle">Συγκριτική ανάλυση μοντέλων με λεπτομερή μετρήματα</p>
+            <div class="accuracy-disclaimer">
+              <i class="pi pi-exclamation-triangle"></i>
+              <strong>Σημαντική Σημείωση:</strong> Οι τιμές ακρίβειας και WER υπολογίζονται μόνο από μεταγραφές που έχουν αξιολογηθεί με ground truth data ({{ evaluatedTranscriptionsCount() }} από {{ totalTranscriptions() }}). Τα αποτελέσματα αφορούν μόνο τις δικές σας μεταγραφές.
+            </div>
+          </div>
+        </ng-template>
+        
+        <p-table 
+          [value]="performanceTableData()" 
+          [paginator]="true" 
+          [rows]="10"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Εμφάνιση {first} έως {last} από {totalRecords} εγγραφές"
+          styleClass="analytics-performance-table">
+          
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="modelName">
+                Μοντέλο <p-sortIcon field="modelName"></p-sortIcon>
+              </th>
+              <th pSortableColumn="totalTranscriptions">
+                Μεταγραφές <p-sortIcon field="totalTranscriptions"></p-sortIcon>
+              </th>
+              <th pSortableColumn="avgAccuracy">
+                Μέση Ακρίβεια <p-sortIcon field="avgAccuracy"></p-sortIcon>
+              </th>
+              <th pSortableColumn="avgWER">
+                Μέσο WER <p-sortIcon field="avgWER"></p-sortIcon>
+              </th>
+              <th pSortableColumn="avgProcessingTime">
+                Μέσος Χρόνος <p-sortIcon field="avgProcessingTime"></p-sortIcon>
+              </th>
+              <th pSortableColumn="successRate">
+                Επιτυχία <p-sortIcon field="successRate"></p-sortIcon>
+              </th>
+            </tr>
+          </ng-template>
+          
+          <ng-template pTemplate="body" let-model>
+            <tr>
+              <td>
+                <div class="model-name-cell">
+                  <span class="model-name">{{ model.modelName }}</span>
+                </div>
+              </td>
+              <td>{{ model.totalTranscriptions }}</td>
+              <td>
+                <span class="accuracy-value" 
+                      [class.high-accuracy]="model.avgAccuracy >= 90"
+                      [class.medium-accuracy]="model.avgAccuracy < 90 && model.avgAccuracy >= 80"
+                      [class.low-accuracy]="model.avgAccuracy < 80">
+                  {{ model.avgAccuracy }}%
+                </span>
+              </td>
+              <td>{{ model.avgWER }}%</td>
+              <td>{{ model.avgProcessingTime }}s</td>
+              <td>
+                <span class="success-rate-badge"
+                      [class.high-success]="model.successRate >= 95"
+                      [class.medium-success]="model.successRate < 95 && model.successRate >= 90"
+                      [class.low-success]="model.successRate < 90">
+                  {{ model.successRate }}%
+                </span>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+
+    }
+
+    <!-- Academic Disclaimer -->
+    <div class="academic-disclaimer">
+      <div class="disclaimer-icon">
+        <i class="pi pi-info-circle"></i>
+      </div>
+      <div class="disclaimer-content">
+        <strong>Ακαδημαϊκή Σημείωση:</strong> Τα παραπάνω στατιστικά στοιχεία αφορούν αποκλειστικά 
+        την ερευνητική σύγκριση των μοντέλων Whisper και wav2vec2 για την ελληνική γλώσσα. 
+        Τα αποτελέσματα προορίζονται για ακαδημαϊκή χρήση στο πλαίσιο της διπλωματικής εργασίας.
+      </div>
+    </div>
+  </div>
+</div>

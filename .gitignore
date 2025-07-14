@@ -1,0 +1,607 @@
+# =============================================================================
+# GreekSTT Research Platform - Academic Project .gitignore
+# =============================================================================
+
+# =============================================================================
+# ENVIRONMENT & SECRETS
+# =============================================================================
+# Environment files (keep .env.example for reference)
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+
+# Secrets and credentials
+*.key
+*.pem
+*.p12
+*.pfx
+*.crt
+*.csr
+*.cert
+*.cer
+secrets/
+credentials/
+config/secrets/
+certs/
+docs/
+
+# API keys and tokens
+.apikeys
+.tokens
+auth.json
+
+# =============================================================================
+# PYTHON
+# =============================================================================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# =============================================================================
+# NODE.JS / ANGULAR (Frontend)
+# =============================================================================
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Grunt intermediate storage
+.grunt
+
+# Bower dependency directory
+bower_components
+
+# node-waf configuration
+.lock-wscript
+
+# Compiled binary addons
+build/Release
+
+# Dependency directories
+jspm_packages/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Chrome debug profile for VSCode debugging
+.chrome-debug-profile/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Gatsby files
+.cache/
+public
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Angular
+frontend/.angular/
+frontend/e2e/
+frontend/.sass-cache/
+frontend/dist/
+frontend/tmp/
+.angular/
+
+# =============================================================================
+# DOCKER
+# =============================================================================
+# Docker override files
+docker-compose.override.yml
+docker-compose.*.override.yml
+
+# Docker volumes
+.docker/
+
+# =============================================================================
+# DATABASES
+# =============================================================================
+# SQLite
+*.db
+*.sqlite
+*.sqlite3
+
+# PostgreSQL
+*.dump
+*.sql.gz
+
+# MySQL
+*.mysql
+
+# MongoDB
+*.bson
+
+# =============================================================================
+# LOGS
+# =============================================================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime logs
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# =============================================================================
+# AUDIO FILES (Project Specific)
+# =============================================================================
+# Large audio files - should not be committed
+*.wav
+*.mp3
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.flac
+*.m4a
+*.ogg
+*.aac
+*.opus
+*.webm
+*.wma
+
+# Audio processing temp files
+audio_temp/
+temp_audio/
+processed_audio/
+
+# =============================================================================
+# AI/ML MODEL FILES (Project Specific)
+# =============================================================================
+# Model binaries - too large for git
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+*.h5
+*.pkl
+*.pickle
+*.joblib
+
+# Model cache directories
+models/cache/
+.transformers_cache/
+.cache/huggingface/
+.cache/torch/
+
+# Training artifacts
+runs/
+lightning_logs/
+wandb/
+tensorboard_logs/
+checkpoints/
+
+# =============================================================================
+# PROJECT SPECIFIC DATA
+# =============================================================================
+# AI service data
+ai/data/audio/*
+ai/data/temp/*
+ai/data/results/*
+!ai/data/audio/.gitkeep
+!ai/data/temp/.gitkeep
+!ai/data/results/.gitkeep
+
+# AI models directory
+ai/models/*
+!ai/models/.gitkeep
+
+# AI audit logs (can be large)
+ai/audit_logs/
+ai/logs/
+
+# =============================================================================
+# IDE & EDITORS
+# =============================================================================
+# VSCode - excluded for cleaner repository
+.vscode/
+*.code-workspace
+
+# Sublime Text
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+*~
+*.swp
+*.swo
+*~
+Session.vim
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# IntelliJ / PyCharm
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Eclipse
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# =============================================================================
+# OPERATING SYSTEMS
+# =============================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# =============================================================================
+# TEMPORARY FILES
+# =============================================================================
+# General temp directories
+temp/
+tmp/
+.temp/
+.tmp/
+
+# Backup files
+*.bak
+*.backup
+*.orig
+*.save
+
+# =============================================================================
+# TESTING
+# =============================================================================
+# Test artifacts
+.coverage
+.pytest_cache/
+test-results/
+coverage/
+.nyc_output/
+
+# Performance testing
+locust_reports/
+performance_logs/
+
+# =============================================================================
+# DEPLOYMENT & CI/CD
+# =============================================================================
+# Deployment artifacts
+deploy/
+deployment/
+k8s-manifests/generated/
+
+# CI/CD logs
+.github/workflows/logs/
+.gitlab-ci/logs/
+
+# =============================================================================
+# DOCUMENTATION
+# =============================================================================
+# Generated documentation
+docs/_build/
+docs/build/
+site/
+
+# =============================================================================
+# MONITORING & OBSERVABILITY
+# =============================================================================
+# Monitoring data
+monitoring/data/
+metrics/
+traces/
+
+# =============================================================================
+# COMPRESSION & ARCHIVES
+# =============================================================================
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# =============================================================================
+# CUSTOM PROJECT IGNORES
+# =============================================================================
+# Add any project-specific patterns here
+
+# Configuration overrides
+config.local.*
+settings.local.*
+*/config.local.*
+*/settings.local.*
+
+# Development scripts
+dev-scripts/
+local-scripts/
+backend/dev-scripts/
+ai/dev-scripts/
+frontend/dev-scripts/
+
+# Experimental features
+experimental/
+sandbox/
+
+# User-specific files
+.user
+.personal
+user-*/
+.cursor\rules\nx-rules.mdc
+.github\instructions\nx.instructions.md
+
+.nx/
+.nx/cache
+.nx/workspace-data
+
+apps/ai-service/models
+# SSL certificates will be auto-generated during setup
+# Remove the exceptions that were allowing certs to be committed
+# VS Code debugging profile
+.vscode/chrome-debug-profile/
+
+# =============================================================================
+# ACADEMIC RESEARCH PLATFORM - SPECIFIC IGNORES
+# =============================================================================
+
+# Academic research data (keep samples, ignore large files)
+data/academic/results/*.wav
+data/academic/results/*.mp3
+data/academic/results/*.flac
+data/academic/models/cache/
+data/academic/models/downloads/
+logs/academic/
+
+# Email demo data
+data/emails/mailhog/
+
+# Thesis materials (personal)
+data/academic/thesis-materials/personal-notes/
+data/academic/thesis-materials/committee-feedback/
+data/academic/thesis-materials/defense-preparation/
+
+# Academic demo files to keep in repo
+!data/academic/samples/demo-*
+!data/academic/comparison-reports/sample-*
+!data/academic/thesis-materials/presentation-script.json
+
+# Academic configuration files to keep
+!docker-compose.academic.yml
+!scripts/academic-*.sh
+!scripts/academic-*.js
+
+# Temporary academic files
+*.tmp.academic
+academic-temp/
+thesis-temp/
+
+
+.vscode

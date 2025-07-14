@@ -1,0 +1,295 @@
+// ========== COMPONENT-SPECIFIC DESIGN TOKENS ==========
+// Component tokens built on top of the base design token system
+// These tokens provide semantic meaning for specific UI components
+
+:root {
+  // ========== FORM CONTROL TOKENS ==========
+  // Empty state - white background for clean appearance
+  --form-bg: #ffffff;
+  --form-bg-hover: #ffffff;
+  --form-bg-focus: #ffffff;
+  --form-bg-disabled: var(--color-primary-100);
+  
+  // Borders - subtle cyan accent
+  --form-border: rgba(6, 182, 212, 0.2);
+  --form-border-hover: rgba(6, 182, 212, 0.3);
+  --form-border-focus: var(--color-accent-primary);
+  --form-border-error: var(--color-error);
+  --form-border-success: var(--color-accent-primary);
+  
+  // Text colors - professional and readable
+  --form-text: var(--text-primary);
+  --form-text-placeholder: rgba(6, 182, 212, 0.5);
+  --form-text-disabled: var(--text-muted);
+  --form-text-filled: #1e293b;
+  
+  // Focus and interaction effects
+  --form-shadow-focus: 0 0 0 0.2rem rgba(6, 182, 212, 0.25);
+  --form-shadow-error: 0 0 0 0.2rem rgba(239, 68, 68, 0.25);
+
+  // ========== BUTTON TOKENS ==========
+  // Primary Button
+  --button-primary-bg: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-hover));
+  --button-primary-bg-hover: linear-gradient(135deg, var(--color-accent-hover), var(--color-accent-dark));
+  --button-primary-border: var(--color-accent-primary);
+  --button-primary-border-hover: var(--color-accent-hover);
+  --button-primary-text: var(--text-inverse);
+  --button-primary-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+  --button-primary-shadow-hover: 0 8px 25px rgba(6, 182, 212, 0.4);
+
+  // Secondary Button - Now uses cyan accent  
+  --button-secondary-bg: transparent;
+  --button-secondary-bg-hover: var(--color-accent-primary);
+  --button-secondary-border: var(--color-accent-primary);
+  --button-secondary-border-hover: var(--color-accent-primary);
+  --button-secondary-text: var(--color-accent-primary);
+  --button-secondary-text-hover: var(--text-inverse);
+
+  // Success Button - Using cyan accent instead of green
+  --button-success-bg: var(--button-primary-bg);
+  --button-success-bg-hover: var(--button-primary-bg-hover);
+  --button-success-shadow: var(--button-primary-shadow);
+  --button-success-shadow-hover: var(--button-primary-shadow-hover);
+
+  // Error Button - Keep red for errors
+  --button-error-bg: linear-gradient(135deg, var(--color-error), #dc2626);
+  --button-error-bg-hover: linear-gradient(135deg, #dc2626, #b91c1c);
+  --button-error-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+  --button-error-shadow-hover: 0 8px 25px rgba(239, 68, 68, 0.4);
+
+  // Button Animation
+  --button-hover-transform: var(--hover-lift-sm);
+  --button-active-transform: var(--active-scale);
+  --button-transition: all var(--transition-fast);
+
+  // ========== CARD TOKENS ==========
+  --card-bg: var(--surface-card);
+  --card-bg-hover: var(--surface-card);
+  --card-border: var(--surface-border);
+  --card-border-hover: var(--color-primary-300);
+  --card-shadow: var(--shadow-md);
+  --card-shadow-hover: var(--shadow-lg);
+  --card-radius: var(--radius-xl);
+  --card-padding: var(--spacing-xl);
+  --card-gap: var(--spacing-lg);
+
+  // Card Animation
+  --card-hover-transform: var(--hover-lift);
+  --card-transition: all var(--transition-medium);
+
+  // ========== METHOD CARD TOKENS ==========
+  // Upload Method - Using cyan accent
+  --method-upload-color: var(--color-accent-primary);
+  --method-upload-bg: rgba(6, 182, 212, 0.1);
+  --method-upload-border: rgba(6, 182, 212, 0.2);
+  --method-upload-icon-bg: rgba(6, 182, 212, 0.1);
+
+  // URL Method - Using cyan accent
+  --method-url-color: var(--color-accent-primary);
+  --method-url-bg: rgba(6, 182, 212, 0.1);
+  --method-url-border: rgba(6, 182, 212, 0.2);
+  --method-url-icon-bg: rgba(6, 182, 212, 0.1);
+
+  // Recording Method - Using cyan accent
+  --method-record-color: var(--color-accent-primary);
+  --method-record-bg: rgba(6, 182, 212, 0.1);
+  --method-record-border: rgba(6, 182, 212, 0.2);
+  --method-record-icon-bg: rgba(6, 182, 212, 0.1);
+
+  // ========== CARD TOKENS ==========
+  --card-bg: var(--surface-card);
+  --card-border: var(--surface-border);
+  --card-shadow: var(--shadow-md);
+  --card-radius: var(--radius-lg);
+  --card-padding: var(--spacing-lg);
+
+  // ========== STATUS BADGE TOKENS ==========
+  --badge-success-bg: rgba(6, 182, 212, 0.1);
+  --badge-success-text: var(--color-accent-primary);
+  --badge-success-border: rgba(6, 182, 212, 0.2);
+
+  --badge-error-bg: rgba(239, 68, 68, 0.1);
+  --badge-error-text: var(--color-error);
+  --badge-error-border: rgba(239, 68, 68, 0.2);
+
+  --badge-warning-bg: rgba(245, 158, 11, 0.1);
+  --badge-warning-text: var(--color-warning);
+  --badge-warning-border: rgba(245, 158, 11, 0.2);
+
+  --badge-info-bg: rgba(6, 182, 212, 0.1);
+  --badge-info-text: var(--color-accent-primary);
+  --badge-info-border: rgba(6, 182, 212, 0.2);
+
+  --badge-processing-bg: rgba(6, 182, 212, 0.1);
+  --badge-processing-text: var(--color-accent-primary);
+  --badge-processing-border: rgba(6, 182, 212, 0.2);
+
+  // Badge Styles
+  --badge-radius: var(--radius-lg);
+  --badge-padding-x: 0.75rem;
+  --badge-padding-y: 0.25rem;
+  --badge-font-size: var(--font-size-xs);
+  --badge-font-weight: var(--font-weight-semibold);
+
+  // ========== MODAL/OVERLAY TOKENS ==========
+  --modal-backdrop: var(--surface-overlay);
+  --modal-bg: var(--surface-card);
+  --modal-border: var(--surface-border);
+  --modal-shadow: var(--shadow-2xl);
+  --modal-radius: var(--radius-2xl);
+  --modal-padding: var(--spacing-2xl);
+
+  // ========== TOAST/NOTIFICATION TOKENS ==========
+  // Light mode - ultra-transparent for premium glass effect
+  --toast-success-bg: linear-gradient(135deg, rgba(16, 185, 129, 0.65), rgba(5, 150, 105, 0.62));
+  --toast-success-border: rgba(16, 185, 129, 0.75);
+  --toast-error-bg: linear-gradient(135deg, rgba(239, 68, 68, 0.65), rgba(220, 38, 38, 0.62));
+  --toast-error-border: rgba(239, 68, 68, 0.75);
+  --toast-warning-bg: linear-gradient(135deg, rgba(245, 158, 11, 0.65), rgba(217, 119, 6, 0.62));
+  --toast-warning-border: rgba(245, 158, 11, 0.75);
+  --toast-info-bg: linear-gradient(135deg, rgba(6, 182, 212, 0.65), rgba(8, 145, 178, 0.62));
+  --toast-info-border: rgba(6, 182, 212, 0.75);
+
+  --toast-text: var(--text-inverse);
+  --toast-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --toast-radius: var(--radius-lg);
+  --toast-shadow: var(--shadow-xl);
+  --toast-backdrop-filter: blur(8px);
+
+  // ========== TABLE/LIST TOKENS ==========
+  --table-bg: var(--surface-card);
+  --table-border: var(--surface-border);
+  --table-header-bg: var(--surface-ground);
+  --table-row-hover: var(--surface-hover);
+  --table-stripe: var(--surface-ground);
+
+  // ========== MENU/DROPDOWN TOKENS ==========
+  --menu-bg: var(--surface-card);
+  --menu-border: var(--surface-border);
+  --menu-shadow: var(--shadow-lg);
+  --menu-radius: var(--radius-lg);
+  --menu-item-hover: rgba(6, 182, 212, 0.1);
+  --menu-item-active: rgba(6, 182, 212, 0.15);
+  --menu-item-active-text: var(--color-accent-primary);
+
+  // ========== PROGRESS TOKENS ==========
+  --progress-bg: var(--color-primary-200);
+  --progress-fill: var(--color-accent-primary);
+  --progress-height: 0.5rem;
+  --progress-radius: var(--radius-full);
+
+  // ========== LOADING SPINNER TOKENS ==========
+  --spinner-color: var(--color-accent-primary);
+  --spinner-size: 2rem;
+  --spinner-border-width: 2px;
+}
+
+// ========== DARK THEME COMPONENT OVERRIDES ==========
+[data-theme="dark"], 
+.dark {
+  // Form Controls - Dark theme with transparent background
+  --form-bg: transparent;
+  --form-bg-hover: transparent;
+  --form-bg-focus: transparent;
+  --form-bg-disabled: rgba(255, 255, 255, 0.05);
+  
+  --form-border: rgba(6, 182, 212, 0.25);
+  --form-border-hover: rgba(6, 182, 212, 0.35);
+  --form-text-placeholder: rgba(34, 211, 238, 0.30);
+  --form-text-filled: #e2e8f0;
+
+  // Cards - Dark
+  --card-border-hover: var(--color-primary-600);
+
+  // Method Cards - Dark (maintain same colors but adjust opacity)
+  --method-upload-bg: rgba(99, 102, 241, 0.15);
+  --method-upload-border: rgba(99, 102, 241, 0.3);
+  --method-url-bg: rgba(34, 197, 94, 0.15);
+  --method-url-border: rgba(34, 197, 94, 0.3);
+  --method-record-bg: rgba(14, 165, 233, 0.15);
+  --method-record-border: rgba(14, 165, 233, 0.3);
+
+  // Progress - Dark
+  --progress-bg: var(--color-primary-700);
+
+  // Table - Dark
+  --table-header-bg: var(--color-primary-800);
+  --table-stripe: var(--color-primary-800);
+
+  // Toast - Dark mode with maximum transparency for ethereal appearance
+  --toast-success-bg: linear-gradient(135deg, rgba(16, 185, 129, 0.48), rgba(5, 150, 105, 0.45));
+  --toast-success-border: rgba(16, 185, 129, 0.65);
+  --toast-error-bg: linear-gradient(135deg, rgba(239, 68, 68, 0.48), rgba(220, 38, 38, 0.45));
+  --toast-error-border: rgba(239, 68, 68, 0.65);
+  --toast-warning-bg: linear-gradient(135deg, rgba(245, 158, 11, 0.48), rgba(217, 119, 6, 0.45));
+  --toast-warning-border: rgba(245, 158, 11, 0.65);
+  --toast-info-bg: linear-gradient(135deg, rgba(6, 182, 212, 0.48), rgba(8, 145, 178, 0.45));
+  --toast-info-border: rgba(6, 182, 212, 0.65);
+  --toast-backdrop-filter: blur(20px);
+  --toast-shadow: var(--shadow-2xl);
+}
+
+// ========== COMPONENT UTILITY CLASSES ==========
+// Use these classes for consistent component styling
+
+.token-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
+  box-shadow: var(--card-shadow);
+  transition: var(--card-transition);
+
+  &:hover {
+    border-color: var(--card-border-hover);
+    box-shadow: var(--card-shadow-hover);
+    transform: var(--card-hover-transform);
+  }
+}
+
+.token-button-primary {
+  background: var(--button-primary-bg);
+  border: 1px solid var(--button-primary-border);
+  color: var(--button-primary-text);
+  box-shadow: var(--button-primary-shadow);
+  transition: var(--button-transition);
+
+  &:hover:not(:disabled) {
+    background: var(--button-primary-bg-hover);
+    border-color: var(--button-primary-border-hover);
+    box-shadow: var(--button-primary-shadow-hover);
+    transform: var(--button-hover-transform);
+  }
+
+  &:active {
+    transform: var(--button-active-transform);
+  }
+}
+
+.token-form-control {
+  background: var(--form-bg);
+  border: 1px solid var(--form-border);
+  color: var(--form-text);
+  transition: var(--transition-fast);
+
+  &:hover {
+    background: var(--form-bg-hover);
+    border-color: var(--form-border-hover);
+  }
+
+  &:focus {
+    background: var(--form-bg-focus);
+    border-color: var(--form-border-focus);
+    box-shadow: var(--form-shadow-focus);
+    outline: none;
+  }
+
+  &::placeholder {
+    color: var(--form-text-placeholder);
+  }
+
+  &:disabled {
+    background: var(--form-bg-disabled);
+    color: var(--form-text-disabled);
+  }
+}

@@ -1,0 +1,964 @@
+<!-- Enhanced Transcription Home Page with Unified Cards -->
+<div class="transcription-hub">
+  
+  <!-- Onboarding Overlay -->
+  @if (showOnboarding()) {
+    <div class="onboarding-overlay">
+      <div class="onboarding-content">
+        <div class="onboarding-header">
+          <h2>🎉 Καλώς ήρθατε στις δοκιμές ASR!</h2>
+          <p>Ας ξεκινήσουμε τη δημιουργία της πρώτης σας μεταγραφής</p>
+        </div>
+        
+        <div class="onboarding-steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h3>Επιλέξτε μέθοδο</h3>
+              <p>Ανεβάστε αρχείο, δώστε URL ή ηχογραφήστε</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h3>Αυτόματη επεξεργασία</h3>
+              <p>Η AI αναλύει και μεταγράφει το περιεχόμενό σας</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h3>Λήψη αποτελέσματος</h3>
+              <p>Δείτε, επεξεργαστείτε και εξάγετε τη μεταγραφή</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="onboarding-actions">
+          <p-button 
+            label="Ας ξεκινήσουμε!" 
+            icon="pi pi-arrow-right"
+            (onClick)="completeOnboarding()"
+            styleClass="onboarding-start-btn">
+          </p-button>
+          <button class="skip-btn" (click)="skipOnboarding()">
+            Παράλειψη
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Header Section -->
+  <div class="hub-header">
+    <div class="header-main">
+      <h1 class="hub-title">
+        <i class="pi pi-plus-circle"></i>
+        Δημιουργία Νέας Μεταγραφής
+      </h1>
+    </div>
+    <div class="help-trigger">
+      <p-button 
+        icon="pi pi-question-circle" 
+        [text]="true"
+        (onClick)="startOnboarding()"
+        pTooltip="Βοήθεια"
+        styleClass="help-btn">
+      </p-button>
+    </div>
+  </div>
+
+  <!-- Model Selection Section -->
+  <div class="model-selection-section">
+    <h2 class="section-title">
+      <i class="pi pi-brain"></i>
+      Επιλογή Μοντέλου ASR
+    </h2>
+    <p class="section-subtitle">Επιλέξτε το μοντέλο τεχνητής νοημοσύνης για την ανάλυση του περιεχομένου σας</p>
+    
+    <div class="model-cards-grid">
+      <!-- Whisper Model Card -->
+      <div class="model-card" 
+           [class.selected]="selectedModel() === 'whisper'"
+           (click)="selectedModel.set('whisper')"
+           role="button"
+           tabindex="0"
+           (keydown.enter)="selectedModel.set('whisper')"
+           (keydown.space)="selectedModel.set('whisper')"
+           aria-label="Επιλογή μοντέλου Whisper">
+        <div class="model-card-header">
+          <div class="model-icon whisper-icon">
+            <i class="pi pi-microphone"></i>
+          </div>
+          <div class="model-badge recommended">Συνιστάται</div>
+        </div>
+        <div class="model-card-content">
+          <h3 class="model-name">Whisper</h3>
+          <p class="model-provider">OpenAI</p>
+          <p class="model-description">
+            Προηγμένο μοντέλο με εξαιρετική ακρίβεια σε πολλές γλώσσες. 
+            Ιδανικό για περίπλοκο περιεχόμενο και θόρυβο.
+          </p>
+          <div class="model-features">
+            <div class="feature">
+              <i class="pi pi-check-circle"></i>
+              <span>Υψηλή ακρίβεια</span>
+            </div>
+            <div class="feature">
+              <i class="pi pi-globe"></i>
+              <span>Πολυγλωσσικό</span>
+            </div>
+            <div class="feature">
+              <i class="pi pi-shield"></i>
+              <span>Ανθεκτικό σε θόρυβο</span>
+            </div>
+          </div>
+        </div>
+        <div class="model-card-footer">
+          <div class="model-specs">
+            <span class="spec">Μέγεθος: Large-v3</span>
+            <span class="spec">Ταχύτητα: Μέτρια</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wav2Vec2 Model Card -->
+      <div class="model-card" 
+           [class.selected]="selectedModel() === 'wav2vec2'"
+           (click)="selectedModel.set('wav2vec2')"
+           role="button"
+           tabindex="0"
+           (keydown.enter)="selectedModel.set('wav2vec2')"
+           (keydown.space)="selectedModel.set('wav2vec2')"
+           aria-label="Επιλογή μοντέλου Wav2Vec2">
+        <div class="model-card-header">
+          <div class="model-icon wav2vec-icon">
+            <i class="pi pi-bolt"></i>
+          </div>
+          <div class="model-badge fast">Γρήγορο</div>
+        </div>
+        <div class="model-card-content">
+          <h3 class="model-name">Wav2Vec2</h3>
+          <p class="model-provider">Meta (Facebook)</p>
+          <p class="model-description">
+            Εξειδικευμένο μοντέλο για ελληνικά με γρήγορη επεξεργασία. 
+            Βελτιστοποιημένο για την ελληνική φωνολογία.
+          </p>
+          <div class="model-features">
+            <div class="feature">
+              <i class="pi pi-clock"></i>
+              <span>Γρήγορη επεξεργασία</span>
+            </div>
+            <div class="feature">
+              <i class="pi pi-heart"></i>
+              <span>Ελληνική εξειδίκευση</span>
+            </div>
+            <div class="feature">
+              <i class="pi pi-chart-line"></i>
+              <span>Βελτιωμένη φωνολογία</span>
+            </div>
+          </div>
+        </div>
+        <div class="model-card-footer">
+          <div class="model-specs">
+            <span class="spec">Μέγεθος: Large-XLSR</span>
+            <span class="spec">Ταχύτητα: Γρήγορη</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comparison Mode Card -->
+      <div class="model-card comparison-card" 
+           [class.selected]="selectedModel() === 'both'"
+           (click)="selectedModel.set('both')"
+           role="button"
+           tabindex="0"
+           (keydown.enter)="selectedModel.set('both')"
+           (keydown.space)="selectedModel.set('both')"
+           aria-label="Επιλογή σύγκρισης μοντέλων">
+        <div class="model-card-header">
+          <div class="model-icon comparison-icon">
+            <i class="pi pi-chart-bar"></i>
+          </div>
+          <div class="model-badge research">Ερευνητικό</div>
+        </div>
+        <div class="model-card-content">
+          <h3 class="model-name">Σύγκριση Μοντέλων</h3>
+          <p class="model-provider">Ακαδημαϊκή Ανάλυση</p>
+          <p class="model-description">
+            Εκτελέστε και τα δύο μοντέλα παράλληλα για λεπτομερή σύγκριση 
+            των αποτελεσμάτων και μετρικών επίδοσης.
+          </p>
+          <div class="model-features">
+            <div class="feature">
+              <i class="pi pi-eye"></i>
+              <span>Παράλληλη ανάλυση</span>
+            </div>
+            <div class="feature">
+              <i class="pi pi-chart-pie"></i>
+              <span>Μετρικές επίδοσης</span>
+            </div>
+            <div class="feature">
+              <i class="pi pi-book"></i>
+              <span>Ερευνητικές ιδέες</span>
+            </div>
+          </div>
+        </div>
+        <div class="model-card-footer">
+          <div class="model-specs">
+            <span class="spec">Διπλή επεξεργασία</span>
+            <span class="spec">Ταχύτητα: Αργή</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selected Model Summary -->
+    <div class="selected-model-summary">
+      @switch (selectedModel()) {
+        @case ('whisper') {
+          <div class="model-summary">
+            <div class="summary-icon">
+              <i class="pi pi-microphone"></i>
+            </div>
+            <div class="summary-content">
+              <h4>Επιλεγμένο: Whisper (OpenAI)</h4>
+              <p>Το περιεχόμενό σας θα επεξεργαστεί με το προηγμένο μοντέλο Whisper large-v3, γνωστό για την υψηλή του ακρίβεια.</p>
+            </div>
+          </div>
+        }
+        @case ('wav2vec2') {
+          <div class="model-summary">
+            <div class="summary-icon">
+              <i class="pi pi-bolt"></i>
+            </div>
+            <div class="summary-content">
+              <h4>Επιλεγμένο: Wav2Vec2 (Meta)</h4>
+              <p>Το περιεχόμενό σας θα επεξεργαστεί με το εξειδικευμένο για ελληνικά μοντέλο Wav2Vec2, βελτιστοποιημένο για ταχύτητα.</p>
+            </div>
+          </div>
+        }
+        @case ('both') {
+          <div class="model-summary">
+            <div class="summary-icon">
+              <i class="pi pi-chart-bar"></i>
+            </div>
+            <div class="summary-content">
+              <h4>Επιλεγμένο: Σύγκριση Μοντέλων</h4>
+              <p>Το περιεχόμενό σας θα επεξεργαστεί με και τα δύο μοντέλα για παράλληλη ανάλυση και σύγκριση αποτελεσμάτων.</p>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+  <!-- Unified Method Cards -->
+  <div class="transcription-methods">
+    <div class="methods-grid">
+      
+      <!-- Upload Method Card -->
+      <div class="method-card upload-card">
+        <div class="card-header">
+          <div class="method-icon">
+            <i class="pi pi-cloud-upload"></i>
+          </div>
+          <div class="badge badge-primary">Δημοφιλης</div>
+        </div>
+        
+        <div class="card-content">
+          <h3>Ανεβάστε Αρχείο</h3>
+          <p>Drag & drop ή επιλέξτε αρχεία ήχου/βίντεο</p>
+        </div>
+
+        <div class="card-form">
+          <div class="upload-zone" 
+               [class.drag-active]="isDragOver()" 
+               [class.has-file]="selectedFile()"
+               (dragenter)="onDragEnter($event)"
+               (dragover)="onDragOver($event)" 
+               (dragleave)="onDragLeave($event)"
+               (drop)="onDrop($event)" 
+               (click)="fileInput.click()"
+               role="button"
+               tabindex="0"
+               (keydown.enter)="fileInput.click()"
+               (keydown.space)="fileInput.click()"
+               aria-label="Επιλογή αρχείου για μεταφόρτωση"
+               aria-describedby="upload-help">
+            
+            @if (!selectedFile()) {
+              <div class="upload-content">
+                <i class="pi pi-upload upload-icon"></i>
+                <h4>{{ isDragOver() ? 'Αφήστε το αρχείο εδώ' : 'Σύρετε αρχεία ή κάντε κλικ' }}</h4>
+                <p>MP3, WAV, M4A, FLAC, OGG, WebM, WMA, AAC, Opus, MP4, MOV, AVI, MKV, WMV (έως 8GB)</p>
+              </div>
+            } @else {
+              <div class="file-preview">
+                <i class="pi pi-file"></i>
+                <div class="file-info">
+                  <span class="file-name">{{ selectedFile()!.name }}</span>
+                  <span class="file-size">{{ formatFileSize(selectedFile()!.size) }}</span>
+                </div>
+                <button class="remove-btn" (click)="selectedFile.set(null); $event.stopPropagation()">
+                  <i class="pi pi-times"></i>
+                </button>
+              </div>
+            }
+
+            <input #fileInput 
+                   type="file" 
+                   accept="audio/*,video/*,.mp3,.wav,.m4a,.flac,.ogg,.webm,.wma,.aac,.opus,.mp4,.mov,.avi,.mkv,.wmv" 
+                   (change)="onFileSelected($event)" 
+                   style="display: none;">
+          </div>
+
+          @if (fileValidationError()) {
+            <div class="error-message">
+              <i class="pi pi-exclamation-triangle"></i>
+              {{ fileValidationError() }}
+            </div>
+          }
+
+          <p-button 
+            label="Μεταφόρτωση για Μεταγραφή" 
+            icon="pi pi-upload"
+            [disabled]="!selectedFile() || !!fileValidationError()" 
+            [loading]="isUploading()"
+            (onClick)="uploadFile()" 
+            ariaLabel="Μεταφόρτωση αρχείου για μεταγραφή"
+            styleClass="w-full action-btn">
+          </p-button>
+        </div>
+      </div>
+
+      <!-- URL Method Card -->
+      <div class="method-card url-card">
+        <div class="card-header">
+          <div class="method-icon">
+            <i class="pi pi-globe"></i>
+          </div>
+          <div class="badge badge-success">Αμεσο</div>
+        </div>
+        
+        <div class="card-content">
+          <h3>Διαδικτυακό Αρχείο</h3>
+          <p>YouTube, Facebook, TikTok, Vimeo και άλλα</p>
+        </div>
+
+        <div class="card-form">
+          <div class="input-group">
+            <label>URL Βίντεο/Ήχου</label>
+            <textarea 
+              [(ngModel)]="urlInput" 
+              (input)="onUrlInput()" 
+              placeholder="https://youtube.com/watch?v=..." 
+              rows="3"
+              class="url-input"
+              [class.valid]="isUrlValid() && urlPreview()"
+              [class.invalid]="urlError()"
+              aria-label="Εισάγετε URL αρχείου βίντεο ή ήχου"
+              aria-describedby="url-help">
+            </textarea>
+          </div>
+
+          @if (isLoadingPreview()) {
+            <div class="loading-preview">
+              <i class="pi pi-spin pi-spinner"></i>
+              <span>Φόρτωση προεπισκόπησης...</span>
+            </div>
+          }
+
+          @if (urlPreview() && !isLoadingPreview()) {
+            <div class="url-preview">
+              <div class="preview-info">
+                <h4>{{ urlPreview()!.title }}</h4>
+                <div class="preview-meta">
+                  <span class="platform">{{ urlPreview()!.platform }}</span>
+                  @if (urlPreview()!.duration) {
+                    <span class="duration">{{ urlPreview()!.duration }}</span>
+                  }
+                </div>
+              </div>
+              <i class="pi pi-check-circle success-icon"></i>
+            </div>
+          }
+
+          @if (urlError()) {
+            <div class="error-message">
+              <i class="pi pi-exclamation-triangle"></i>
+              {{ urlError() }}
+            </div>
+          }
+
+          <p-button 
+            label="Μεταγραφή από URL" 
+            icon="pi pi-globe"
+            [disabled]="!isValidUrl() || !urlPreview()" 
+            [loading]="isValidatingUrl()"
+            (onClick)="transcribeUrl()" 
+            ariaLabel="Έναρξη μεταγραφής από διαδικτυακό URL"
+            styleClass="w-full action-btn">
+          </p-button>
+        </div>
+      </div>
+
+      <!-- Recording Method Card -->
+      <div class="method-card record-card">
+        <div class="card-header">
+          <div class="method-icon">
+            <i class="pi pi-microphone"></i>
+          </div>
+          <div class="badge badge-info">Live</div>
+        </div>
+        
+        <div class="card-content">
+          <h3>Ηχογράφηση</h3>
+          <p>Άμεση ηχογράφηση έως 6 ώρες</p>
+        </div>
+
+        <div class="card-form">
+          <!-- Microphone Selection -->
+          @if (devicePermissionGranted() && availableAudioDevices().length > 1) {
+            <div class="microphone-selection">
+              <label>Επιλογή Μικροφώνου:</label>
+              <p-select 
+                [(ngModel)]="selectedAudioDevice"
+                (ngModelChange)="onAudioDeviceChange($event)"
+                [options]="availableAudioDevices()" 
+                optionLabel="label" 
+                optionValue="deviceId"
+                placeholder="Επιλέξτε μικρόφωνο"
+                styleClass="w-full microphone-select"
+                appendTo="body">
+                <ng-template let-device pTemplate="item">
+                  <div class="microphone-option">
+                    <i class="pi pi-microphone"></i>
+                    <span class="device-name">{{ device.label }}</span>
+                    @if (device.isDefault) {
+                      <span class="default-badge">Προεπιλογή</span>
+                    }
+                  </div>
+                </ng-template>
+              </p-select>
+            </div>
+          }
+
+          @if (!devicePermissionGranted()) {
+            <div class="permission-request">
+              <div class="permission-content">
+                <i class="pi pi-lock"></i>
+                <h4>Άδεια Μικροφώνου</h4>
+                <p>Χρειαζόμαστε πρόσβαση στο μικρόφωνό σας για την ηχογράφηση</p>
+                <p-button 
+                  label="Παροχή Άδειας" 
+                  icon="pi pi-unlock"
+                  (onClick)="requestMicrophonePermission()"
+                  [loading]="isLoadingDevices()"
+                  styleClass="permission-btn">
+                </p-button>
+              </div>
+            </div>
+          } @else {
+            <div class="recording-studio">
+              <div class="mic-visual" [class.recording]="isRecording()">
+                <div class="mic-circle">
+                  <i class="pi pi-microphone"></i>
+                  @if (isRecording()) {
+                    <div class="pulse-ring"></div>
+                    <!-- Circular waveform visualization -->
+                    <div class="circular-waveform">
+                      @for (bar of activeBars(); track bar.id) {
+                        <div 
+                          class="waveform-bar-circular"
+                          [style.transform]="'rotate(' + (bar.id * 30) + 'deg)'"
+                          [style.opacity]="bar.opacity">
+                          <div 
+                            class="bar-line"
+                            [style.height.px]="(bar.height * 25) + 5">
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+
+            <div class="recording-info">
+              <div class="timer">{{ formatRecordingTime(recordingTime()) }}</div>
+              <div class="status">{{ isRecording() ? 'Ηχογραφεί...' : 'Έτοιμο' }}</div>
+            </div>
+
+              @if (recordedAudio() && !isRecording()) {
+                <div class="audio-preview">
+                  <!-- Custom Audio Player -->
+                  <div class="custom-audio-player">
+                    <audio 
+                      #audioElement
+                      [src]="recordedAudio()" 
+                      preload="auto"
+                      muted="false"
+                      (loadstart)="onAudioLoadStart($event)"
+                      (loadedmetadata)="onAudioLoadedMetadata($event)"
+                      (loadeddata)="onAudioCanPlay($event)"
+                      (canplay)="onAudioCanPlay($event)"
+                      (canplaythrough)="onAudioCanPlayThrough($event)"
+                      (durationchange)="onAudioLoadedMetadata($event)"
+                      (timeupdate)="onAudioTimeUpdate($event)"
+                      (play)="onAudioPlay($event)"
+                      (pause)="onAudioPause($event)"
+                      (ended)="onAudioEnded($event)"
+                      (error)="onAudioError($event)"
+                      (seeking)="onAudioSeeking($event)"
+                      (seeked)="onAudioSeeked($event)"
+                      (progress)="onAudioProgress($event)">
+                    </audio>
+                    
+                    <div class="player-controls">
+                      <button 
+                        class="play-pause-btn"
+                        (click)="toggleAudioPlayback(audioElement)"
+                        [class.playing]="isAudioPlaying()">
+                        <i [class]="isAudioPlaying() ? 'pi pi-pause' : 'pi pi-play'"></i>
+                      </button>
+                      
+                      <div class="time-display">
+                        {{ formatTime(currentAudioTime()) }}
+                      </div>
+                      
+                      <div class="progress-container" (click)="seekAudio($event, audioElement)">
+                        <div class="progress-track">
+                          <div 
+                            class="progress-fill"
+                            [style.width.%]="audioProgress()">
+                          </div>
+                          <div 
+                            class="progress-thumb"
+                            [style.left.%]="audioProgress()">
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="time-display">
+                        {{ formatTime(audioDuration()) }}
+                      </div>
+                      
+                      <div class="volume-control">
+                        <button 
+                          class="volume-btn"
+                          (click)="toggleMute(audioElement)"
+                          [class.muted]="isAudioMuted()">
+                          <i [class]="isAudioMuted() ? 'pi pi-volume-off' : 'pi pi-volume-up'"></i>
+                        </button>
+                        <div class="volume-slider-container">
+                          <input 
+                            type="range" 
+                            class="volume-slider"
+                            min="0" 
+                            max="100" 
+                            [value]="audioVolume() * 100"
+                            (input)="changeVolume($event, audioElement)"
+                            aria-label="Ένταση ήχου">
+                          <span class="volume-value">{{ (audioVolume() * 100).toFixed(0) }}%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <p class="audio-info">
+                    <i class="pi pi-info-circle"></i>
+                    Ηχογράφηση έτοιμη για αναπαραγωγή και μεταγραφή
+                  </p>
+                  
+                </div>
+              }
+            </div>
+          }
+
+          @if (!recordedAudio()) {
+            <p-button 
+              [label]="isRecording() ? 'Διακοπή Ηχογράφησης' : 'Έναρξη Ηχογράφησης'"
+              [icon]="isRecording() ? 'pi pi-stop' : 'pi pi-microphone'"
+              [severity]="isRecording() ? 'danger' : 'primary'" 
+              (onClick)="toggleRecording()"
+              [ariaLabel]="isRecording() ? 'Διακοπή της τρέχουσας ηχογράφησης' : 'Έναρξη νέας ηχογράφησης'"
+              styleClass="w-full action-btn">
+            </p-button>
+          } @else {
+            <div class="button-group">
+              <p-button 
+                label="Μεταγραφή" 
+                icon="pi pi-send"
+                severity="success" 
+                (onClick)="submitRecording()"
+                ariaLabel="Υποβολή ηχογράφησης για μεταγραφή"
+                styleClass="flex-1 action-btn">
+              </p-button>
+              <p-button 
+                label="Νέα" 
+                icon="pi pi-refresh"
+                [outlined]="true"
+                (onClick)="deleteRecording()"
+                ariaLabel="Διαγραφή τρέχουσας ηχογράφησης και έναρξη νέας"
+                styleClass="flex-1 action-btn secondary-neutral">
+              </p-button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+  <!-- Recent Transcriptions with Enhanced Filtering -->
+  <div class="recent-transcriptions-section">
+    <div class="section-header">
+      <h2>📄 Πρόσφατες μεταγραφές</h2>
+      <div class="header-actions">
+        <p-button 
+          icon="pi pi-refresh" 
+          [text]="true"
+          [loading]="isLoading()"
+          (onClick)="refreshTranscriptions()" 
+          pTooltip="Ανανέωση"
+          ariaLabel="Ανανέωση λίστας μεταγραφών">
+        </p-button>
+      </div>
+    </div>
+
+    <!-- Enhanced Filters - Collapsible Panel -->
+    <div class="filters-container">
+      <div class="filters-header" (click)="toggleFilters()">
+        <h3 class="filters-title">
+          <i class="pi pi-filter"></i>
+          Φίλτρα
+        </h3>
+        <p-button 
+          [icon]="showFilters() ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+          [text]="true"
+          [rounded]="true"
+          (onClick)="toggleFilters(); $event.stopPropagation()"
+          pTooltip="Εμφάνιση/Απόκρυψη φίλτρων"
+          styleClass="filter-toggle-btn">
+        </p-button>
+      </div>
+
+      @if (showFilters()) {
+        <div class="filters-panel">
+          <div class="filter-row">
+            <div class="filter-group">
+              <label>Ταξινόμηση:</label>
+              <p-select 
+                [options]="sortOptions" 
+                [(ngModel)]="sortBy"
+                (ngModelChange)="onSortChange($event)"
+                optionLabel="label" 
+                optionValue="value"
+                placeholder="Επιλέξτε ταξινόμηση"
+                styleClass="sort-select"
+                [autoDisplayFirst]="false"
+                appendTo="body">
+              </p-select>
+            </div>
+
+            <div class="filter-group">
+              <label>Κατάσταση:</label>
+              <p-select 
+                [options]="statusFilterOptions" 
+                [(ngModel)]="statusFilter"
+                (ngModelChange)="onStatusFilterChange($event)"
+                optionLabel="label" 
+                optionValue="value"
+                styleClass="status-select"
+                [autoDisplayFirst]="false"
+                appendTo="body">
+              </p-select>
+            </div>
+
+            <div class="filter-group">
+              <label>Ημερομηνία:</label>
+              <p-datePicker 
+                [(ngModel)]="dateFilter"
+                (ngModelChange)="onDateFilterChange($event)"
+                selectionMode="range" 
+                [showIcon]="true"
+                dateFormat="dd/mm/yy"
+                placeholder="Επιλέξτε εύρος"
+                styleClass="date-filter"
+                [touchUI]="false"
+                [showOnFocus]="true"
+                appendTo="body">
+              </p-datePicker>
+            </div>
+
+            <div class="filter-actions">
+              <p-button 
+                label="Καθαρισμός" 
+                icon="pi pi-filter-slash"
+                [text]="true" 
+                [loading]="isLoading()"
+                (onClick)="clearFilters()"
+                ariaLabel="Καθαρισμός όλων των φίλτρων"
+                styleClass="clear-filters-btn">
+              </p-button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Transcriptions List -->
+    @if (isLoading()) {
+      <div class="loading-state">
+        <i class="pi pi-spin pi-spinner loading-icon"></i>
+        <p>Φόρτωση μεταγραφών...</p>
+      </div>
+    } @else if (recentTranscriptions().length === 0) {
+      <div class="empty-state">
+        <div class="empty-illustration">
+          <i class="pi pi-file-o"></i>
+        </div>
+        <h3>Δεν υπάρχουν μεταγραφές</h3>
+        <p>Δημιουργήστε την πρώτη σας μεταγραφή για να ξεκινήσετε!</p>
+      </div>
+    } @else {
+      <!-- Desktop Table -->
+      <div class="transcriptions-table hidden md:block" [class.filtering]="isFiltering()">
+        <!-- Filtering overlay -->
+        @if (isFiltering()) {
+          <div class="filtering-overlay">
+            <i class="pi pi-spin pi-spinner"></i>
+            <span>Φιλτράρισμα...</span>
+          </div>
+        }
+        
+        <div class="table-header">
+          <div class="header-row">
+            <div class="col-file">Αρχείο</div>
+            <div class="col-duration">Διάρκεια</div>
+            <div class="col-size">Μέγεθος</div>
+            <div class="col-date">Ημερομηνία</div>
+            <div class="col-status">Κατάσταση</div>
+            <div class="col-actions">Ενέργειες</div>
+          </div>
+        </div>
+        
+        <div class="table-body">
+          @for (transcription of recentTranscriptions(); track transcription.id) {
+            <div class="table-row" (click)="viewTranscription(transcription.id)">
+              <div class="col-file">
+                <a [routerLink]="['/app/transcriptions', transcription.id]" class="file-link">
+                  {{ transcription.title || transcription.file_name || transcription.audio_file?.filename }}
+                </a>
+              </div>
+              <div class="col-duration">
+                <span class="duration-text">{{ formatDuration(transcription.duration_seconds) }}</span>
+              </div>
+              <div class="col-size">
+                <span class="size-text">{{ transcription.audio_file?.file_size_formatted || formatFileSize(transcription.audio_file?.file_size || transcription.file_size || 0) }}</span>
+              </div>
+              <div class="col-date">
+                <span class="date-text">{{ formatDate(transcription.created_at || transcription.createdAt) }}</span>
+              </div>
+              <div class="col-status">
+                <div class="status-badge" [ngClass]="getStatusClass(transcription.status)">
+                  <span>{{ getStatusText(transcription.status) }}</span>
+                </div>
+                @if (transcription.has_evaluation || transcription.evaluation_completed) {
+                  <span class="evaluation-indicator" title="Έχει αξιολογηθεί με ground truth">
+                    <i class="pi pi-check-circle"></i>
+                  </span>
+                }
+              </div>
+              <div class="col-actions" (click)="$event.stopPropagation()">
+                <p-button 
+                  label="Προβολή" 
+                  size="small"
+                  [text]="true"
+                  (onClick)="viewTranscription(transcription.id)"
+                  styleClass="view-action-btn">
+                </p-button>
+                <p-button 
+                  icon="pi pi-ellipsis-v" 
+                  [text]="true" 
+                  size="small"
+                  (onClick)="showTranscriptionMenu($event, transcription); menu.toggle($event)"
+                  styleClass="menu-action-btn">
+                </p-button>
+                <p-button 
+                  icon="pi pi-trash" 
+                  [text]="true" 
+                  size="small"
+                  severity="danger"
+                  (onClick)="confirmDelete(transcription.id, transcription.title || transcription.file_name || transcription.audio_file?.filename || 'Αυτή τη μεταγραφή')"
+                  styleClass="delete-action-btn"
+                  pTooltip="Διαγραφή μεταγραφής">
+                </p-button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Mobile Cards -->
+      <div class="transcriptions-cards block md:hidden" [class.filtering]="isFiltering()">
+        <!-- Filtering overlay for mobile -->
+        @if (isFiltering()) {
+          <div class="filtering-overlay">
+            <i class="pi pi-spin pi-spinner"></i>
+            <span>Φιλτράρισμα...</span>
+          </div>
+        }
+        @for (transcription of recentTranscriptions(); track transcription.id) {
+          <div class="mobile-transcription-card">
+            <div class="card-header">
+              <h4>{{ transcription.title || transcription.file_name || transcription.audio_file?.filename }}</h4>
+              <div class="status-badge" [ngClass]="getStatusClass(transcription.status)">
+                {{ getStatusText(transcription.status) }}
+              </div>
+              @if (transcription.has_evaluation || transcription.evaluation_completed) {
+                <span class="evaluation-indicator-mobile" title="Έχει αξιολογηθεί με ground truth">
+                  <i class="pi pi-check-circle"></i>
+                </span>
+              }
+            </div>
+            <div class="card-meta">
+              <span>{{ formatDuration(transcription.duration_seconds) }}</span>
+              <span>{{ transcription.audio_file?.file_size_formatted || formatFileSize(transcription.audio_file?.file_size || transcription.file_size || 0) }}</span>
+              <span>{{ formatDate(transcription.created_at || transcription.createdAt) }}</span>
+            </div>
+            <div class="card-actions">
+              <p-button 
+                label="Προβολή" 
+                icon="pi pi-eye"
+                size="small"
+                [routerLink]="['/app/transcriptions', transcription.id]">
+              </p-button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Enhanced Pagination -->
+      @if (totalTranscriptions() > 5) {
+        <div class="smart-pagination">
+          <div class="pagination-info">
+            Εμφάνιση {{ (currentPage() - 1) * 5 + 1 }}-{{ Math.min(currentPage() * 5, totalTranscriptions()) }} από {{ totalTranscriptions() }}
+          </div>
+          <div class="pagination-controls">
+            <p-button 
+              icon="pi pi-angle-left" 
+              [disabled]="currentPage() <= 1"
+              (onClick)="previousPage()"
+              styleClass="pagination-nav"
+              pTooltip="Προηγούμενη σελίδα">
+            </p-button>
+            <span class="page-indicator">{{ currentPage() }} / {{ totalPages() }}</span>
+            <p-button 
+              icon="pi pi-angle-right" 
+              [disabled]="!hasMorePages()"
+              (onClick)="nextPage()"
+              styleClass="pagination-nav"
+              pTooltip="Επόμενη σελίδα">
+            </p-button>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>
+
+<!-- Context Menu for Transcription Actions -->
+<p-menu #menu [model]="menuItems" [popup]="true" appendTo="body" styleClass="transcription-context-menu"></p-menu>
+
+<!-- Confirmation Dialog -->
+<p-confirmdialog></p-confirmdialog>
+
+<!-- Retry Transcription Dialog -->
+<p-dialog 
+  [(visible)]="showRetryDialog" 
+  [modal]="true" 
+  [closable]="!isRetrying()"
+  [resizable]="false"
+  [draggable]="false"
+  header="Επανάληψη Μεταγραφής"
+  styleClass="retry-dialog"
+  [style]="{ width: '500px' }">
+  
+  @if (retryTranscription_data(); as transcription) {
+    <div class="retry-dialog-content">
+      <!-- Header Info -->
+      <div class="retry-header">
+        <div class="retry-icon">
+          <i class="pi pi-refresh"></i>
+        </div>
+        <div class="retry-info">
+          <h3>{{ transcription.title }}</h3>
+          <p class="transcription-meta">
+            <i class="pi pi-calendar"></i>
+            {{ formatDate(transcription.created_at) }}
+            <span class="separator">•</span>
+            <i class="pi pi-clock"></i>
+            {{ formatDuration(transcription.duration_seconds) }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Error Information -->
+      @if (transcription.errorMessage) {
+        <div class="error-info">
+          <h4>
+            <i class="pi pi-exclamation-triangle"></i>
+            Σφάλμα που προέκυψε:
+          </h4>
+          <div class="error-message">
+            {{ transcription.errorMessage }}
+          </div>
+        </div>
+      }
+
+      <!-- Retry Information -->
+      <div class="retry-explanation">
+        <h4>
+          <i class="pi pi-info-circle"></i>
+          Τι θα συμβεί:
+        </h4>
+        <ul class="retry-steps">
+          <li>
+            <i class="pi pi-cog"></i>
+            Το αρχείο θα επεξεργαστεί ξανά με το μοντέλο <strong>{{ getModelDisplayName(transcription.model_used) }}</strong>
+          </li>
+          <li>
+            <i class="pi pi-clock"></i>
+            Η διαδικασία μπορεί να διαρκέσει μερικά λεπτά
+          </li>
+          <li>
+            <i class="pi pi-bell"></i>
+            Θα ενημερωθείτε όταν ολοκληρωθεί η επεξεργασία
+          </li>
+        </ul>
+      </div>
+    </div>
+  }
+
+  <!-- Dialog Actions -->
+  <ng-template pTemplate="footer">
+    <div class="retry-dialog-footer">
+      <p-button 
+        label="Ακύρωση" 
+        icon="pi pi-times"
+        [text]="true"
+        [disabled]="isRetrying()"
+        (onClick)="cancelRetry()"
+        styleClass="p-button-secondary">
+      </p-button>
+      <p-button 
+        label="Επανάληψη Μεταγραφής" 
+        icon="pi pi-refresh"
+        [loading]="isRetrying()"
+        loadingIcon="pi pi-spin pi-spinner"
+        (onClick)="confirmRetry()"
+        styleClass="p-button-success retry-confirm-btn">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+

@@ -1,0 +1,200 @@
+<div class="bg-white dark:bg-gray-800 py-8 px-6 shadow-xl rounded-lg border border-gray-200 dark:border-gray-700">
+  <div class="space-y-6">
+    <!-- Header -->
+    <div class="text-center">
+      <div class="mx-auto h-16 w-16 rounded-full bg-cyan-100 dark:bg-cyan-900/50 flex items-center justify-center">
+        <svg class="h-8 w-8 text-cyan-600 dark:text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+      </div>
+      <h2 class="mt-6 text-center text-3xl font-bold text-gray-900 dark:text-white">
+        {{ getHeaderMessage() }}
+      </h2>
+      <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+        {{ getSubHeaderMessage() }}
+      </p>
+      
+      <!-- Dashboard Access Button -->
+      <div *ngIf="authService.isAuthenticated() && !isVerified() && !loadingState.isLoading()" class="mt-6">
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">
+          Μπορείτε να συνεχίσετε στον πίνακα ελέγχου χωρίς επιβεβαίωση (με περιορισμένες λειτουργίες)
+        </p>
+        <p-button
+          (click)="navigateToDashboard()"
+          label="Μετάβαση στον Πίνακα Ελέγχου"
+          icon="pi pi-th-large"
+          severity="secondary"
+          [outlined]="true"
+          size="large">
+        </p-button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+      
+    <!-- Loading State -->
+    <div *ngIf="loadingState.isLoading()" class="text-center space-y-4">
+      <app-loading-spinner></app-loading-spinner>
+      <p class="text-gray-600 dark:text-gray-400">{{ isCodeMode() ? 'Επαληθεύουμε τον κωδικό...' : 'Επιβεβαιώνουμε το email...' }}</p>
+    </div>
+
+    <!-- Success State -->
+    <div *ngIf="!loadingState.isLoading() && isVerified()" class="text-center space-y-6">
+      <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-cyan-100 dark:bg-cyan-900/50 animate-pulse">
+        <svg class="h-8 w-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Επιτυχής Επαλήθευση!</h3>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">
+          Το email σας επιβεβαιώθηκε επιτυχώς!
+        </p>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Θα μεταφερθείτε αυτόματα σε λίγα δευτερόλεπτα...
+        </p>
+      </div>
+      <div class="flex space-x-4">
+        <p-button
+          (click)="navigateToDashboard()"
+          label="{{ verificationReason() === 'registration' ? 'Μετάβαση στον Πίνακα' : 'Συνέχεια' }}"
+          icon="pi pi-arrow-right"
+          severity="success"
+          styleClass="flex-1"
+          size="large">
+        </p-button>
+      </div>
+    </div>
+
+    <!-- 6-Digit Code Input Mode -->
+    <div *ngIf="!loadingState.isLoading() && !isVerified() && isCodeMode()" class="space-y-6">
+      <!-- Email Display -->
+      <div class="text-center" *ngIf="userEmail() || authService.currentUser()?.email">
+        <div class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-cyan-50 dark:bg-cyan-900/50 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-700">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+          </svg>
+          {{ userEmail() || authService.currentUser()?.email }}
+        </div>
+      </div>
+
+      <!-- Reactive Form for Validation -->
+      <form [formGroup]="codeForm" class="space-y-6">
+        <!-- Code Input with PrimeNG InputOtp -->
+        <div class="flex flex-col items-center space-y-4">
+          <p-inputOtp
+            formControlName="code"
+            [length]="6"
+            [disabled]="loadingState.isLoading()"
+            (onInput)="onCodeChange()"
+            class="w-full flex justify-center">
+          </p-inputOtp>
+          
+          <!-- Error Message -->
+          <div *ngIf="errorMessage() || getFieldError(codeForm, 'code')" class="text-sm text-red-600 dark:text-red-400 text-center">
+            {{ errorMessage() || getFieldError(codeForm, 'code') }}
+          </div>
+        </div>
+
+        <!-- Manual Submit Button -->
+        <div class="flex justify-center">
+          <p-button
+            type="button"
+            (click)="onCodeComplete()"
+            [disabled]="codeForm.invalid || loadingState.isLoading()"
+            [loading]="loadingState.isLoading()"
+            label="{{ loadingState.isLoading() ? 'Επαλήθευση...' : 'Επαλήθευση κωδικού' }}"
+            icon="pi pi-check"
+            severity="info"
+            size="large">
+          </p-button>
+        </div>
+
+        <!-- Resend Code Button -->
+        <div class="flex justify-center">
+          <p-button
+            type="button"
+            (click)="onResendCode()"
+            [disabled]="resendCooldown() > 0 || loadingState.isLoading()"
+            [loading]="loadingState.isLoading()"
+            [label]="resendCooldown() > 0 ? 'Αποστολή σε ' + formatCooldown(resendCooldown()) : 'Αποστολή νέου κωδικού'"
+            icon="pi pi-refresh"
+            severity="secondary"
+            [outlined]="true"
+            size="small">
+          </p-button>
+        </div>
+      </form>
+
+      <!-- Help Text -->
+      <div class="text-center space-y-2">
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          Δεν λάβατε κωδικό; Ελέγξτε τον φάκελο spam ή ζητήστε νέο κωδικό.
+        </p>
+        <div class="text-xs text-gray-400 dark:text-gray-500">
+          <p *ngIf="verificationReason() === 'registration'">
+            Ο κωδικός επαλήθευσης είναι απαραίτητος για την ενεργοποίηση του λογαριασμού σας.
+          </p>
+          <p *ngIf="verificationReason() === 'security'">
+            Αυτό είναι ένα επιπλέον μέτρο ασφαλείας για την προστασία του λογαριασμού σας.
+          </p>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="flex justify-center space-x-4">
+        <button
+          (click)="navigateToLogin()"
+          class="text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 font-medium text-sm transition-colors"
+        >
+          ← Επιστροφή στη σύνδεση
+        </button>
+        <span class="text-gray-300 dark:text-gray-600">|</span>
+        <button
+          (click)="navigateToDashboard()"
+          *ngIf="authService.isAuthenticated()"
+          class="text-gray-600 dark:text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 font-medium text-sm transition-colors"
+        >
+          Πίνακας ελέγχου →
+        </button>
+      </div>
+    </div>
+
+    <!-- Legacy Token Error State -->
+    <div *ngIf="!loadingState.isLoading() && !isVerified() && !isCodeMode()" class="text-center space-y-6">
+      <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 dark:bg-red-900/50">
+        <svg class="h-8 w-8 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Αποτυχία Επαλήθευσης</h3>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">
+          {{ errorMessage() || 'Το link επαλήθευσης είναι άκυρο ή έχει λήξει.' }}
+        </p>
+        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          Παρακαλώ ζητήστε νέο email επαλήθευσης ή επικοινωνήστε με την υποστήριξη.
+        </p>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <p-button
+          (click)="navigateToLogin()"
+          label="Επιστροφή στη Σύνδεση"
+          icon="pi pi-arrow-left"
+          severity="info"
+          styleClass="flex-1"
+          size="large">
+        </p-button>
+        <p-button
+          (click)="onResendCode()"
+          *ngIf="userEmail() || authService.currentUser()?.email"
+          label="Νέος Κωδικός"
+          icon="pi pi-refresh"
+          severity="secondary"
+          styleClass="flex-1"
+          size="large">
+        </p-button>
+      </div>
+    </div>
+  </div>
+</div>

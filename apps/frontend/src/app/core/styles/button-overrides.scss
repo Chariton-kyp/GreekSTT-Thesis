@@ -1,0 +1,1137 @@
+// ========== BUTTON OVERRIDES ==========
+// Comprehensive button styling for consistency across the application
+
+/* ========== UNIFIED THEME TOGGLE STYLING ========== */
+/* Best practice theme toggle with cyan accent, glow effects, and smooth animations */
+
+.theme-toggle-btn,
+.theme-toggle-modern,
+.p-button.p-button-secondary.p-button-text.p-button-rounded {
+  /* Base Styling */
+  position: relative;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(6, 182, 212, 0.2) !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  color: var(--color-accent-primary) !important;
+  backdrop-filter: blur(8px);
+  
+  /* Transitions */
+  transition: all var(--transition-bounce) !important;
+  
+  /* Icon Styling */
+  .p-button-icon {
+    font-size: 1.125rem;
+    color: inherit;
+    transition: all var(--transition-bounce);
+  }
+
+  /* Hover Effects */
+  &:hover:not(:disabled) {
+    transform: var(--hover-scale-lg) rotate(15deg);
+    background: rgba(6, 182, 212, 0.1) !important;
+    border-color: rgba(6, 182, 212, 0.4) !important;
+    color: var(--color-accent-primary) !important;
+    box-shadow: 
+      0 0 20px rgba(6, 182, 212, 0.3),
+      0 4px 15px rgba(6, 182, 212, 0.2);
+    
+    .p-button-icon {
+      transform: rotate(-15deg) scale(1.1);
+      filter: drop-shadow(0 0 4px rgba(6, 182, 212, 0.4));
+    }
+  }
+
+  /* Active State */
+  &:active:not(:disabled) {
+    transform: var(--active-scale) rotate(10deg);
+    background: rgba(6, 182, 212, 0.15) !important;
+  }
+
+  /* Focus State */
+  &:focus:not(:disabled),
+  &:focus-visible:not(:disabled) {
+    outline: none !important;
+    box-shadow: 
+      0 0 0 3px rgba(6, 182, 212, 0.3),
+      0 0 20px rgba(6, 182, 212, 0.4);
+    border-color: rgba(6, 182, 212, 0.5) !important;
+  }
+
+  /* Dark Mode Adjustments */
+  :host-context(.dark) &,
+  .dark & {
+    background: rgba(31, 41, 55, 0.8) !important;
+    border-color: rgba(34, 211, 238, 0.3) !important;
+    color: #22d3ee !important;
+    
+    &:hover:not(:disabled) {
+      background: rgba(34, 211, 238, 0.1) !important;
+      border-color: rgba(34, 211, 238, 0.5) !important;
+      color: #22d3ee !important;
+      box-shadow: 
+        0 0 25px rgba(34, 211, 238, 0.4),
+        0 4px 15px rgba(34, 211, 238, 0.3);
+      
+      .p-button-icon {
+        filter: drop-shadow(0 0 6px rgba(34, 211, 238, 0.5));
+      }
+    }
+    
+    &:active:not(:disabled) {
+      background: rgba(34, 211, 238, 0.15) !important;
+    }
+    
+    &:focus:not(:disabled),
+    &:focus-visible:not(:disabled) {
+      outline: none !important;
+      box-shadow: 
+        0 0 0 3px rgba(34, 211, 238, 0.3),
+        0 0 25px rgba(34, 211, 238, 0.4);
+      border-color: rgba(34, 211, 238, 0.5) !important;
+    }
+  }
+
+  /* Loading/Disabled State */
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    background: var(--surface-hover) !important;
+    border-color: var(--surface-border) !important;
+    color: var(--text-tertiary) !important;
+    box-shadow: none !important;
+  }
+
+  /* Accessibility Enhancements */
+  &[aria-pressed="true"] {
+    background: rgba(6, 182, 212, 0.1) !important;
+    border-color: rgba(6, 182, 212, 0.3) !important;
+    
+    :host-context(.dark) &,
+    .dark & {
+      background: rgba(34, 211, 238, 0.1) !important;
+      border-color: rgba(34, 211, 238, 0.3) !important;
+    }
+  }
+
+  /* High Contrast Mode Support */
+  @media (prefers-contrast: high) {
+    border-width: 2px !important;
+    
+    &:hover:not(:disabled) {
+      border-width: 3px !important;
+    }
+  }
+
+  /* Reduced Motion Support */
+  @media (prefers-reduced-motion: reduce) {
+    transition: color var(--transition-fast), background-color var(--transition-fast) !important;
+    
+    &:hover:not(:disabled) {
+      transform: none;
+      
+      .p-button-icon {
+        transform: none;
+      }
+    }
+  }
+
+  /* Size Variants */
+  &.p-button-small {
+    width: 2.25rem;
+    height: 2.25rem;
+    
+    .p-button-icon {
+      font-size: 1rem;
+    }
+  }
+  
+  &.p-button-large {
+    width: 3.25rem;
+    height: 3.25rem;
+    
+    .p-button-icon {
+      font-size: 1.375rem;
+    }
+  }
+}
+
+/* Landing page button styles - using cyan accent */
+.login-btn-modern,
+.register-btn-modern,
+.dashboard-btn-modern {
+  border: 2px solid var(--color-accent-primary);
+  color: var(--color-accent-primary);
+  background: transparent;
+  transition: all 0.15s ease;
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(10px);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    background: transparent;
+    border-color: var(--color-accent-primary);
+    color: var(--color-accent-primary);
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.4), 0 0 40px rgba(6, 182, 212, 0.2);
+  }
+
+  .p-button-icon {
+    color: currentColor;
+  }
+}
+
+/* Mobile button styles */
+.login-btn-mobile,
+.register-btn-mobile,
+.dashboard-btn-mobile {
+  width: 2.5rem;
+  height: 2.5rem;
+  min-width: 2.5rem;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-md);
+  transition: all 0.15s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .p-button-icon {
+    font-size: 0.9rem;
+    margin: 0;
+    color: var(--text-inverse);
+  }
+}
+
+/* Hero CTA button styles - using design tokens */
+.hero-cta-primary {
+  background: var(--button-primary-bg);
+  border: none;
+  color: var(--button-primary-text);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--button-primary-shadow);
+  min-height: 3.5rem;
+  transition: all 0.15s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--button-primary-shadow-hover);
+  }
+
+  // Ensure icons are white
+  .p-button-icon {
+    color: var(--text-inverse);
+  }
+
+  @media (max-width: 640px) {
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    min-height: 3rem;
+  }
+}
+
+.hero-cta-secondary {
+  border-width: 2px;
+  border-color: var(--color-accent-primary);
+  background: transparent;
+  backdrop-filter: blur(10px);
+  color: var(--color-accent-primary);
+  font-weight: var(--font-weight-semibold);
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  min-height: 3.5rem;
+  transition: all 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: transparent;
+    border-color: var(--color-accent-primary);
+    color: var(--color-accent-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.4), 0 0 40px rgba(6, 182, 212, 0.2);
+  }
+
+  // Ensure icons match text color
+  .p-button-icon {
+    color: currentColor;
+  }
+
+  @media (max-width: 640px) {
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    min-height: 3rem;
+  }
+}
+
+/* Scroll to Top Button - using cyan accent with PrimeNG override */
+.scroll-to-top-modern,
+p-scrolltop.scroll-to-top-modern button,
+p-scrolltop.scroll-to-top-modern .p-scrolltop {
+  position: fixed !important;
+  bottom: var(--spacing-xl) !important;
+  right: var(--spacing-xl) !important;
+  z-index: var(--z-fixed) !important;
+  width: 3.5rem !important;
+  height: 3.5rem !important;
+  border-radius: var(--radius-full) !important;
+  background: var(--color-accent-primary) !important;
+  border: none !important;
+  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3) !important;
+  backdrop-filter: blur(10px) !important;
+  color: var(--text-inverse) !important;
+  transition: all 0.15s ease !important;
+
+  &:hover:not(:disabled) {
+    background: var(--color-accent-hover) !important;
+    transform: translateY(-4px) scale(1.01) !important;
+    box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4) !important;
+  }
+
+  i,
+  .pi {
+    color: var(--text-inverse) !important;
+    font-size: 1.25rem !important;
+    transition: transform 0.15s ease !important;
+  }
+
+  &:hover i,
+  &:hover .pi {
+    transform: translateY(-2px) scale(1.1) translateZ(0) !important;
+  }
+
+  @media (max-width: 640px) {
+    bottom: var(--spacing-lg) !important;
+    right: var(--spacing-lg) !important;
+    width: 3rem !important;
+    height: 3rem !important;
+
+    i,
+    .pi {
+      font-size: 1.1rem !important;
+    }
+  }
+}
+
+/* Additional PrimeNG ScrollTop overrides */
+p-scrolltop.scroll-to-top-modern {
+  .p-scrolltop {
+    background: var(--color-accent-primary) !important;
+    color: var(--text-inverse) !important;
+    border: none !important;
+
+    &:hover {
+      background: var(--color-accent-hover) !important;
+    }
+  }
+}
+
+/* Button enhancements with design tokens */
+.p-button {
+  transition: all 0.15s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Disabled button styling for better UX */
+  &:disabled,
+  &[disabled] {
+    opacity: 0.4 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Global disabled button styling for all button types */
+button:disabled,
+button[disabled],
+.p-button:disabled,
+.p-button[disabled],
+.p-button-text:disabled,
+.p-button-text[disabled],
+.p-button-outlined:disabled,
+.p-button-outlined[disabled],
+.p-button-link:disabled,
+.p-button-link[disabled] {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Ensure disabled state works for buttons with loading state */
+.p-button.p-disabled,
+.p-button[aria-disabled="true"] {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Button icon enhancements */
+.p-button .p-button-icon {
+  transition: transform 0.15s ease;
+}
+
+.p-button:hover .p-button-icon {
+  transform: scale(1.1) translateZ(0);
+}
+
+.p-button-icon.p-button-icon-right {
+  margin-right: 0;
+  margin-left: var(--spacing-sm);
+}
+
+.p-button.p-button-icon-only .p-button-icon {
+  margin: 0;
+}
+
+.p-button-loading-icon {
+  animation: spin 1s linear infinite;
+}
+
+/* Ensure all primary buttons have white icons */
+.p-button:not(.p-button-outlined):not(.p-button-text) {
+  .p-button-icon {
+    color: var(--text-inverse);
+  }
+}
+
+/* Fix all outlined buttons to use cyan accent */
+.p-button.p-button-outlined {
+  border: 2px solid var(--color-accent-primary) !important;
+  color: var(--color-accent-primary) !important;
+  background: transparent !important;
+
+  &:hover:not(:disabled) {
+    background: transparent !important;
+    border-color: var(--color-accent-primary) !important;
+    color: var(--color-accent-primary) !important;
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.4), 0 0 40px rgba(6, 182, 212, 0.2) !important;
+    transform: translateY(-1px) !important;
+  }
+
+  &:focus:not(:disabled) {
+    background: transparent !important;
+    border-color: var(--color-accent-primary) !important;
+    color: var(--color-accent-primary) !important;
+  }
+
+  &:active {
+    background: transparent !important;
+    border-color: var(--color-accent-primary) !important;
+    color: var(--color-accent-primary) !important;
+  }
+
+  .p-button-icon {
+    color: currentColor !important;
+  }
+
+  .p-button-label {
+    color: currentColor !important;
+  }
+}
+
+/* Enhanced button variants */
+.p-button-success {
+  background: var(--button-success-bg);
+  border: none;
+  box-shadow: var(--button-success-shadow);
+  color: var(--text-inverse);
+
+  &:hover:not(:disabled) {
+    background: var(--button-success-bg-hover);
+    box-shadow: var(--button-success-shadow-hover);
+  }
+
+  .p-button-icon {
+    color: var(--text-inverse);
+  }
+}
+
+.p-button-info {
+  background: var(--button-primary-bg);
+  border: none;
+  box-shadow: var(--button-primary-shadow);
+  color: var(--button-primary-text);
+
+  &:hover:not(:disabled) {
+    background: var(--button-primary-bg-hover);
+    box-shadow: var(--button-primary-shadow-hover);
+  }
+
+  .p-button-label {
+    color: var(--button-primary-text);
+  }
+
+  .p-button-icon {
+    color: var(--text-inverse);
+  }
+}
+
+.p-button-secondary.p-button-outlined {
+  border: 2px solid var(--color-accent-primary) !important;
+  color: var(--color-accent-primary) !important;
+  background: transparent !important;
+
+  &:hover:not(:disabled) {
+    background: transparent !important;
+    border-color: var(--color-accent-primary) !important;
+    color: var(--color-accent-primary) !important;
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.4), 0 0 40px rgba(6, 182, 212, 0.2) !important;
+    transform: translateY(-1px) !important;
+  }
+
+  .p-button-icon {
+    color: currentColor !important;
+  }
+
+  .p-button-label {
+    color: currentColor !important;
+  }
+}
+
+.p-button-text {
+  color: var(--color-accent-primary) !important;
+  transition: all 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(6, 182, 212, 0.1) !important;
+    color: var(--color-accent-primary) !important;
+  }
+
+  .p-button-icon {
+    color: currentColor !important;
+  }
+
+  .p-button-label {
+    color: currentColor !important;
+  }
+}
+
+/* Additional targeting for secondary buttons */
+.p-button-secondary,
+.p-button.p-button-secondary {
+  border: 2px solid var(--color-accent-primary) !important;
+  color: var(--color-accent-primary) !important;
+  background: transparent !important;
+
+  &:hover:not(:disabled) {
+    background: transparent !important;
+    border-color: var(--color-accent-primary) !important;
+    color: var(--color-accent-primary) !important;
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.4), 0 0 40px rgba(6, 182, 212, 0.2) !important;
+    transform: translateY(-1px) !important;
+  }
+
+  &:focus:not(:disabled) {
+    background: transparent !important;
+    border-color: var(--color-accent-primary) !important;
+    color: var(--color-accent-primary) !important;
+  }
+
+  &:active {
+    background: transparent !important;
+    border-color: var(--color-accent-primary) !important;
+    color: var(--color-accent-primary) !important;
+  }
+
+  .p-button-icon,
+  .p-button-label {
+    color: currentColor !important;
+  }
+}
+
+/* Neutral secondary buttons (non-cyan) - Higher specificity to override outlined */
+.p-button.p-button-outlined.p-button-secondary-neutral,
+.p-button.p-button-outlined.secondary-neutral,
+.p-button.secondary-neutral {
+  background: transparent !important;
+  color: var(--text-secondary) !important;
+  border: 2px solid var(--surface-border) !important;
+  box-shadow: none !important;
+
+  &:hover:not(:disabled) {
+    background: transparent !important;
+    color: var(--text-primary) !important;
+    border-color: var(--surface-border-hover) !important;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm) !important;
+  }
+
+  &:focus:not(:disabled) {
+    background: transparent !important;
+    color: var(--text-primary) !important;
+    border-color: var(--surface-border-hover) !important;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  &:active {
+    background: transparent !important;
+    color: var(--text-primary) !important;
+    border-color: var(--surface-border-hover) !important;
+  }
+
+  .p-button-icon,
+  .p-button-label {
+    color: currentColor !important;
+  }
+}
+
+// Theme toggle button - High specificity to override global button styles
+.p-button.theme-toggle,
+.p-button.p-button-secondary.p-button-text.p-button-rounded {
+  transition: transform 0.15s ease;
+  border-radius: 9999px;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: none !important;
+  background: transparent !important;
+  color: #06b6d4 !important;
+  box-shadow: none !important;
+
+  // Ensure icon is always cyan in all states
+  .p-button-icon,
+  .p-button-label,
+  span,
+  i {
+    color: #06b6d4 !important;
+  }
+
+  &:hover {
+    transform: scale(1.1) rotate(12deg) translateZ(0);
+    background: rgba(6, 182, 212, 0.08) !important;
+    color: #06b6d4 !important;
+    border: none !important;
+    box-shadow: none !important;
+
+    .p-button-icon,
+    .p-button-label,
+    span,
+    i {
+      color: #06b6d4 !important;
+    }
+  }
+
+  &:focus,
+  &:active {
+    background: transparent !important;
+    color: #06b6d4 !important;
+    border: none !important;
+    box-shadow: none !important;
+    transform: none;
+
+    .p-button-icon,
+    .p-button-label,
+    span,
+    i {
+      color: #06b6d4 !important;
+    }
+  }
+
+  &:disabled {
+    background: transparent !important;
+    color: rgba(6, 182, 212, 0.4) !important;
+    border: none !important;
+    box-shadow: none !important;
+
+    .p-button-icon,
+    .p-button-label,
+    span,
+    i {
+      color: rgba(6, 182, 212, 0.4) !important;
+    }
+  }
+}
+
+/* Action Button Overrides - Specific styling for action buttons in transcription cards */
+.p-button.action-btn,
+.action-btn {
+  background: var(--color-accent-primary) !important;
+  border-color: var(--color-accent-primary) !important;
+  color: var(--text-inverse) !important;
+  
+  &:hover:not(:disabled) {
+    background: var(--color-accent-hover) !important;
+    border-color: var(--color-accent-hover) !important;
+    color: var(--text-inverse) !important;
+  }
+  
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba(6, 182, 212, 0.5) !important;
+  }
+  
+  // Ensure all text and icons are white
+  .p-button-label,
+  .p-button-icon {
+    color: var(--text-inverse) !important;
+  }
+}
+
+// ========== GLOBAL BUTTON STYLING ==========
+// Global button styling - make ALL PRIMARY buttons cyan with white text by default
+.p-button:not(.p-button-outlined):not(.p-button-text):not(.p-button-secondary) {
+  background: #06b6d4 !important;
+  border-color: #06b6d4 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3) !important;
+
+  // Ensure all text and icons are white
+  .p-button-label,
+  .p-button-icon,
+  span,
+  i {
+    color: #ffffff !important;
+  }
+
+  &:hover:not(:disabled) {
+    background: #0891b2 !important;
+    border-color: #0891b2 !important;
+    box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4) !important;
+    transform: translateY(-1px);
+    color: #ffffff !important;
+
+    .p-button-label,
+    .p-button-icon,
+    span,
+    i {
+      color: #ffffff !important;
+    }
+  }
+
+  &:active {
+    transform: scale(0.98);
+    color: #ffffff !important;
+  }
+
+  &:focus {
+    color: #ffffff !important;
+    
+    .p-button-label,
+    .p-button-icon,
+    span,
+    i {
+      color: #ffffff !important;
+    }
+  }
+
+  // Disabled state with very light cyan and white text
+  &:disabled {
+    background: rgba(6, 182, 212, 0.3) !important;
+    border-color: rgba(6, 182, 212, 0.3) !important;
+    color: #ffffff !important;
+    opacity: 1 !important;
+    transform: none !important;
+    box-shadow: none !important;
+    
+    .p-button-label,
+    .p-button-icon,
+    span,
+    i {
+      color: #ffffff !important;
+    }
+
+    // Remove all hover effects when disabled
+    &:hover {
+      background: rgba(6, 182, 212, 0.3) !important;
+      border-color: rgba(6, 182, 212, 0.3) !important;
+      color: #ffffff !important;
+      transform: none !important;
+      box-shadow: none !important;
+      
+      .p-button-label,
+      .p-button-icon,
+      span,
+      i {
+        color: #ffffff !important;
+      }
+    }
+  }
+}
+
+.p-button.p-button-info {
+  background: #06b6d4 !important;
+  border-color: #06b6d4 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3) !important;
+
+  // Ensure all text and icons are white
+  .p-button-label,
+  .p-button-icon,
+  span {
+    color: #ffffff !important;
+  }
+
+  &:hover:not(:disabled) {
+    background: #0891b2 !important;
+    border-color: #0891b2 !important;
+    box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4) !important;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  // Disabled state with very light cyan and white text
+  &:disabled {
+    background: rgba(6, 182, 212, 0.3) !important;
+    border-color: rgba(6, 182, 212, 0.3) !important;
+    color: #ffffff !important;
+    opacity: 1 !important;
+    transform: none !important;
+    box-shadow: none !important;
+    
+    .p-button-label,
+    .p-button-icon,
+    span {
+      color: #ffffff !important;
+    }
+
+    &:hover {
+      background: rgba(6, 182, 212, 0.3) !important;
+      border-color: rgba(6, 182, 212, 0.3) !important;
+      color: #ffffff !important;
+      transform: none !important;
+      box-shadow: none !important;
+      
+      .p-button-label,
+      .p-button-icon,
+      span {
+        color: #ffffff !important;
+      }
+    }
+  }
+}
+
+// Override success buttons to use cyan instead of green
+.p-button[severity="success"],
+.p-button.p-button-success {
+  background: #06b6d4 !important;
+  border-color: #06b6d4 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3) !important;
+
+  // Ensure all text and icons are white
+  .p-button-label,
+  .p-button-icon,
+  span {
+    color: #ffffff !important;
+  }
+
+  &:hover:not(:disabled) {
+    background: #0891b2 !important;
+    border-color: #0891b2 !important;
+    box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4) !important;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  // Disabled state with very light cyan and white text
+  &:disabled {
+    background: rgba(6, 182, 212, 0.3) !important;
+    border-color: rgba(6, 182, 212, 0.3) !important;
+    color: #ffffff !important;
+    opacity: 1 !important;
+    transform: none !important;
+    box-shadow: none !important;
+    
+    .p-button-label,
+    .p-button-icon,
+    span {
+      color: #ffffff !important;
+    }
+
+    &:hover {
+      background: rgba(6, 182, 212, 0.3) !important;
+      border-color: rgba(6, 182, 212, 0.3) !important;
+      color: #ffffff !important;
+      transform: none !important;
+      box-shadow: none !important;
+      
+      .p-button-label,
+      .p-button-icon,
+      span {
+        color: #ffffff !important;
+      }
+    }
+  }
+}
+
+// Override primary buttons to use cyan
+.p-button[severity="primary"],
+.p-button.p-button-primary {
+  background: #06b6d4 !important;
+  border-color: #06b6d4 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3) !important;
+
+  // Ensure all text and icons are white
+  .p-button-label,
+  .p-button-icon,
+  span {
+    color: #ffffff !important;
+  }
+
+  &:hover:not(:disabled) {
+    background: #0891b2 !important;
+    border-color: #0891b2 !important;
+    box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4) !important;
+    transform: translateY(-1px);
+    color: #ffffff !important;
+
+    // Ensure white text on hover too
+    .p-button-label,
+    .p-button-icon,
+    span {
+      color: #ffffff !important;
+    }
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  // Force white text when disabled too with very light cyan background
+  &:disabled {
+    background: rgba(6, 182, 212, 0.3) !important;
+    border-color: rgba(6, 182, 212, 0.3) !important;
+    color: #ffffff !important;
+    opacity: 1 !important;
+    transform: none !important;
+    box-shadow: none !important;
+    
+    .p-button-label,
+    .p-button-icon,
+    span {
+      color: #ffffff !important;
+    }
+
+    // Remove all hover effects when disabled
+    &:hover {
+      background: rgba(6, 182, 212, 0.3) !important;
+      border-color: rgba(6, 182, 212, 0.3) !important;
+      color: #ffffff !important;
+      transform: none !important;
+      box-shadow: none !important;
+      
+      .p-button-label,
+      .p-button-icon,
+      span {
+        color: #ffffff !important;
+      }
+    }
+  }
+}
+
+// Note: Secondary and outlined buttons styling handled above in specific sections
+// This global override is commented out to prevent conflicts with the custom secondary button styling
+
+.p-button.p-button-primary:hover:not(:disabled) {
+  color: #ffffff !important;
+}
+
+/* ========== DARK MODE SECONDARY BUTTON OVERRIDES ========== */
+[data-theme="dark"], .dark {
+  /* Ensure all secondary buttons maintain cyan color in dark mode */
+  .login-btn-modern,
+  .register-btn-modern,
+  .dashboard-btn-modern,
+  .hero-cta-secondary,
+  .p-button.p-button-outlined,
+  .p-button-secondary,
+  .p-button.p-button-secondary,
+  .p-button-secondary.p-button-outlined {
+    color: #22d3ee !important; // Light cyan for dark mode
+    border-color: #22d3ee !important;
+
+    &:hover:not(:disabled) {
+      color: #22d3ee !important; // Stay light cyan on hover
+      border-color: #22d3ee !important;
+      box-shadow: 0 0 20px rgba(34, 211, 238, 0.4), 0 0 40px rgba(34, 211, 238, 0.2) !important;
+    }
+
+    &:focus:not(:disabled) {
+      color: #22d3ee !important;
+      border-color: #22d3ee !important;
+    }
+
+    &:active {
+      color: #22d3ee !important;
+      border-color: #22d3ee !important;
+    }
+
+    .p-button-icon,
+    .p-button-label {
+      color: currentColor !important;
+    }
+  }
+}
+
+/* ========== LIGHT MODE SECONDARY BUTTON REINFORCEMENT ========== */
+[data-theme="light"], .light, :root {
+  /* Ensure all secondary buttons maintain cyan color in light mode */
+  .login-btn-modern,
+  .register-btn-modern,
+  .dashboard-btn-modern,
+  .hero-cta-secondary,
+  .p-button.p-button-outlined,
+  .p-button-secondary,
+  .p-button.p-button-secondary,
+  .p-button-secondary.p-button-outlined {
+    color: #06b6d4 !important; // Standard cyan for light mode
+    border-color: #06b6d4 !important;
+
+    &:hover:not(:disabled) {
+      color: #06b6d4 !important; // Stay cyan on hover
+      border-color: #06b6d4 !important;
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.4), 0 0 40px rgba(6, 182, 212, 0.2) !important;
+    }
+
+    &:focus:not(:disabled) {
+      color: #06b6d4 !important;
+      border-color: #06b6d4 !important;
+    }
+
+    &:active {
+      color: #06b6d4 !important;
+      border-color: #06b6d4 !important;
+    }
+
+    .p-button-icon,
+    .p-button-label {
+      color: currentColor !important;
+    }
+  }
+}
+
+/* ========== MOBILE BUTTON OPTIMIZATIONS ========== */
+@media (max-width: 640px) {
+  .hero-cta-primary,
+  .hero-cta-secondary {
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-sm) var(--spacing-lg);
+  }
+}
+
+/* ========== TOOLTIP OVERRIDES ========== */
+/* Fix PrimeNG tooltips to match project theme and prevent text wrapping */
+
+/* Light mode tooltip styling */
+.p-tooltip,
+.p-tooltip.p-tooltip-top,
+.p-tooltip.p-tooltip-bottom,
+.p-tooltip.p-tooltip-left,
+.p-tooltip.p-tooltip-right {
+  z-index: 1070 !important;
+  
+  .p-tooltip-text {
+    background: #ffffff !important;
+    color: #333333 !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    line-height: 1.3 !important;
+    
+    /* Fix text wrapping and visual issues */
+    white-space: normal !important;
+    max-width: 200px !important;
+    min-width: auto !important;
+    width: auto !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    word-break: break-word !important;
+    hyphens: none !important;
+    
+    /* Ensure clean text rendering */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    letter-spacing: 0.01em !important;
+    text-rendering: optimizeLegibility !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+  }
+
+  /* Arrow styling for all directions */
+  .p-tooltip-arrow {
+    border-color: transparent !important;
+  }
+  
+  &.p-tooltip-top .p-tooltip-arrow {
+    border-top-color: #ffffff !important;
+    border-bottom-color: transparent !important;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+  }
+  
+  &.p-tooltip-bottom .p-tooltip-arrow {
+    border-bottom-color: #ffffff !important;
+    border-top-color: transparent !important;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+  }
+  
+  &.p-tooltip-left .p-tooltip-arrow {
+    border-left-color: #ffffff !important;
+    border-top-color: transparent !important;
+    border-bottom-color: transparent !important;
+    border-right-color: transparent !important;
+  }
+  
+  &.p-tooltip-right .p-tooltip-arrow {
+    border-right-color: #ffffff !important;
+    border-top-color: transparent !important;
+    border-bottom-color: transparent !important;
+    border-left-color: transparent !important;
+  }
+}
+
+/* Dark mode tooltip adjustments */
+[data-theme="dark"] .p-tooltip,
+.dark .p-tooltip,
+[data-theme="dark"] .p-tooltip.p-tooltip-top,
+[data-theme="dark"] .p-tooltip.p-tooltip-bottom,
+[data-theme="dark"] .p-tooltip.p-tooltip-left,
+[data-theme="dark"] .p-tooltip.p-tooltip-right,
+.dark .p-tooltip.p-tooltip-top,
+.dark .p-tooltip.p-tooltip-bottom,
+.dark .p-tooltip.p-tooltip-left,
+.dark .p-tooltip.p-tooltip-right {
+  .p-tooltip-text {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #f9fafb !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  &.p-tooltip-top .p-tooltip-arrow {
+    border-top-color: #1f2937 !important;
+  }
+  
+  &.p-tooltip-bottom .p-tooltip-arrow {
+    border-bottom-color: #1f2937 !important;
+  }
+  
+  &.p-tooltip-left .p-tooltip-arrow {
+    border-left-color: #1f2937 !important;
+  }
+  
+  &.p-tooltip-right .p-tooltip-arrow {
+    border-right-color: #1f2937 !important;
+  }
+}

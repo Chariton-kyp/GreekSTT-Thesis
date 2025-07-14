@@ -1,0 +1,159 @@
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col">
+  <!-- Header -->
+  <header class="relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-6">
+        <!-- Logo -->
+        <div class="flex items-center">
+          <app-logo 
+            size="lg" 
+            [isClickable]="true" 
+            navigateTo="/">
+          </app-logo>
+        </div>
+
+        <!-- Theme Toggle -->
+        <p-button
+          [icon]="isDarkMode() ? 'pi pi-sun' : 'pi pi-moon'"
+          severity="secondary"
+          [text]="true"
+          [rounded]="true"
+          size="small"
+          [attr.aria-label]="isDarkMode() ? 'Αλλαγή σε φωτεινό θέμα' : 'Αλλαγή σε σκοτεινό θέμα'"
+          [attr.aria-pressed]="isDarkMode()"
+          (click)="toggleTheme()"
+          styleClass="theme-toggle-modern"
+        >
+        </p-button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex">
+    <!-- Left Side - Branding/Info -->
+    <div class="hidden lg:flex lg:w-1/2 lg:flex-col lg:justify-center lg:px-12 xl:px-20">
+      <div class="max-w-lg">
+        <!-- Hero Section -->
+        <div class="mb-8">
+          <div class="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-indigo-100 to-blue-100 dark:from-indigo-900/30 dark:to-blue-900/30 text-indigo-700 dark:text-indigo-300 text-sm font-medium mb-4">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+Δοκιμές ASR
+          </div>
+          
+          <h2 class="text-4xl xl:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+            Καλώς ήρθατε στις 
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-blue-500 to-cyan-500">
+              Δοκιμές ASR
+            </span>
+          </h2>
+          
+          <p class="text-xl text-gray-600 dark:text-gray-300 mb-8">
+            Δοκιμάζουμε πώς λειτουργούν τα AI μοντέλα στην ελληνική γλώσσα
+          </p>
+        </div>
+        
+        <!-- Feature List -->
+        <div class="space-y-5 text-lg text-gray-700 dark:text-gray-300 mb-10">
+          <div class="flex items-center space-x-4 group">
+            <div class="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-green-400 to-emerald-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+              <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <p><span class="font-semibold">Εύκολα</span> εργαλεία σύγκρισης</p>
+          </div>
+          
+          <div class="flex items-center space-x-4 group">
+            <div class="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+              <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <p><span class="font-semibold">Γρήγορα</span> και απλά αποτελέσματα</p>
+          </div>
+          
+          <div class="flex items-center space-x-4 group">
+            <div class="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+              <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <p><span class="font-semibold">Ασφαλής</span> και απλή χρήση</p>
+          </div>
+          
+          <div class="flex items-center space-x-4 group">
+            <div class="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-cyan-400 to-teal-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+              <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <p><span class="font-semibold">Δωρεάν</span> πρόσβαση σε όλες τις δοκιμές</p>
+          </div>
+        </div>
+
+        <!-- Info Card -->
+        <div class="relative">
+          <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-blue-500 to-cyan-500 rounded-xl blur opacity-25"></div>
+          <div class="relative p-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
+            <div class="flex items-center space-x-4 mb-4">
+              <div class="w-12 h-12 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"/>
+                </svg>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-900 dark:text-white">Δοκιμές ASR</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+                  <svg class="w-4 h-4 mr-1 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                  </svg>
+                  Δοκιμαστική έκδοση
+                </p>
+              </div>
+            </div>
+            <div class="relative">
+              <svg class="absolute -top-1 -left-1 w-6 h-6 text-indigo-500 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+              </svg>
+              <p class="text-gray-700 dark:text-gray-300 text-lg leading-relaxed pl-6">
+Εδώ μπορείτε να <span class="font-semibold text-indigo-600 dark:text-indigo-400">δοκιμάσετε</span> πώς λειτουργούν διαφορετικά AI μοντέλα. Δείτε <span class="font-semibold text-green-600 dark:text-green-400">ποιο είναι καλύτερο</span> και τι διαφορές έχουν.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Side - Auth Form -->
+    <div class="w-full lg:w-1/2 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div class="w-full max-w-md">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div class="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
+        <div class="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+          <span>&copy; 2024 GreekSTT Research Platform. Όλα τα δικαιώματα διατηρούνται.</span>
+        </div>
+        <div class="flex items-center space-x-6">
+          <a href="#" class="text-sm text-gray-500 dark:text-gray-400 hover-text-blue transition-colors">
+            Πολιτική Απορρήτου
+          </a>
+          <a href="#" class="text-sm text-gray-500 dark:text-gray-400 hover-text-blue transition-colors">
+            Όροι Χρήσης
+          </a>
+          <a href="#" class="text-sm text-gray-500 dark:text-gray-400 hover-text-blue transition-colors">
+            Υποστήριξη
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>

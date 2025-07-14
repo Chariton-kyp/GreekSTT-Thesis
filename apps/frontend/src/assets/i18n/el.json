@@ -1,0 +1,95 @@
+{
+  "app": {
+    "title": "GreekSTT Research Platform",
+    "subtitle": "Μετατρέψτε την ομιλία σας σε κείμενο"
+  },
+  "theme": {
+    "dark": "Σκοτεινό θέμα",
+    "light": "Φωτεινό θέμα",
+    "toggle": "Αλλαγή θέματος",
+    "auto": "Αυτόματο"
+  },
+  "auth": {
+    "login": "Σύνδεση",
+    "register": "Εγγραφή",
+    "email": "Email",
+    "password": "Κωδικός",
+    "forgotPassword": "Ξέχασα τον κωδικό μου",
+    "remember_me": "Να με θυμάσαι",
+    "alreadyHaveAccount": "Έχετε ήδη λογαριασμό;",
+    "dontHaveAccount": "Δεν έχετε λογαριασμό;",
+    "first_name": "Όνομα",
+    "last_name": "Επώνυμο",
+    "confirmPassword": "Επιβεβαίωση κωδικού",
+    "organization": "Οργανισμός",
+    "sector": "Τομέας"
+  },
+  "dashboard": {
+    "welcome": "Καλώς ήρθατε",
+    "recentFiles": "Πρόσφατα Αρχεία",
+    "totalTranscriptions": "Συνολικές Μεταγραφές",
+    "monthlyUsage": "Μηνιαία Χρήση",
+    "availableCredits": "Διαθέσιμα Πιστώματα",
+    "successRate": "Ποσοστό Επιτυχίας"
+  },
+  "transcription": {
+    "upload": "Μεταφόρτωση",
+    "processing": "Επεξεργασία",
+    "completed": "Ολοκληρώθηκε",
+    "failed": "Αποτυχία",
+    "pending": "Εκκρεμεί",
+    "audioTranscription": "Μεταγραφή Ήχου",
+    "videoTranscription": "Μεταγραφή Βίντεο",
+    "selectFile": "Επιλέξτε αρχείο",
+    "selectTemplate": "Επιλέξτε πρότυπο",
+    "startTranscription": "Έναρξη Μεταγραφής",
+    "downloadTranscription": "Λήψη Μεταγραφής",
+    "editTranscription": "Επεξεργασία Μεταγραφής"
+  },
+  "profile": {
+    "profile": "Προφίλ",
+    "personalInfo": "Προσωπικά Στοιχεία",
+    "accountSettings": "Ρυθμίσεις Λογαριασμού",
+    "changePassword": "Αλλαγή Κωδικού",
+    "currentPassword": "Τρέχων Κωδικός",
+    "newPassword": "Νέος Κωδικός"
+  },
+  "navigation": {
+    "dashboard": "Πίνακας Ελέγχου",
+    "transcriptions": "Μεταγραφές",
+    "profile": "Προφίλ",
+    "settings": "Ρυθμίσεις",
+    "logout": "Αποσύνδεση"
+  },
+  "common": {
+    "save": "Αποθήκευση",
+    "cancel": "Ακύρωση",
+    "delete": "Διαγραφή",
+    "edit": "Επεξεργασία",
+    "view": "Προβολή",
+    "download": "Λήψη",
+    "upload": "Μεταφόρτωση",
+    "search": "Αναζήτηση",
+    "filter": "Φίλτρο",
+    "close": "Κλείσιμο",
+    "yes": "Ναι",
+    "no": "Όχι",
+    "loading": "Φόρτωση..."
+  },
+  "errors": {
+    "required": "Το πεδίο είναι υποχρεωτικό",
+    "email": "Μη έγκυρη διεύθυνση email",
+    "fileSize": "Το αρχείο είναι πολύ μεγάλο",
+    "fileFormat": "Μη υποστηριζόμενος τύπος αρχείου",
+    "networkError": "Σφάλμα δικτύου",
+    "serverError": "Σφάλμα διακομιστή",
+    "unauthorized": "Μη εξουσιοδοτημένη πρόσβαση",
+    "forbidden": "Απαγορευμένη πρόσβαση"
+  },
+  "success": {
+    "fileSaved": "Το αρχείο αποθηκεύτηκε επιτυχώς",
+    "profileUpdated": "Το προφίλ ενημερώθηκε επιτυχώς",
+    "passwordChanged": "Ο κωδικός άλλαξε επιτυχώς",
+    "transcriptionCompleted": "Η μεταγραφή ολοκληρώθηκε επιτυχώς"
+  }
+}

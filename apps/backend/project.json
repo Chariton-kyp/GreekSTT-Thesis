@@ -1,0 +1,57 @@
+{
+  "name": "backend",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/backend",
+  "tags": ["scope:backend", "type:app"],
+  "targets": {
+    "serve": {
+      "executor": "@nx/node:execute",
+      "options": {
+        "buildTarget": "backend:build",
+        "file": "apps/backend/run.py",
+        "env": {
+          "FLASK_ENV": "development",
+          "FLASK_APP": "run.py"
+        }
+      }
+    },
+    "build": {
+      "executor": "@nx/node:package",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/backend",
+        "main": "apps/backend/run.py",
+        "tsConfig": "apps/backend/tsconfig.app.json",
+        "assets": [
+          "apps/backend/requirements.txt",
+          "apps/backend/migrations",
+          "apps/backend/app/templates",
+          "apps/backend/certs"
+        ]
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/backend/jest.config.ts"
+      }
+    },
+    "docker-build": {
+      "executor": "@nx/node:execute",
+      "options": {
+        "command": "docker build -t greekstt-research-backend -f apps/backend/Dockerfile ."
+      }
+    },
+    "migration": {
+      "executor": "@nx/node:execute",
+      "options": {
+        "command": "cd apps/backend && python manage_migrations.py upgrade"
+      }
+    }
+  }
+}

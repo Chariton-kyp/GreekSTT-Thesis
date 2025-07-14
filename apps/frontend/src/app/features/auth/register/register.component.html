@@ -1,0 +1,266 @@
+<div class="bg-white dark:bg-gray-800 py-8 px-6 shadow-xl rounded-lg border border-gray-200 dark:border-gray-700">
+  <div class="space-y-6">
+    <!-- Header -->
+    <div class="text-center">
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Ξεκινήστε δωρεάν!</h2>
+      <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+        Δημιουργήστε τον λογαριασμό σας και αρχίστε τη μεταγραφή αμέσως
+      </p>
+    </div>
+
+    <!-- Academic Registration Notice -->
+    <div class="bg-blue-50 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-6">
+      <div class="flex items-center">
+        <i class="pi pi-info-circle text-blue-600 dark:text-blue-400 mr-3"></i>
+        <div>
+          <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">Ακαδημαϊκή Εγγραφή</h3>
+          <p class="text-sm text-blue-700 dark:text-blue-300 mt-1">
+            Εγγραφή μόνο με email για ερευνητική χρήση
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Register Form -->
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
+      <!-- Name Fields -->
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label for="first_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Όνομα
+          </label>
+          <input
+            pInputText
+            id="first_name"
+            name="first_name"
+            type="text"
+            formControlName="first_name"
+            required
+            class="w-full"
+            placeholder="Όνομα"
+          />
+          <div *ngIf="getFieldError(registerForm, 'first_name')" class="mt-1 text-sm text-red-600 dark:text-red-400">
+            {{ getFieldError(registerForm, 'first_name') }}
+          </div>
+        </div>
+        <div>
+          <label for="last_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Επώνυμο
+          </label>
+          <input
+            pInputText
+            id="last_name"
+            name="last_name"
+            type="text"
+            formControlName="last_name"
+            required
+            class="w-full"
+            placeholder="Επώνυμο"
+          />
+          <div *ngIf="getFieldError(registerForm, 'last_name')" class="mt-1 text-sm text-red-600 dark:text-red-400">
+            {{ getFieldError(registerForm, 'last_name') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Email Field -->
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> Email </label>
+        <input
+          pInputText
+          id="email"
+          name="email"
+          type="email"
+          formControlName="email"
+          required
+          class="w-full"
+          placeholder="Διεύθυνση email"
+        />
+        <div *ngIf="getFieldError(registerForm, 'email')" class="mt-1 text-sm text-red-600 dark:text-red-400">
+          {{ getFieldError(registerForm, 'email') }}
+        </div>
+      </div>
+
+      <!-- Username Field -->
+      <div>
+        <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Όνομα χρήστη
+        </label>
+        <input
+          pInputText
+          id="username"
+          name="username"
+          type="text"
+          formControlName="username"
+          required
+          class="w-full"
+          placeholder="Όνομα χρήστη"
+        />
+        <div *ngIf="getFieldError(registerForm, 'username')" class="mt-1 text-sm text-red-600 dark:text-red-400">
+          {{ getFieldError(registerForm, 'username') }}
+        </div>
+      </div>
+
+      <!-- Phone & Organization Fields -->
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Τηλέφωνο (προαιρετικό)
+          </label>
+          <input
+            pInputText
+            id="phone"
+            name="phone"
+            type="tel"
+            formControlName="phone"
+            class="w-full"
+            placeholder="+30 123 456 7890"
+          />
+          <div *ngIf="getFieldError(registerForm, 'phone')" class="mt-1 text-sm text-red-600 dark:text-red-400">
+            {{ getFieldError(registerForm, 'phone') }}
+          </div>
+        </div>
+        <div>
+          <label for="organization" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Οργανισμός (προαιρετικό)
+          </label>
+          <input
+            pInputText
+            id="organization"
+            name="organization"
+            type="text"
+            formControlName="organization"
+            class="w-full"
+            placeholder="Οργανισμός"
+          />
+          <div *ngIf="getFieldError(registerForm, 'organization')" class="mt-1 text-sm text-red-600 dark:text-red-400">
+            {{ getFieldError(registerForm, 'organization') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Password Fields -->
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Κωδικός πρόσβασης
+          </label>
+          <p-password
+            id="password"
+            name="password"
+            formControlName="password"
+            required
+            [toggleMask]="true"
+            placeholder="Κωδικός πρόσβασης"
+            inputStyleClass="w-full"
+            styleClass="w-full"
+            [feedback]="false"
+          >
+          </p-password>
+          <div *ngIf="getFieldError(registerForm, 'password')" class="mt-1 text-sm text-red-600 dark:text-red-400">
+            {{ getFieldError(registerForm, 'password') }}
+          </div>
+        </div>
+        <div>
+          <label for="confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Επιβεβαίωση κωδικού
+          </label>
+          <p-password
+            id="confirmPassword"
+            name="confirmPassword"
+            formControlName="confirmPassword"
+            required
+            [toggleMask]="true"
+            placeholder="Επιβεβαίωση κωδικού"
+            inputStyleClass="w-full"
+            styleClass="w-full"
+            [feedback]="false"
+          >
+          </p-password>
+          <div *ngIf="getFieldError(registerForm, 'confirmPassword')" class="mt-1 text-sm text-red-600 dark:text-red-400">
+            {{ getFieldError(registerForm, 'confirmPassword') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Password Requirements -->
+      <div class="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 p-3 rounded-md">
+        <p class="font-medium mb-2">Ο κωδικός πρέπει να περιέχει:</p>
+        <ul class="space-y-1">
+          <li class="flex items-center">
+            <span class="w-1.5 h-1.5 bg-gray-400 rounded-full mr-2"></span>
+            Τουλάχιστον 5 χαρακτήρες
+          </li>
+          <li class="flex items-center">
+            <span class="w-1.5 h-1.5 bg-gray-400 rounded-full mr-2"></span>
+            Ένα κεφαλαίο γράμμα (A-Z)
+          </li>
+          <li class="flex items-center">
+            <span class="w-1.5 h-1.5 bg-gray-400 rounded-full mr-2"></span>
+            Ένα πεζό γράμμα (a-z)
+          </li>
+          <li class="flex items-center">
+            <span class="w-1.5 h-1.5 bg-gray-400 rounded-full mr-2"></span>
+            Έναν αριθμό (0-9)
+          </li>
+        </ul>
+      </div>
+
+      <!-- Terms & Conditions -->
+      <div class="flex items-start">
+        <p-checkbox
+          id="acceptTerms"
+          name="acceptTerms"
+          formControlName="acceptTerms"
+          [binary]="true"
+          styleClass="mt-0.5"
+        >
+        </p-checkbox>
+        <label for="acceptTerms" class="ml-3 block text-sm text-gray-700 dark:text-gray-300">
+          Αποδέχομαι τους
+          <a
+            href="#"
+            class="text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 font-medium transition-colors"
+          >
+            όρους χρήσης
+          </a>
+          και την
+          <a
+            href="#"
+            class="text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 font-medium transition-colors"
+          >
+            πολιτική απορρήτου
+          </a>
+        </label>
+      </div>
+
+      <!-- Submit Button -->
+      <div>
+        <p-button
+          type="submit"
+          [disabled]="registerForm.invalid || loadingState.isLoading()"
+          [loading]="loadingState.isLoading()"
+          label="{{ loadingState.isLoading() ? 'Δημιουργία...' : 'Δημιουργία λογαριασμού' }}"
+          severity="info"
+          styleClass="w-full"
+          size="large"
+        >
+        </p-button>
+      </div>
+
+    </form>
+
+    <!-- Login Link -->
+    <div class="text-center">
+      <p class="text-sm text-gray-600 dark:text-gray-400">
+        Έχετε ήδη λογαριασμό;
+        <a
+          routerLink="/auth/login"
+          class="font-medium text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 transition-colors"
+        >
+          Συνδεθείτε εδώ
+        </a>
+      </p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Production build
+dist/
+build/
+
+# Environment
+.env*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+README*
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Angular
+.angular/
+coverage/
+e2e/results/
+.nyc_output
+
+# Testing
+*.spec.ts
+karma.conf.js
+protractor.conf.js
+
+# Linting
+.eslintrc*
+.stylelintrc*
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log

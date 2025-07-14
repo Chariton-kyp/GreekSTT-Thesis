@@ -1,0 +1,430 @@
+.not-found-container {
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  min-height: 100vh;
+  
+  // Global text color fixes for light mode
+  * {
+    color: #1f2937 !important;
+  }
+  
+  // Override specific text colors for light mode
+  h1, h2, h3, h4, h5, h6 {
+    color: #111827 !important;
+  }
+  
+  p {
+    color: #4b5563 !important;
+  }
+  
+  span {
+    color: #1f2937 !important;
+  }
+  
+  div {
+    color: #1f2937 !important;
+  }
+  
+  // Card styling consistent with project
+  ::ng-deep .p-card {
+    background: var(--surface-card) !important;
+    border: 1px solid var(--surface-border) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+    overflow: hidden !important;
+    
+    .p-card-body {
+      padding: 2rem !important;
+    }
+    
+    .p-card-content {
+      padding: 0 !important;
+    }
+  }
+  
+  // Button styling consistent with project theme
+  ::ng-deep .p-button {
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    
+    &:not(.p-button-outlined):not(.p-button-text) {
+      background: var(--cyan-600) !important;
+      border-color: var(--cyan-600) !important;
+      color: white !important;
+      
+      &:hover {
+        background: var(--cyan-700) !important;
+        border-color: var(--cyan-700) !important;
+        transform: translateY(-1px) !important;
+      }
+      
+      &:active {
+        transform: translateY(0) !important;
+      }
+    }
+    
+    &.p-button-outlined {
+      background: transparent !important;
+      border-color: var(--surface-border) !important;
+      color: var(--text-color) !important;
+      
+      &:hover {
+        background: var(--surface-hover) !important;
+        border-color: var(--cyan-600) !important;
+        color: var(--cyan-600) !important;
+        transform: translateY(-1px) !important;
+      }
+    }
+    
+    &.p-button-text {
+      color: var(--cyan-600) !important;
+      
+      &:hover {
+        background: rgba(6, 182, 212, 0.1) !important;
+        color: var(--cyan-700) !important;
+      }
+    }
+  }
+  
+  // Text color fixes for light mode
+  .text-gray-900 {
+    color: #111827 !important;
+  }
+  
+  .text-gray-600 {
+    color: #4b5563 !important;
+  }
+  
+  .text-gray-500 {
+    color: #6b7280 !important;
+  }
+  
+  .text-sm {
+    color: #4b5563 !important;
+  }
+  
+  .text-xs {
+    color: #6b7280 !important;
+  }
+  
+  .font-medium,
+  .font-semibold {
+    color: #111827 !important;
+  }
+  
+  // 404 number animation
+  .text-8xl {
+    animation: bounce 2s infinite;
+    text-shadow: 0 2px 4px rgba(6, 182, 212, 0.3);
+  }
+  
+  // Icon styling
+  .pi {
+    &.text-6xl {
+      animation: pulse 2s infinite;
+    }
+    
+    &.text-2xl {
+      color: var(--cyan-500) !important;
+    }
+  }
+  
+  // Academic info box
+  .bg-blue-50 {
+    background-color: rgba(59, 130, 246, 0.1) !important;
+    border: 1px solid rgba(59, 130, 246, 0.2) !important;
+  }
+  
+  .text-blue-900 {
+    color: #1e3a8a !important;
+  }
+  
+  .text-blue-700 {
+    color: #1d4ed8 !important;
+  }
+  
+  .text-blue-500 {
+    color: #3b82f6 !important;
+  }
+  
+  // Responsive adjustments
+  @media (max-width: 640px) {
+    .text-8xl {
+      font-size: 4rem !important;
+    }
+    
+    .text-6xl {
+      font-size: 3rem !important;
+    }
+    
+    .text-3xl {
+      font-size: 1.875rem !important;
+    }
+    
+    ::ng-deep .p-card .p-card-body {
+      padding: 1.5rem !important;
+    }
+  }
+}
+
+// Dark mode styles
+:host-context(.dark) .not-found-container {
+  background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+  
+  // Global text color fixes for dark mode
+  * {
+    color: #f9fafb !important;
+  }
+  
+  // Override specific text colors for dark mode
+  h1, h2, h3, h4, h5, h6 {
+    color: #ffffff !important;
+  }
+  
+  p {
+    color: #d1d5db !important;
+  }
+  
+  span {
+    color: #f9fafb !important;
+  }
+  
+  div {
+    color: #f9fafb !important;
+  }
+  
+  // Dark mode text colors for Tailwind classes
+  .text-gray-900 {
+    color: #f9fafb !important;
+  }
+  
+  .text-gray-600 {
+    color: #d1d5db !important;
+  }
+  
+  .text-gray-500 {
+    color: #9ca3af !important;
+  }
+  
+  .text-sm {
+    color: #d1d5db !important;
+  }
+  
+  .text-xs {
+    color: #9ca3af !important;
+  }
+  
+  .font-medium,
+  .font-semibold {
+    color: #ffffff !important;
+  }
+  
+  // Dark mode specific classes
+  .dark\:text-white {
+    color: #ffffff !important;
+  }
+  
+  .dark\:text-gray-300 {
+    color: #d1d5db !important;
+  }
+  
+  .dark\:text-gray-400 {
+    color: #9ca3af !important;
+  }
+  
+  .dark\:text-blue-100 {
+    color: #dbeafe !important;
+  }
+  
+  .dark\:text-blue-200 {
+    color: #bfdbfe !important;
+  }
+  
+  .dark\:text-blue-400 {
+    color: #60a5fa !important;
+  }
+  
+  .dark\:text-cyan-400 {
+    color: #22d3ee !important;
+  }
+  
+  .dark\:text-orange-400 {
+    color: #fb923c !important;
+  }
+  
+  // Academic info box dark mode
+  .dark\:bg-blue-900\/20 {
+    background-color: rgba(30, 58, 138, 0.2) !important;
+    border: 1px solid rgba(30, 58, 138, 0.3) !important;
+  }
+  
+  // Border colors
+  .dark\:border-gray-700 {
+    border-color: #374151 !important;
+  }
+}
+
+// Animations
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0,0,0);
+  }
+  40%, 43% {
+    transform: translate3d(0,-8px,0);
+  }
+  70% {
+    transform: translate3d(0,-4px,0);
+  }
+  90% {
+    transform: translate3d(0,-2px,0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// Hover effects
+.not-found-container {
+  ::ng-deep .p-card {
+    transition: all 0.3s ease !important;
+    
+    &:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+    }
+  }
+}
+
+// Ultra-specific light mode text overrides
+.not-found-container * {
+  color: #1f2937 !important;
+}
+
+.not-found-container h1 {
+  color: #111827 !important;
+}
+
+.not-found-container h3 {
+  color: #111827 !important;
+}
+
+.not-found-container h4 {
+  color: #111827 !important;
+}
+
+.not-found-container p {
+  color: #4b5563 !important;
+}
+
+.not-found-container span {
+  color: #1f2937 !important;
+}
+
+.not-found-container .text-gray-900 {
+  color: #111827 !important;
+}
+
+.not-found-container .text-gray-600 {
+  color: #4b5563 !important;
+}
+
+.not-found-container .text-gray-500 {
+  color: #6b7280 !important;
+}
+
+.not-found-container .text-sm {
+  color: #4b5563 !important;
+}
+
+.not-found-container .text-xs {
+  color: #6b7280 !important;
+}
+
+.not-found-container .font-medium,
+.not-found-container .font-semibold {
+  color: #111827 !important;
+}
+
+// Ultra-specific dark mode text overrides
+:host-context(.dark) .not-found-container *,
+.dark .not-found-container * {
+  color: #f9fafb !important;
+}
+
+:host-context(.dark) .not-found-container h1,
+.dark .not-found-container h1 {
+  color: #ffffff !important;
+}
+
+:host-context(.dark) .not-found-container h3,
+.dark .not-found-container h3 {
+  color: #ffffff !important;
+}
+
+:host-context(.dark) .not-found-container h4,
+.dark .not-found-container h4 {
+  color: #ffffff !important;
+}
+
+:host-context(.dark) .not-found-container p,
+.dark .not-found-container p {
+  color: #d1d5db !important;
+}
+
+:host-context(.dark) .not-found-container span,
+.dark .not-found-container span {
+  color: #f9fafb !important;
+}
+
+:host-context(.dark) .not-found-container .text-gray-900,
+.dark .not-found-container .text-gray-900 {
+  color: #f9fafb !important;
+}
+
+:host-context(.dark) .not-found-container .text-gray-600,
+.dark .not-found-container .text-gray-600 {
+  color: #d1d5db !important;
+}
+
+:host-context(.dark) .not-found-container .text-gray-500,
+.dark .not-found-container .text-gray-500 {
+  color: #9ca3af !important;
+}
+
+:host-context(.dark) .not-found-container .text-sm,
+.dark .not-found-container .text-sm {
+  color: #d1d5db !important;
+}
+
+:host-context(.dark) .not-found-container .text-xs,
+.dark .not-found-container .text-xs {
+  color: #9ca3af !important;
+}
+
+:host-context(.dark) .not-found-container .font-medium,
+:host-context(.dark) .not-found-container .font-semibold,
+.dark .not-found-container .font-medium,
+.dark .not-found-container .font-semibold {
+  color: #ffffff !important;
+}
+
+:host-context(.dark) .not-found-container .dark\:text-white,
+.dark .not-found-container .dark\:text-white {
+  color: #ffffff !important;
+}
+
+:host-context(.dark) .not-found-container .dark\:text-gray-300,
+.dark .not-found-container .dark\:text-gray-300 {
+  color: #d1d5db !important;
+}
