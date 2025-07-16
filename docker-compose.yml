@@ -2,7 +2,6 @@
 # Focused on ASR models comparison without LLM service
 
 services:
-  # PostgreSQL Database
   db:
     image: postgres:16
     container_name: greekstt_db
@@ -24,7 +23,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # Redis for analytics caching (simplified for thesis)
   redis:
     image: redis:7-alpine
     container_name: greekstt_redis
@@ -40,18 +38,16 @@ services:
       timeout: 3s
       retries: 3
 
-  # MailHog for email demo
   mailhog:
     image: mailhog/mailhog:latest
     container_name: greekstt_mailhog
     restart: unless-stopped
     ports:
-      - '1025:1025' # SMTP
-      - '8025:8025' # Web UI
+      - '1025:1025'
+      - '8025:8025'
     networks:
       - greekstt_network
 
-  # PgAdmin for database management
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: greekstt_pgadmin
@@ -71,7 +67,6 @@ services:
       db:
         condition: service_healthy
 
-  # Flask Backend API with debugging capabilities
   backend:
     build:
       context: .
@@ -79,14 +74,15 @@ services:
     container_name: greekstt_backend
     restart: unless-stopped
     ports:
-      - '5001:5000' # Flask app
-      - '5678:5678' # Debugpy port
+      - '5001:5000'
+      - '5678:5678'
     environment:
       FLASK_APP: 'run.py'
       FLASK_ENV: 'development'
       FLASK_DEBUG: '1'
       RUNNING_UNDER_DEBUGPY: 'true'
-      ASR_SERVICE_URL: 'http://asr-service:8001' # Points to ASR service
+      WHISPER_SERVICE_URL: 'http://whisper-service:8001'
+      WAV2VEC2_SERVICE_URL: 'http://wav2vec2-service:8002'
       AI_SERVICE_TIMEOUT: '3600'
       POSTGRES_HOST: 'db'
       POSTGRES_PORT: '5432'
@@ -111,7 +107,6 @@ services:
     volumes:
       - ./apps/backend:/app:delegated
       - backend_uploads:/app/uploads
-      # Mount host system info for real metrics
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/host/root:ro
@@ -120,17 +115,16 @@ services:
     entrypoint: ['/bin/sh', '-c']
     command: ['python -m debugpy --listen 0.0.0.0:5678 run.py']
 
-  # ASR Service - Whisper and wav2vec2 with debugging
-  asr-service:
+  whisper-service:
     build:
-      context: ./apps/asr-service
+      context: ./apps/whisper-service
       dockerfile: Dockerfile
       target: development
-    container_name: greekstt_asr
+    container_name: greekstt_whisper
     restart: unless-stopped
     ports:
-      - '8001:8001' # ASR Service API
-      - '5680:5680' # ASR Debugpy port
+      - '8001:8001'
+      - '5680:5680'
     environment:
       - PYTHONDONTWRITEBYTECODE=1
       - PYTHONUNBUFFERED=1
@@ -140,13 +134,12 @@ services:
       - CUDA_MODULE_LOADING=LAZY
       # Memory allocation settings
       - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512,expandable_segments:True
-      # Model storage for ASR models
+      # Model storage for Whisper models
       - HF_HOME=/app/models
       - TRANSFORMERS_CACHE=/app/models/transformers_cache
       - HF_HUB_CACHE=/app/models/hf_hub_cache
       - TORCH_HOME=/app/models/torch_cache
       - WHISPER_CACHE_DIR=/app/models/whisper
-      - WAV2VEC2_CACHE_DIR=/app/models/wav2vec2
       # Optimization settings
       - TRANSFORMERS_OFFLINE=0
       - HF_HUB_ENABLE_HF_TRANSFER=0
@@ -158,18 +151,25 @@ services:
       - TORCH_CUDA_FOUND_EFFICIENT_ATTENTION=1
       # cuDNN library path fix for faster-whisper
       - LD_LIBRARY_PATH=/usr/local/lib/python3.11/site-packages/ctranslate2.libs:/usr/lib/x86_64-linux-gnu:/usr/local/cuda/lib64
+      # Whisper-specific optimizations
+      - WHISPER_COMPUTE_TYPE=float16
+      - WHISPER_DEVICE=cuda
+      - WHISPER_BEAM_SIZE=10
+      - WHISPER_BEST_OF=5
+      - WHISPER_LANGUAGE=el
+      - WHISPER_VAD_FILTER=true
       # Development settings
       - ENVIRONMENT=development
       - DEBUG_MODE=1
     env_file:
       - .env
     volumes:
-      - ./apps/asr-service:/app:delegated
-      - asr_models:/app/models:delegated
+      - ./apps/whisper-service:/app:delegated
+      - whisper_models:/app/models:delegated
       - type: tmpfs
         target: /tmp
         tmpfs:
-          size: 8G
+          size: 4G
     networks:
       - greekstt_network
     deploy:
@@ -185,15 +185,84 @@ services:
     tty: true
     command: python -m debugpy --listen 0.0.0.0:5680 -m uvicorn app.main:app --host 0.0.0.0 --port 8001 --workers 1
 
+  wav2vec2-service:
+    build:
+      context: ./apps/wav2vec2-service
+      dockerfile: Dockerfile
+      target: development
+    container_name: greekstt_wav2vec2
+    restart: unless-stopped
+    ports:
+      - '8002:8002'
+      - '5681:5681'
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app
+      - CUDA_VISIBLE_DEVICES=0
+      - NVIDIA_VISIBLE_DEVICES=0
+      - CUDA_MODULE_LOADING=LAZY
+      # Memory allocation settings
+      - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512,expandable_segments:True
+      # Model storage for wav2vec2 models
+      - HF_HOME=/app/models
+      - TRANSFORMERS_CACHE=/app/models/transformers_cache
+      - HF_HUB_CACHE=/app/models/hf_hub_cache
+      - TORCH_HOME=/app/models/torch_cache
+      - WAV2VEC2_CACHE_DIR=/app/models/wav2vec2
+      # Optimization settings
+      - TRANSFORMERS_OFFLINE=0
+      - HF_HUB_ENABLE_HF_TRANSFER=0
+      - PYTHONWARNINGS=ignore
+      - TRANSFORMERS_VERBOSITY=error
+      - TOKENIZERS_PARALLELISM=false
+      # CUDA optimizations
+      - CUDA_LAUNCH_BLOCKING=0
+      - TORCH_CUDA_FOUND_EFFICIENT_ATTENTION=1
+      # wav2vec2-specific optimizations
+      - WAV2VEC2_MODEL_NAME=lighteternal/wav2vec2-large-xlsr-53-greek
+      - WAV2VEC2_CHUNK_LENGTH_S=30
+      - WAV2VEC2_STRIDE_LENGTH_S=2
+      - WAV2VEC2_DEVICE=cuda
+      - WAV2VEC2_SAMPLE_RATE=16000
+      # Development settings
+      - ENVIRONMENT=development
+      - DEBUG_MODE=1
+    env_file:
+      - .env
+    volumes:
+      - ./apps/wav2vec2-service:/app:delegated
+      - wav2vec2_models:/app/models:delegated
+      - type: tmpfs
+        target: /tmp
+        tmpfs:
+          size: 4G
+    networks:
+      - greekstt_network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    shm_size: '2gb'
+    ipc: host
+    stdin_open: true
+    tty: true
+    command: python -m debugpy --listen 0.0.0.0:5681 -m uvicorn app.main:app --host 0.0.0.0 --port 8002 --workers 1
+
 volumes:
   postgres_data:
   redis_data:
   pgadmin_data:
   backend_uploads:
-  # ASR model storage volume
-  asr_models:
+  whisper_models:
     driver: local
-    name: greekstt_asr_models
+    name: greekstt_whisper_models
+  wav2vec2_models:
+    driver: local
+    name: greekstt_wav2vec2_models
 
 networks:
   greekstt_network:

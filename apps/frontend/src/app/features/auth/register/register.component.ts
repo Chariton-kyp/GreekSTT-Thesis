@@ -54,7 +54,7 @@ export class RegisterComponent extends BaseComponent {
             Validators.pattern(/^[a-zA-Z0-9._-]+$/),
           ],
         ],
-        phone: ['', Validators.pattern(/^\+?[1-9]\d{1,14}$/)], // International format
+        phone: ['', Validators.pattern(/^\+?[1-9]\d{1,14}$/)],
         organization: ['', Validators.maxLength(100)],
         password: ['', [Validators.required, Validators.minLength(5), this.passwordStrengthValidator]],
         confirmPassword: ['', Validators.required],
@@ -109,7 +109,6 @@ export class RegisterComponent extends BaseComponent {
     this.loadingState.setLoading(true);
     const formData = this.registerForm.value;
 
-    // Clean up form data and convert to backend expected format (snake_case)
     const registerData = {
       first_name: formData.first_name.trim(),
       last_name: formData.last_name.trim(),
@@ -124,8 +123,6 @@ export class RegisterComponent extends BaseComponent {
       const result = await this.authService.register(registerData);
 
       if (result.requiresVerification) {
-        // Email verification required - user is logged in but needs to verify
-        // Start cooldown for email verification (2 minutes)
         this.cooldownService.startCooldown('email_verification_resend', 120);
         
         this.router.navigate(['/auth/verify-email'], {
@@ -135,7 +132,6 @@ export class RegisterComponent extends BaseComponent {
           },
         });
       } else {
-        // No verification required, user is fully logged in
         this.router.navigate(['/app/dashboard']);
       }
     } finally {

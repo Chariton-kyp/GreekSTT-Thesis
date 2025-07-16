@@ -1,6 +1,6 @@
 """
-Simple Whisper Model Implementation for Academic Research  
-Clean, minimal implementation using faster-whisper ONLY
+Whisper Model Implementation for Academic Research  
+Using faster-whisper for Greek language processing
 """
 import logging
 import time
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class WhisperModel:
-    """Simple Whisper model using faster-whisper"""
+    """Whisper model using faster-whisper"""
     
     def __init__(self):
         self.model = None
@@ -20,68 +20,61 @@ class WhisperModel:
         self.implementation = None
         
     def _detect_device(self) -> str:
-        """Detect available device with advanced faster-whisper compatibility checks"""
+        """Detect available device for faster-whisper"""
         try:
             import torch
             if torch.cuda.is_available():
-                # Test if cuDNN is actually working
+                # Test cuDNN compatibility
                 try:
-                    # Create a simple tensor operation to test cuDNN
                     test_tensor = torch.randn(1, 1, 4, 4).cuda()
                     test_conv = torch.nn.Conv2d(1, 1, 3, padding=1).cuda()
                     _ = test_conv(test_tensor)
-                    logger.info("✅ CUDA and cuDNN are working properly")
+                    logger.info("CUDA and cuDNN working")
                     
-                    # Test faster-whisper GPU compatibility with CUDA 12 + cuDNN 8
+                    # Test faster-whisper GPU compatibility
                     try:
                         from faster_whisper import WhisperModel
                         import ctranslate2
                         
-                        # Log versions for debugging
-                        logger.info(f"Testing with ctranslate2 version: {ctranslate2.__version__}")
+                        logger.info(f"ctranslate2 version: {ctranslate2.__version__}")
                         
-                        # Try to initialize a tiny model to test GPU compatibility
                         test_model = WhisperModel(
                             "tiny", 
                             device="cuda", 
                             compute_type="float16",
-                            # CUDA 12 + cuDNN 8 optimizations
                             num_workers=1
                         )
                         
-                        # If this succeeds, GPU is compatible
                         del test_model
                         import gc
                         gc.collect()
                         torch.cuda.empty_cache()
-                        logger.info("✅ faster-whisper GPU compatibility confirmed with CUDA 12 + cuDNN 8")
+                        logger.info("faster-whisper GPU compatible")
                         return "cuda"
                     except Exception as fw_error:
-                        logger.warning(f"⚠️ faster-whisper GPU test failed: {fw_error}")
+                        logger.warning(f"faster-whisper GPU failed: {fw_error}")
                         if "cudnn" in str(fw_error).lower():
-                            logger.info("🔄 cuDNN compatibility issue detected - ctranslate2 4.4.0 should resolve this")
-                        logger.info("🔄 Will attempt CPU mode")
+                            logger.info("cuDNN issue detected")
                         return "cpu"
                         
                 except Exception as e:
-                    logger.warning(f"⚠️ CUDA available but cuDNN test failed: {e}")
-                    logger.info("🔄 Falling back to CPU due to cuDNN issues")
+                    logger.warning(f"CUDA available but cuDNN failed: {e}")
                     return "cpu"
             else:
-                logger.info("ℹ️ CUDA not available, using CPU")
+                logger.info("CUDA not available")
                 return "cpu"
         except ImportError:
-            logger.info("ℹ️ PyTorch not available, using CPU")
+            logger.info("PyTorch not available")
             return "cpu"
     
     async def load(self) -> None:
-        """Load faster-whisper model - ONLY implementation"""
+        """Load faster-whisper model"""
         try:
-            logger.info("🚀 Loading faster-whisper 1.1.1 (ONLY implementation)")
+            logger.info("Loading faster-whisper 1.1.1")
             await self._load_faster_whisper()
             
         except Exception as e:
-            logger.error(f"❌ faster-whisper failed to load: {e}")
+            logger.error(f"faster-whisper failed to load: {e}")
             raise RuntimeError(f"faster-whisper loading failed: {e}")
     
     async def _load_faster_whisper(self) -> None:
@@ -128,13 +121,13 @@ class WhisperModel:
         )
         self.implementation = "faster-whisper"
         
-        logger.info("✅ faster-whisper model loaded successfully")
+        logger.info("faster-whisper model loaded successfully")
     
     def unload(self) -> None:
-        """Unload Whisper model from memory with ultra-aggressive cleanup"""
+        """Unload Whisper model from memory"""
         try:
             if self.model:
-                logger.info(f"🗑️ Unloading {getattr(self, 'implementation', 'Whisper')} model from GPU memory...")
+                logger.info(f"Unloading {getattr(self, 'implementation', 'Whisper')} model from GPU memory...")
                 
                 # Store device for cleanup
                 device_type = self.device
@@ -188,19 +181,19 @@ class WhisperModel:
                         try:
                             allocated = torch.cuda.memory_allocated() / 1024**3
                             cached = torch.cuda.memory_reserved() / 1024**3
-                            logger.info(f"🧹 GPU memory after cleanup: {allocated:.2f}GB allocated, {cached:.2f}GB cached")
+                            logger.info(f"GPU memory after cleanup: {allocated:.2f}GB allocated, {cached:.2f}GB cached")
                         except:
-                            logger.info("🧹 GPU cache cleared with ultra-aggressive cleanup")
+                            logger.info("GPU cache cleared")
                             
                     except ImportError:
                         pass
                 
-                logger.info("✅ Whisper model unloaded with ultra-aggressive cleanup")
+                logger.info("Whisper model unloaded")
             else:
-                logger.info("ℹ️ Whisper model was not loaded")
+                logger.info("Whisper model was not loaded")
                 
         except Exception as e:
-            logger.error(f"❌ Error unloading Whisper model: {e}")
+            logger.error(f"Error unloading Whisper model: {e}")
             # Force cleanup even if error occurred
             self.model = None
             if hasattr(self, 'implementation'):
@@ -215,7 +208,7 @@ class WhisperModel:
                 pass
     
     async def transcribe(self, audio_path: str, **kwargs) -> Dict[str, Any]:
-        """Transcribe audio file using faster-whisper ONLY"""
+        """Transcribe audio file using faster-whisper"""
         if not self.model:
             raise RuntimeError("Model not loaded")
         
@@ -323,7 +316,7 @@ class WhisperModel:
                 except ImportError:
                     pass
             
-            logger.info(f"🧹 Pre-transcription cleanup complete, starting deterministic processing...")
+            logger.info("Pre-transcription cleanup complete, starting processing...")
             
             # Transcribe with memory management
             try:
@@ -335,24 +328,24 @@ class WhisperModel:
                 
                 for segment in segments_generator:
                     # Log each segment as it's generated
-                    logger.info(f"🎯 Segment {segment_index}: [{segment.start:.2f}s - {segment.end:.2f}s] = '{segment.text.strip()}'")
+                    logger.info(f"Segment {segment_index}: [{segment.start:.2f}s - {segment.end:.2f}s] = '{segment.text.strip()}'")
                     segments.append(segment)
                     segment_index += 1
                     
-                logger.info(f"📝 Generated {len(segments)} segments from audio")
+                logger.info(f"Generated {len(segments)} segments from audio")
             except Exception as e:
                 logger.error(f"Transcription failed: {e}")
                 raise
             
             # Debug: Check segment integrity
-            logger.info("🔍 Checking segment order and gaps:")
+            logger.info("Checking segment order and gaps:")
             prev_end = 0.0
             for i, seg in enumerate(segments):
                 gap = seg.start - prev_end
                 if gap > 0.5:  # More than 0.5s gap
-                    logger.warning(f"  ⚠️ Large gap detected: {gap:.2f}s between segments {i-1} and {i}")
+                    logger.warning(f"  Large gap detected: {gap:.2f}s between segments {i-1} and {i}")
                 if seg.start < prev_end:
-                    logger.error(f"  ❌ OVERLAPPING segments! Seg {i} starts at {seg.start:.2f}s but previous ended at {prev_end:.2f}s")
+                    logger.error(f"  OVERLAPPING segments! Seg {i} starts at {seg.start:.2f}s but previous ended at {prev_end:.2f}s")
                 prev_end = seg.end
             
             # Process results with periodic memory cleanup
@@ -367,24 +360,24 @@ class WhisperModel:
             for i, seg in enumerate(segments):
                 if seg.start < prev_start:
                     order_check_failed = True
-                    logger.warning(f"  ❌ Segment {i} out of order: {seg.start:.2f}s < previous {prev_start:.2f}s")
+                    logger.warning(f"  Segment {i} out of order: {seg.start:.2f}s < previous {prev_start:.2f}s")
                 prev_start = seg.start
             
             # Only sort if there's actually an ordering problem
             if order_check_failed:
-                logger.warning("⚠️ SEGMENTS OUT OF ORDER - applying chronological sorting")
+                logger.warning("SEGMENTS OUT OF ORDER - applying chronological sorting")
                 segments_before = [(i, s.start, s.text[:30] + "...") for i, s in enumerate(segments)]
                 segments = sorted(segments, key=lambda s: s.start)
                 segments_after = [(i, s.start, s.text[:30] + "...") for i, s in enumerate(segments)]
                 
-                logger.warning("🔍 Before sorting:")
+                logger.warning("Before sorting:")
                 for i, start, text in segments_before[:5]:  # Show first 5
                     logger.warning(f"    Seg {i}: {start:.2f}s = '{text}'")
-                logger.warning("🔍 After sorting:")
+                logger.warning("After sorting:")
                 for i, start, text in segments_after[:5]:  # Show first 5
                     logger.warning(f"    Seg {i}: {start:.2f}s = '{text}'")
             else:
-                logger.info("✅ Segments already in correct chronological order - no sorting needed")
+                logger.info("Segments already in correct chronological order - no sorting needed")
             
             # Remove overlapping segments (keep the first one)
             filtered_segments = []
@@ -395,7 +388,7 @@ class WhisperModel:
                 # Skip if this segment starts before the last one ended (overlap)
                 if segment.start < last_end_time - 0.1:  # 0.1s tolerance
                     overlap_count += 1
-                    logger.warning(f"  🚫 Removing overlapping segment {i}: [{segment.start:.2f}s-{segment.end:.2f}s] '{segment.text.strip()}'")
+                    logger.warning(f"  Removing overlapping segment {i}: [{segment.start:.2f}s-{segment.end:.2f}s] '{segment.text.strip()}'")
                     logger.warning(f"     (Previous segment ended at {last_end_time:.2f}s)")
                     continue
                     
@@ -403,11 +396,11 @@ class WhisperModel:
                 last_end_time = segment.end
             
             segments = filtered_segments
-            logger.info(f"📋 Filtering complete: {len(segments)} segments remain (removed {overlap_count} overlapping)")
+            logger.info(f"Filtering complete: {len(segments)} segments remain (removed {overlap_count} overlapping)")
             
             # Process segments with natural break detection
             segments = self._process_with_natural_breaks(segments)
-            logger.info(f"🎯 Natural break processing complete: {len(segments)} final segments")
+            logger.info(f"Natural break processing complete: {len(segments)} final segments")
             
             for segment in segments:
                 # Anti-hallucination: Skip segments with repetitive patterns
@@ -415,7 +408,7 @@ class WhisperModel:
                 
                 # Check for repetitive watermarks like "Υπότιτλοι AUTHORWAVE"
                 if self._is_repetitive_hallucination(segment_text):
-                    logger.warning(f"🚫 Skipping hallucination segment: '{segment_text[:50]}...'")
+                    logger.warning(f"Skipping hallucination segment: '{segment_text[:50]}...'")
                     continue
                     
                 text_parts.append(segment_text)
@@ -445,24 +438,24 @@ class WhisperModel:
             
             # Final hallucination check on complete text
             if self._is_only_hallucination(full_text):
-                logger.warning(f"⚠️ Entire transcription appears to be hallucination, returning empty")
+                logger.warning("Entire transcription appears to be hallucination, returning empty")
                 full_text = ""
                 segment_list = []
             
             # Debug: Log segment order in final result
-            logger.info(f"🔍 Final segment order verification:")
+            logger.info("Final segment order verification:")
             for i, seg in enumerate(segment_list[:5]):  # Show first 5 segments
                 logger.info(f"    Final Seg {i}: [{seg['start']:.2f}s-{seg['end']:.2f}s] = '{seg['text'][:50]}{'...' if len(seg['text']) > 50 else ''}'")
             
             # Log final assembled text (first 200 chars)
-            logger.info(f"📄 Final transcription ({len(full_text)} chars): '{full_text[:200]}{'...' if len(full_text) > 200 else ''}'")
-            logger.info(f"📊 Segments in final output: {len(segment_list)}")
+            logger.info(f"Final transcription ({len(full_text)} chars): '{full_text[:200]}{'...' if len(full_text) > 200 else ''}'")
+            logger.info(f"Segments in final output: {len(segment_list)}")
             
             # Debug: Check if final text matches expected order
             if segment_list and len(segment_list) > 1:
                 first_segment_text = segment_list[0]['text'].strip()
                 if first_segment_text and not full_text.startswith(first_segment_text[:20]):
-                    logger.error(f"❌ SEGMENT ORDER MISMATCH!")
+                    logger.error("SEGMENT ORDER MISMATCH!")
                     logger.error(f"    First segment: '{first_segment_text[:50]}'")
                     logger.error(f"    Full text starts: '{full_text[:50]}'")
                     logger.error(f"    Expected match but texts don't align!")
@@ -512,9 +505,9 @@ class WhisperModel:
                 result["metadata"]["actual_audio_duration"] = final_duration
                 if original_video_duration:
                     result["metadata"]["video_duration_source"] = "original_file"
-                    logger.info(f"📊 Using original video duration: {final_duration:.2f}s for final result")
+                    logger.info(f"Using original video duration: {final_duration:.2f}s for final result")
             
-            logger.info(f"✅ faster-whisper complete: {len(full_text)} chars in {processing_time:.0f}ms")
+            logger.info(f"faster-whisper complete: {len(full_text)} chars in {processing_time:.0f}ms")
             return result
             
         finally:
@@ -609,7 +602,7 @@ class WhisperModel:
         cleaned_text = re.sub(r'\s+', ' ', cleaned_text).strip()
         
         if cleaned_text != text:
-            logger.info(f"🧹 Cleaned AUTHORWAVE watermark from transcription")
+            logger.info("Cleaned AUTHORWAVE watermark from transcription")
             logger.debug(f"   Before: '{text[:100]}...'")
             logger.debug(f"   After:  '{cleaned_text[:100]}...'")
         
@@ -793,9 +786,9 @@ class WhisperModel:
             if "error" not in memory_stats:
                 result["memory_after_cleanup"] = memory_stats
             
-            logger.info(f"🧹 Force cleanup: {collected_objects} objects collected, GPU cache: {gpu_cleaned}")
+            logger.info(f"Force cleanup: {collected_objects} objects collected, GPU cache: {gpu_cleaned}")
             return result
             
         except Exception as e:
-            logger.error(f"❌ Force cleanup failed: {e}")
+            logger.error(f"Force cleanup failed: {e}")
             return {"status": "error", "message": str(e)}

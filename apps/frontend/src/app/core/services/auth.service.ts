@@ -29,28 +29,22 @@ export class AuthService {
   private readonly jwtService = inject(JwtService);
   private readonly messageService = inject(MessageService);
 
-  // Private writable signals
   private _currentUser = signal<User | null>(null);
   private _currentClaims = signal<JWTClaims | null>(null);
   private _isLoading = signal<boolean>(false);
   private _error = signal<string | null>(null);
   private _isInitialized = signal<boolean>(false);
 
-  // Public readonly signals
   readonly currentUser = this._currentUser.asReadonly();
   readonly currentClaims = this._currentClaims.asReadonly();
   readonly isLoading = this._isLoading.asReadonly();
   readonly error = this._error.asReadonly();
   readonly isInitialized = this._isInitialized.asReadonly();
 
-  // Computed signals - prefer JWT claims for performance
   readonly isAuthenticated = computed(() => {
-    // User is authenticated if we have either valid JWT claims OR user data
-    // This allows unverified users to remain authenticated even if /users/me fails
     return !!this.currentClaims() || !!this.currentUser();
   });
   readonly isEmailVerified = computed(() => {
-    // Check JWT claims first, then user data
     const claims = this.currentClaims();
     if (claims) {
       return claims.email_verified || false;
@@ -74,15 +68,12 @@ export class AuthService {
 
   private tokenRefreshTimer?: any;
   
-  // Event subjects for reactive updates
   private _emailVerificationUpdated = new Subject<boolean>();
   readonly emailVerificationUpdated$ = this._emailVerificationUpdated.asObservable();
 
   constructor() {
-    // Initialize auth state from storage
     this.initializeAuth();
 
-    // Effect for token refresh scheduling
     effect(() => {
       if (this.isAuthenticated()) {
         this.scheduleTokenRefresh();
@@ -92,9 +83,6 @@ export class AuthService {
     });
   }
 
-  /**
-   * Initialize authentication state from stored tokens
-   */
   private async initializeAuth(): Promise<void> {
     if (!environment.production) {
       console.log('[AuthService] Starting initialization...');
@@ -115,7 +103,6 @@ export class AuthService {
 
     if (token) {
       try {
-        // First try to load from JWT claims for fast initialization
         const claims = this.jwtService.decodeToken(token);
         if (claims && !this.jwtService.isTokenExpired(token)) {
           this._currentClaims.set(claims);
@@ -123,30 +110,25 @@ export class AuthService {
           if (!environment.production) {
             console.log('[AuthService] Token valid, loading user data...');
           }
-          
-          // Then verify token and get full user data
           try {
             await this.getCurrentUser();
           } catch (error) {
             if (!environment.production) {
               console.log('[AuthService] getCurrentUser failed during init, but keeping JWT claims:', error);
             }
-            // Keep the JWT claims even if getCurrentUser fails
-            // This allows unverified users to stay authenticated
+            // Keep JWT claims even if getCurrentUser fails - allows unverified users to stay authenticated
           }
         } else if (refreshToken) {
           if (!environment.production) {
             console.log('[AuthService] Token expired, attempting refresh...');
           }
           
-          // Token is expired or invalid, try refresh if we have refresh token
           await this.refreshToken();
         } else {
           if (!environment.production) {
             console.log('[AuthService] Token expired and no refresh token, clearing storage...');
           }
           
-          // No refresh token available, clear storage
           this.clearAuthStorage();
         }
       } catch (error) {
@@ -170,9 +152,6 @@ export class AuthService {
     }
   }
 
-  /**
-   * Login with email and password
-   */
   async login(credentials: LoginCredentials): Promise<void> {
     this._isLoading.set(true);
     this._error.set(null);
@@ -213,9 +192,6 @@ export class AuthService {
     }
   }
 
-  /**
-   * Register new user
-   */
   async register(userData: RegisterData): Promise<{ requiresVerification: boolean; user?: any }> {
     this._isLoading.set(true);
     this._error.set(null);
@@ -225,13 +201,10 @@ export class AuthService {
         () => this.api.post<any>('/auth/register', userData)
       );
 
-      // Check if email verification is required
       if (response.requires_verification) {
-        // Hybrid approach: store tokens but flag that verification is needed
         this.handleAuthResponse(response);
         return { requiresVerification: true, user: response.user };
       } else {
-        // Handle as normal login response with tokens
         this.handleAuthResponse(response);
         return { requiresVerification: false, user: response.user };
       }
@@ -243,11 +216,7 @@ export class AuthService {
     }
   }
 
-  /**
-   * Logout user
-   */
   async logout(): Promise<void> {
-    // Prevent multiple concurrent logout calls
     if (this._isLoading()) {
       return;
     }
@@ -259,7 +228,6 @@ export class AuthService {
     }
 
     try {
-      // Only call logout endpoint if we have a valid token
       const token = this.storage.getItem<string>('token');
       if (token && !this.jwtService.isTokenExpired(token)) {
         await this.api.execute(
@@ -275,13 +243,11 @@ export class AuthService {
         }
       }
     } catch (error) {
-      // Continue with logout even if API call fails
       if (!environment.production) {
         console.warn('[AuthService] Logout API call failed (continuing with client-side logout):', error);
       }
     }
 
-    // Always clear local auth state
     this.clearAuthStorage();
     this._currentUser.set(null);
     this._isLoading.set(false);
@@ -290,7 +256,6 @@ export class AuthService {
       console.log('[AuthService] Logout complete');
     }
     
-    // Redirect to landing page
     await this.router.navigate(['/']);
   }
 

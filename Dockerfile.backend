@@ -28,12 +28,9 @@ WORKDIR /app
 RUN groupadd -r flaskuser && useradd -r -g flaskuser flaskuser && \
     groupadd -f docker && usermod -aG docker flaskuser
 
-# Create necessary directories including certs
-RUN mkdir -p /app/uploads/audio /app/logs /app/instance /app/certs && \
+# Create necessary directories 
+RUN mkdir -p /app/uploads/audio /app/logs /app/instance && \
     chown -R flaskuser:flaskuser /app
-
-# Copy SSL certificates for HTTPS support
-COPY apps/backend/certs/ /app/certs/
 
 # Copy requirements files
 COPY apps/backend/requirements*.txt ./

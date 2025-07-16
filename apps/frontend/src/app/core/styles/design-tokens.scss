@@ -1,10 +1,4 @@
-// ========== GREEKSTT RESEARCH PLATFORM DESIGN TOKENS ==========
-// Central design token system using CSS custom properties
-// This file establishes the foundation for consistent theming across the application
-
 :root {
-  // ========== COLOR SYSTEM ==========
-  // Primary Palette (Blue-Gray) - Matches Tailwind config
   --color-primary-50: #f8fafc;
   --color-primary-100: #f1f5f9;
   --color-primary-200: #e2e8f0;
@@ -17,26 +11,22 @@
   --color-primary-900: #0f172a;
   --color-primary-950: #020617;
 
-  // Accent Colors - Cyan focus
   --color-accent-primary: #06b6d4;
   --color-accent-hover: #0891b2;
   --color-accent-light: #67e8f9;
   --color-accent-dark: #0e7490;
 
-  // Semantic Colors
   --color-success: var(--color-accent-primary);
   --color-warning: #f59e0b;
   --color-error: #ef4444;
   --color-info: var(--color-accent-primary);
 
-  // ========== SURFACE SYSTEM ==========
   --surface-ground: #f9fafb;
   --surface-card: #ffffff;
   --surface-border: #e5e7eb;
   --surface-hover: #f3f4f6;
   --surface-overlay: rgba(0, 0, 0, 0.5);
 
-  // ========== TEXT SYSTEM ==========
   --text-primary: var(--color-primary-900);
   --text-secondary: var(--color-primary-600);
   --text-tertiary: var(--color-primary-400);

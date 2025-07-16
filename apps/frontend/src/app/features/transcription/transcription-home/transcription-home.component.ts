@@ -6,7 +6,6 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
 
-// PrimeNG Imports
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -20,7 +19,6 @@ import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
-// Core Services
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { DateService } from '../../../core/services/date.service';
@@ -28,10 +26,8 @@ import { NotificationService } from '../../../core/services/notification.service
 import { TranscriptionService } from '../../../core/services/transcription.service';
 import { WebSocketService } from '../../../core/services/websocket.service';
 
-// Models
 import { Transcription, TranscriptionStatus } from '../../../core/models/transcription.model';
 
-// Recording interfaces
 interface AudioRecorder {
   start(): Promise<void>;
   stop(): Promise<Blob>;
@@ -134,13 +130,10 @@ export class TranscriptionHomeComponent implements OnInit, OnDestroy {
   private wsService = inject(WebSocketService);
   private destroyRef = inject(DestroyRef);
   
-  // Make Math available in template
   Math = Math;
 
-  // Onboarding state (no method activation needed anymore)
   showOnboarding = signal(false);
 
-  // Upload Section Signals
   selectedFile = signal<File | null>(null);
   isDragOver = signal(false);
   isUploading = signal(false);
@@ -148,7 +141,6 @@ export class TranscriptionHomeComponent implements OnInit, OnDestroy {
   fileValidationError = signal<string | null>(null);
   dragDepth = signal(0);
 
-  // URL Section Signals
   urlInput = signal('');
   isUrlValid = signal(false);
   isValidatingUrl = signal(false);
@@ -156,7 +148,6 @@ export class TranscriptionHomeComponent implements OnInit, OnDestroy {
   urlPreview = signal<UrlPreview | null>(null);
   isLoadingPreview = signal(false);
 
-  // Recording Section Signals
   isRecording = signal(false);
   recordingTime = signal(0);
   recordedAudio = signal<string | null>(null);
@@ -164,13 +155,11 @@ export class TranscriptionHomeComponent implements OnInit, OnDestroy {
   audioRecorder?: AudioRecorder;
   activeBars = signal<WaveformBar[]>([]);
   
-  // Audio Device Signals
   availableAudioDevices = signal<AudioDevice[]>([]);
   selectedAudioDevice = signal<string>('default');
   isLoadingDevices = signal(false);
   devicePermissionGranted = signal(false);
   
-  // Audio Visualization Signals
   audioVisualization = signal<AudioVisualizationData>({
     volume: 0,
     frequency: new Uint8Array(32),
@@ -179,12 +168,11 @@ export class TranscriptionHomeComponent implements OnInit, OnDestroy {
   });
   visualizationAnimationId?: number;
 
-  // Custom Audio Player Signals
   isAudioPlaying = signal(false);
   isAudioMuted = signal(false);
   currentAudioTime = signal(0);
   audioDuration = signal(0);
-  audioVolume = signal(1); // Volume from 0 to 1
+  audioVolume = signal(1);
   private audioProgressInterval: any = null;
   private audioReadyToPlay = signal(false);
   private simulatedProgressInterval: any = null;
@@ -197,35 +185,29 @@ export class TranscriptionHomeComponent implements OnInit, OnDestroy {
     if (!isFinite(current) || current < 0) return 0;
     
     const progress = (current / duration) * 100;
-    return Math.min(100, Math.max(0, progress)); // Clamp between 0-100
+    return Math.min(100, Math.max(0, progress));
   });
 
-  // Recent Transcriptions Signals
   recentTranscriptions = signal<Transcription[]>([]);
   currentPage = signal(1);
   hasMorePages = signal(false);
   isLoading = signal(false);
   totalTranscriptions = signal(0);
   
-  // Add gentle loading state that doesn't hide content immediately
   isFiltering = signal(false);
   
-  // Debounce timer for filter changes
   private filterDebounceTimer?: any;
   
-  // Filtering and Sorting
   sortBy = signal<string>('created_at_desc');
   dateFilter = signal<Date[] | null>(null);
   statusFilter = signal<string>('all');
   
-  // Computed properties
   totalPages = computed(() => {
     const total = this.totalTranscriptions();
     const itemsPerPage = 5;
     return Math.ceil(total / itemsPerPage);
   });
 
-  // Sort options for dropdown
   sortOptions: SortOption[] = [
     { label: 'Νεότερα πρώτα', value: 'created_at_desc' },
     { label: 'Παλαιότερα πρώτα', value: 'created_at_asc' },
@@ -235,7 +217,6 @@ export class TranscriptionHomeComponent implements OnInit, OnDestroy {
     { label: 'Διάρκεια (μεγάλη-μικρή)', value: 'duration_desc' }
   ];
 
-  // Status filter options
   statusFilterOptions = [
     { label: 'Όλες', value: 'all' },
     { label: 'Ολοκληρωμένες', value: 'completed' },
@@ -244,46 +225,37 @@ export class TranscriptionHomeComponent implements OnInit, OnDestroy {
     { label: 'Αναμονή', value: 'pending' }
   ];
 
-  // Supported file types
   private readonly acceptedTypes = '.mp3,.wav,.m4a,.mp4,.mov,.avi,.mkv,.webm,.ogg,.flac,.aac,.opus,.wma,.wmv';
-  private readonly maxFileSize = 8 * 1024 * 1024 * 1024; // 8GB
-  private readonly maxRecordingTime = 6 * 60 * 60; // 6 hours in seconds
+  private readonly maxFileSize = 8 * 1024 * 1024 * 1024;
+  private readonly maxRecordingTime = 6 * 60 * 60;
 
-  // Track if we've already shown the email verification warning
   private emailWarningShown = signal<boolean>(false);
 
-  // Menu for transcription actions
   @ViewChild('menu') menu!: Menu;
   selectedTranscription: Transcription | null = null;
   menuItems: any[] = [];
   
-  // Retry dialog state
   showRetryDialog = signal<boolean>(false);
   retryTranscription_data = signal<Transcription | null>(null);
   isRetrying = signal<boolean>(false);
   
-  // Show/hide filters panel
   showFilters = signal<boolean>(false);
 
-  // Model selection signal with type
   selectedModel = signal<'whisper' | 'wav2vec2' | 'both'>('whisper');
 
-  // Map frontend model names to backend model names
   private mapModelName(modelName: string): string {
     const modelMapping: { [key: string]: string } = {
       'whisper': 'whisper-large-v3',
       'wav2vec2': 'wav2vec2-greek',
-      'both': 'both' // Keep 'both' as is for comparison mode
+      'both': 'both'
     };
     return modelMapping[modelName] || 'whisper-large-v3';
   }
 
-  // WebSocket subscription for real-time updates
   private wsSubscriptions: Subscription[] = [];
   private destroy$ = new Subject<void>();
 
   constructor() {
-    // Use reactive effect to watch for email verification status changes
     effect(() => {
       const isAuthenticated = this.authService.isAuthenticated();
       const isEmailVerified = this.authService.isEmailVerified();
@@ -296,17 +268,15 @@ export class TranscriptionHomeComponent implements OnInit, OnDestroy {
         warningShown: this.emailWarningShown()
       });
       
-      // Only show warning once per session if user is authenticated but email not verified
       if (isInitialized && isAuthenticated && !isEmailVerified && !this.emailWarningShown()) {
         this.emailWarningShown.set(true);
         setTimeout(() => {
           this.notificationService.warning(
             'Παρακαλούμε επιβεβαιώστε το email σας για να μπορείτε να ανεβάσετε αρχεία.'
           );
-        }, 1000); // Small delay to avoid showing too early
+        }, 1000);
       }
       
-      // Reset warning flag when email gets verified
       if (isEmailVerified) {
         this.emailWarningShown.set(false);
       }
@@ -314,18 +284,13 @@ export class TranscriptionHomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // Setup WebSocket listeners for real-time updates
     this.setupWebSocketListeners();
-    
     this.loadRecentTranscriptions();
     this.checkFirstTimeUser();
     this.initializeAudioDevices();
   }
 
-  // No method activation needed - all cards are always open
-
   private checkFirstTimeUser() {
-    // Check if user has seen onboarding before
     const hasSeenOnboarding = localStorage.getItem('greekstt-research_onboarding_completed');
     const hasTranscriptions = this.recentTranscriptions().length > 0;
     
@@ -333,8 +298,6 @@ export class TranscriptionHomeComponent implements OnInit, OnDestroy {
       this.showOnboarding.set(true);
     }
   }
-
-  // Method states reset is not needed since cards are always open
 
   ngOnDestroy() {
     this.stopRecording();

@@ -44,31 +44,24 @@ export class WebSocketService {
   private isConnected = signal<boolean>(false);
   private connectionError = signal<string | null>(null);
   
-  // Subjects for different event types
   private progressSubject = new Subject<TranscriptionProgress>();
   private completionSubject = new Subject<TranscriptionCompletion>();
   private errorSubject = new Subject<TranscriptionError>();
   private connectionSubject = new BehaviorSubject<boolean>(false);
   
-  // Public observables
   readonly isConnected$ = this.connectionSubject.asObservable();
   readonly progressUpdates$ = this.progressSubject.asObservable();
   readonly completionEvents$ = this.completionSubject.asObservable();
   readonly errorEvents$ = this.errorSubject.asObservable();
   
-  // Signals
   readonly connected = this.isConnected.asReadonly();
   readonly error = this.connectionError.asReadonly();
 
-  /**
-   * Connect to the WebSocket server
-   */
   connect(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       try {
         const token = this.tokenService.getAccessToken();
         
-        // Create socket connection with optional authentication
         const socketOptions: any = {
           transports: ['websocket', 'polling'],
           timeout: 10000,
@@ -80,14 +73,12 @@ export class WebSocketService {
           autoConnect: true
         };
 
-        // Add auth only if token is available
         if (token) {
           socketOptions.auth = { token };
         }
 
         this.socket = io(environment.wsUrl, socketOptions);
 
-        // Connection successful
         this.socket.on('connect', () => {
           console.log('WebSocket connected successfully');
           this.isConnected.set(true);
@@ -96,25 +87,21 @@ export class WebSocketService {
           resolve(true);
         });
 
-        // Connection confirmation from server
         this.socket.on('connected', (data) => {
           console.log('Server confirmed connection:', data);
         });
 
-        // Connection error
         this.socket.on('connect_error', (error) => {
           console.error('WebSocket connection error:', error);
           const errorMsg = error.message || 'Connection failed';
           this.connectionError.set(`${errorMsg} - retrying...`);
           this.isConnected.set(false);
           this.connectionSubject.next(false);
-          // Don't reject on connection errors if this is a reconnection attempt
           if (!this.socket?.active) {
             reject(error);
           }
         });
 
-        // Authentication error
         this.socket.on('auth_error', (data) => {
           console.error('WebSocket authentication error:', data);
           this.connectionError.set(data.message || 'Authentication failed');
@@ -122,42 +109,34 @@ export class WebSocketService {
           reject(new Error(data.message));
         });
 
-        // Disconnection
         this.socket.on('disconnect', (reason) => {
           console.log('WebSocket disconnected:', reason);
           this.isConnected.set(false);
           this.connectionSubject.next(false);
           
           if (reason === 'io server disconnect') {
-            // Server initiated disconnect, attempt to reconnect
             this.connectionError.set('Server disconnected - attempting to reconnect...');
-            // Force reconnection attempt
             this.socket?.connect();
           } else if (reason === 'transport close' || reason === 'transport error') {
-            // Network issues, let Socket.IO handle reconnection automatically
             this.connectionError.set('Connection lost - reconnecting...');
           }
         });
 
-        // Progress updates
         this.socket.on('transcription_progress', (data: TranscriptionProgress) => {
           console.log('Progress update received:', data);
           this.progressSubject.next(data);
         });
 
-        // Completion events
         this.socket.on('transcription_completed', (data: TranscriptionCompletion) => {
           console.log('Transcription completed:', data);
           this.completionSubject.next(data);
         });
 
-        // Error events
         this.socket.on('transcription_error', (data: TranscriptionError) => {
           console.error('Transcription error:', data);
           this.errorSubject.next(data);
         });
 
-        // Room events
         this.socket.on('room_joined', (data) => {
           console.log('Joined transcription room:', data);
         });
@@ -166,13 +145,11 @@ export class WebSocketService {
           console.log('Left transcription room:', data);
         });
 
-        // Generic error handler
         this.socket.on('error', (data) => {
           console.error('WebSocket error:', data);
           this.connectionError.set(data.message || 'Unknown error');
         });
         
-        // Reconnection events
         this.socket.on('reconnect', (attemptNumber) => {
           console.log('WebSocket reconnected after', attemptNumber, 'attempts');
         });
@@ -199,9 +176,6 @@ export class WebSocketService {
     });
   }
 
-  /**
-   * Disconnect from WebSocket server
-   */
   disconnect(): void {
     if (this.socket) {
       this.socket.disconnect();
@@ -213,9 +187,6 @@ export class WebSocketService {
     this.connectionError.set(null);
   }
 
-  /**
-   * Join a transcription room for progress updates
-   */
   joinTranscriptionRoom(transcriptionId: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
       if (!this.socket || !this.isConnected()) {
@@ -225,7 +196,6 @@ export class WebSocketService {
 
       const token = this.tokenService.getAccessToken();
 
-      // Listen for success/error responses
       const successHandler = (data: any) => {
         if (data.transcription_id === transcriptionId) {
           this.socket?.off('room_joined', successHandler);
@@ -243,7 +213,6 @@ export class WebSocketService {
       this.socket.on('room_joined', successHandler);
       this.socket.on('error', errorHandler);
 
-      // Send join request with optional token
       const joinData: any = {
         transcription_id: transcriptionId
       };
@@ -254,7 +223,6 @@ export class WebSocketService {
 
       this.socket.emit('join_transcription', joinData);
 
-      // Timeout after 5 seconds
       setTimeout(() => {
         this.socket?.off('room_joined', successHandler);
         this.socket?.off('error', errorHandler);
@@ -263,9 +231,6 @@ export class WebSocketService {
     });
   }
 
-  /**
-   * Leave a transcription room
-   */
   leaveTranscriptionRoom(transcriptionId: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
       if (!this.socket || !this.isConnected()) {
@@ -273,7 +238,6 @@ export class WebSocketService {
         return;
       }
 
-      // Listen for success/error responses
       const successHandler = (data: any) => {
         if (data.transcription_id === transcriptionId) {
           this.socket?.off('room_left', successHandler);
@@ -291,12 +255,10 @@ export class WebSocketService {
       this.socket.on('room_left', successHandler);
       this.socket.on('error', errorHandler);
 
-      // Send leave request
       this.socket.emit('leave_transcription', {
         transcription_id: transcriptionId
       });
 
-      // Timeout after 5 seconds
       setTimeout(() => {
         this.socket?.off('room_left', successHandler);
         this.socket?.off('error', errorHandler);
@@ -305,36 +267,24 @@ export class WebSocketService {
     });
   }
 
-  /**
-   * Get progress updates for a specific transcription
-   */
   getProgressUpdates(transcriptionId: string): Observable<TranscriptionProgress> {
     return this.progressUpdates$.pipe(
       filter(progress => progress.transcription_id === transcriptionId)
     );
   }
 
-  /**
-   * Get completion events for a specific transcription
-   */
   getCompletionEvents(transcriptionId: string): Observable<TranscriptionCompletion> {
     return this.completionEvents$.pipe(
       filter(completion => completion.transcription_id === transcriptionId)
     );
   }
 
-  /**
-   * Get error events for a specific transcription
-   */
   getErrorEvents(transcriptionId: string): Observable<TranscriptionError> {
     return this.errorEvents$.pipe(
       filter(error => error.transcription_id === transcriptionId)
     );
   }
 
-  /**
-   * Test connection with ping
-   */
   ping(): Promise<string> {
     return new Promise((resolve, reject) => {
       if (!this.socket || !this.isConnected()) {
@@ -358,9 +308,6 @@ export class WebSocketService {
     });
   }
 
-  /**
-   * Auto-connect (works with or without authentication token)
-   */
   autoConnect(): void {
     if (!this.isConnected()) {
       this.connect().catch(error => {
@@ -369,9 +316,6 @@ export class WebSocketService {
     }
   }
 
-  /**
-   * Get connection status
-   */
   getConnectionStatus(): boolean {
     return this.isConnected();
   }

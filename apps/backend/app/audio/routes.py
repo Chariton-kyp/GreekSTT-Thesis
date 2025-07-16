@@ -273,7 +273,7 @@ def stream_audio_compressed(audio_id):
         file_size = os.path.getsize(audio_file.file_path)
         logger.info(f"Streaming file: {file_size/1024/1024:.1f}MB")
         
-        # Simple direct streaming - no compression, just optimized headers
+        # Simple direct streaming - no compression, just headers
         response = send_file(
             audio_file.file_path,
             as_attachment=False,
@@ -282,7 +282,7 @@ def stream_audio_compressed(audio_id):
             conditional=True  # Enable HTTP range requests
         )
         
-        # Optimized headers for fast streaming
+        # Headers for fast streaming
         response.headers['Access-Control-Allow-Origin'] = '*'
         response.headers['Accept-Ranges'] = 'bytes'
         response.headers['Cache-Control'] = 'public, max-age=3600'  # 1 hour cache

@@ -27,7 +27,7 @@ class TranscriptionService:
                                           language: str = 'el',
                                           ai_model: str = 'whisper-large-v3') -> Transcription:
         """Create a new transcription job with metadata."""
-        logger.info(f"Creating transcription job with metadata | audio_file_id={audio_file_id} | user_id={user_id} | title={title} | language={language} | ai_model={ai_model}")
+        logger.info(f"Creating transcription job for audio file {audio_file_id}")
         
         # Get audio file
         audio_file = AudioFile.query.get(audio_file_id)
@@ -35,7 +35,7 @@ class TranscriptionService:
             logger.error(f"Audio file not found | audio_file_id={audio_file_id}")
             raise ValueError("Audio file not found")
         
-        logger.info(f"Audio file loaded | filename={audio_file.original_filename} | duration={audio_file.duration_seconds}s | size={audio_file.file_size} bytes")
+        logger.info(f"Audio file loaded: {audio_file.original_filename}")
         
         # Create transcription record with metadata (academic version - no template support)
         transcription = Transcription(
@@ -80,7 +80,7 @@ class TranscriptionService:
             logger.error(f"Audio file not found | audio_file_id={audio_file_id}")
             raise ValueError("Audio file not found")
         
-        logger.info(f"Audio file loaded | filename={audio_file.original_filename} | duration={audio_file.duration_seconds}s | size={audio_file.file_size} bytes")
+        logger.info(f"Audio file loaded: {audio_file.original_filename}")
         
         # Create transcription record (academic version - no template support)
         transcription = Transcription(
@@ -154,39 +154,31 @@ class TranscriptionService:
                         'message': message,
                         'transcription_id': str(transcription_id)
                     }
-                    # Use the passed app context or current_app
                     if app:
                         with app.app_context():
                             progress_manager.broadcast_progress(str(transcription_id), progress_data)
                     else:
                         progress_manager.broadcast_progress(str(transcription_id), progress_data)
-                    logger.info(f"Progress update | transcription_id={transcription_id} | stage={stage} | progress={percentage}%")
+                    logger.info(f"Progress update: {transcription_id} | {stage} | {percentage}%")
                 except Exception as e:
                     logger.error(f"Progress broadcast error | transcription_id={transcription_id} | error={str(e)}")
         
         try:
-            # Broadcast initial processing status
             on_progress('initializing', 5, 'Ξεκινά η επεξεργασία...')
             
-            # Update status
             transcription.status = 'processing'
             transcription.started_at = datetime.utcnow()
             db.session.commit()
             
             on_progress('preprocessing', 15, 'Προετοιμασία αρχείου ήχου...')
             
-            # Get audio file
             audio_file = transcription.audio_file
-            
-            # Template functionality removed for academic version
             template = None
             
             on_progress('ai_processing', 25, 'Φόρτωση μοντέλου AI...')
             
-            # Get the model from transcription metadata
-            model = 'whisper'  # Default
+            model = 'whisper'
             if transcription.model_used:
-                # Extract base model name (e.g., 'whisper' from 'whisper-large-v3')
                 if 'whisper' in transcription.model_used.lower():
                     model = 'whisper'
                 elif 'wav2vec' in transcription.model_used.lower():
@@ -194,12 +186,9 @@ class TranscriptionService:
                 elif transcription.model_used in ['both', 'compare']:
                     model = 'both'
             
-            # Call AI service based on model selection
             if model == 'both':
-                # Process with both models in parallel
                 on_progress('ai_processing', 35, 'Επεξεργασία με και τα δύο μοντέλα...')
                 
-                # Use synchronous transcribe_both_models method
                 if app:
                     with app.app_context():
                         result = self.ai_client.transcribe_both_models(

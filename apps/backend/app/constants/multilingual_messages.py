@@ -9,25 +9,21 @@ from typing import Dict, Any
 class MultilingualMessages:
     """Centralized multilingual message management"""
     
-    # Default language
-    DEFAULT_LANGUAGE = 'el'  # Greek
+    DEFAULT_LANGUAGE = 'el'
     
     # Authentication Messages
     AUTH_MESSAGES = {
         'el': {
-            # Registration
             'EMAIL_ALREADY_REGISTERED': 'Αυτό το email είναι ήδη καταχωρημένο. Δοκιμάστε να συνδεθείτε ή να ανακτήσετε τον κωδικό σας.',
             'USERNAME_ALREADY_EXISTS': 'Αυτό το όνομα χρήστη υπάρχει ήδη. Παρακαλώ επιλέξτε ένα άλλο.',
             'REGISTRATION_SUCCESSFUL': 'Η εγγραφή ολοκληρώθηκε επιτυχώς! Ελέγξτε το email σας για επιβεβαίωση.',
             'REGISTRATION_SUCCESSFUL_NO_VERIFICATION': 'Η εγγραφή ολοκληρώθηκε επιτυχώς και συνδεθήκατε!',
             
-            # Login
             'INVALID_CREDENTIALS': 'Λάθος email ή κωδικός. Παρακαλώ ελέγξτε τα στοιχεία σας.',
             'LOGIN_SUCCESSFUL': 'Η σύνδεση ολοκληρώθηκε επιτυχώς!',
             'ACCOUNT_DISABLED': 'Ο λογαριασμός σας έχει απενεργοποιηθεί. Επικοινωνήστε με την υποστήριξη.',
             'EMAIL_NOT_VERIFIED': 'Παρακαλώ επιβεβαιώστε το email σας πριν συνδεθείτε.',
             
-            # Email Verification
             'EMAIL_VERIFICATION_SENT': 'Κωδικός επιβεβαίωσης στάλθηκε στο email σας.',
             'EMAIL_VERIFIED_SUCCESSFULLY': 'Το email επιβεβαιώθηκε επιτυχώς!',
             'INVALID_VERIFICATION_CODE': 'Μη έγκυρος κωδικός επιβεβαίωσης.',
@@ -35,7 +31,6 @@ class MultilingualMessages:
             'EMAIL_ALREADY_VERIFIED': 'Το email είναι ήδη επιβεβαιωμένο.',
             'TOO_MANY_VERIFICATION_ATTEMPTS': 'Πολλές απόπειρες επιβεβαίωσης. Παρακαλώ περιμένετε.',
             
-            # Password Reset
             'PASSWORD_RESET_SENT': 'Κωδικός επαναφοράς στάλθηκε στο email σας.',
             'PASSWORD_RESET_SUCCESSFUL': 'Ο κωδικός πρόσβασης άλλαξε επιτυχώς!',
             'RESET_CODE_VERIFIED': 'Ο κωδικός επαναφοράς επιβεβαιώθηκε επιτυχώς!',

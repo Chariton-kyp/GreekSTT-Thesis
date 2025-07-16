@@ -1,5 +1,5 @@
-# GreekSTT Academic Research Platform - ASR Service
-# Handles Whisper and wav2vec2 models with transformers 4.36
+# GreekSTT Academic Research Platform - Whisper Service
+# Handles only Whisper model with transformers 4.36
 
 # Use CUDA 12.1 with cuDNN 8 base, then upgrade cuDNN via pip packages
 FROM nvidia/cuda:12.1.1-cudnn8-devel-ubuntu22.04 AS base
@@ -40,7 +40,7 @@ WORKDIR /app
 
 # Install Python dependencies
 COPY requirements.txt .
-# Install PyTorch with CUDA 12.1 support first
+# Install PyTorch with CUDA 12.1 support first (optimized for Whisper)
 RUN pip3 install --no-cache-dir --index-url https://download.pytorch.org/whl/cu121 \
     torch==2.2.0+cu121 \
     torchaudio==2.2.0+cu121
@@ -48,10 +48,12 @@ RUN pip3 install --no-cache-dir --index-url https://download.pytorch.org/whl/cu1
 # Install the rest of the requirements
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-# Force reinstall ctranslate2 to exact version for CUDA 12 + cuDNN 8 compatibility
-RUN pip3 install --force-reinstall ctranslate2==4.4.0
+# Force reinstall ctranslate2 and numpy to exact versions for compatibility
+RUN pip3 install --force-reinstall ctranslate2==4.4.0 numpy==1.26.4
 
-RUN pip3 install --force-reinstall numpy==1.26.4
+# Whisper-specific optimizations completed
+
+# Model downloading moved to main.py startup for better flexibility
 
 # Copy application code
 COPY app/ ./app/

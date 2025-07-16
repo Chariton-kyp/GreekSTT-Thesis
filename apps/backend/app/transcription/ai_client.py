@@ -229,7 +229,7 @@ class AIServiceClient:
                         'type': 'asr',
                         'language': 'el',
                         'service': 'asr-service',
-                        'description': 'OpenAI Whisper Large V3 optimized for Greek'
+                        'description': 'OpenAI Whisper Large V3 for Greek'
                     },
                     {
                         'name': 'wav2vec2-greek',

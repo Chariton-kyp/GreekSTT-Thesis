@@ -13,10 +13,10 @@ export interface ApiOptions {
   params?: HttpParams | { [param: string]: string | number | boolean | ReadonlyArray<string | number | boolean> };
   timeout?: number;
   withCredentials?: boolean;
-  showSuccessMessage?: boolean;  // Default: true
-  showErrorMessage?: boolean;    // Default: true
-  successMessage?: string;       // Custom success message
-  silentRequest?: boolean;       // No messages at all (overrides all)
+  showSuccessMessage?: boolean;
+  showErrorMessage?: boolean;
+  successMessage?: string;
+  silentRequest?: boolean;
   responseType?: 'arraybuffer' | 'blob' | 'json' | 'text';
 }
 
@@ -40,49 +40,29 @@ export class ApiService {
   private readonly baseUrl = environment.apiUrl;
   private readonly defaultTimeout = 30000; // 30 seconds
 
-  /**
-   * GET request with automatic message handling
-   */
   get<T>(endpoint: string, options: ApiOptions = {}): Observable<T> {
     return this.request<T>('GET', endpoint, null, options);
   }
 
-  /**
-   * POST request with automatic message handling
-   */
   post<T>(endpoint: string, data: any, options: ApiOptions = {}): Observable<T> {
     return this.request<T>('POST', endpoint, data, options);
   }
 
-  /**
-   * PUT request with automatic message handling
-   */
   put<T>(endpoint: string, data: any, options: ApiOptions = {}): Observable<T> {
     return this.request<T>('PUT', endpoint, data, options);
   }
 
-  /**
-   * PATCH request with automatic message handling
-   */
   patch<T>(endpoint: string, data: any, options: ApiOptions = {}): Observable<T> {
     return this.request<T>('PATCH', endpoint, data, options);
   }
 
-  /**
-   * DELETE request with automatic message handling
-   */
   delete<T>(endpoint: string, options: ApiOptions = {}): Observable<T> {
     return this.request<T>('DELETE', endpoint, null, options);
   }
-
-  /**
-   * Async/await wrapper for any request with automatic message handling
-   */
   async execute<T>(requestFn: () => Observable<T>, options: ApiOptions = {}): Promise<T> {
     try {
       const result = await firstValueFrom(requestFn().pipe(
         tap((response) => {
-          // Auto-show success message if enabled (default: true)
           if (this.shouldShowSuccessMessage(options) && !options.silentRequest) {
             if (options.successMessage) {
               this.messageService.handleResponse({
@@ -91,13 +71,12 @@ export class ApiService {
                 message_type: 'success'
               });
             } else if (this.isUnifiedResponse(response)) {
-              console.log('🎉 SUCCESS RESPONSE:', response); // Debug log
+              console.log('🎉 SUCCESS RESPONSE:', response);
               this.messageService.showSuccess(response);
             }
           }
         }),
         catchError((error) => {
-          // Auto-show error message (default: true)
           if (this.shouldShowErrorMessage(options) && !options.silentRequest) {
             this.messageService.showError(error);
           }
@@ -111,26 +90,21 @@ export class ApiService {
     }
   }
 
-  /**
-   * File upload with progress tracking and automatic message handling
-   */
   upload<T>(endpoint: string, formData: FormData, options: ApiOptions = {}): Observable<HttpEvent<T>> {
     const url = this.buildUrl(endpoint);
     
-    // Build headers without Content-Type to let browser set it for FormData
     const headers = new HttpHeaders({
       'Accept': 'application/json',
       'Accept-Language': 'el'
     });
     
-    // Add custom headers from options if provided
     let finalHeaders = headers;
     if (options.headers) {
       if (options.headers instanceof HttpHeaders) {
         const httpHeaders = options.headers as HttpHeaders;
         httpHeaders.keys().forEach(key => {
           const values = httpHeaders.getAll(key);
-          if (values && key.toLowerCase() !== 'content-type') { // Don't override Content-Type for FormData
+          if (values && key.toLowerCase() !== 'content-type') {
             finalHeaders = finalHeaders.set(key, values);
           }
         });
@@ -157,11 +131,10 @@ export class ApiService {
     console.log('API Service: FormData entries count:', Array.from(formData.entries()).length);
 
     return this.http.post<T>(url, formData, requestOptions).pipe(
-      timeout(options.timeout || 300000), // 5 minutes for uploads
+      timeout(options.timeout || 300000),
       tap((event: any) => {
         console.log('API Service: HTTP event received:', event.type, event);
-        // Handle upload completion messages
-        if (event.type === 4 && !options.silentRequest) { // HttpEventType.Response
+        if (event.type === 4 && !options.silentRequest) {
           if (this.shouldShowSuccessMessage(options) && this.isUnifiedResponse(event.body)) {
             this.messageService.showSuccess(event.body);
           }
@@ -177,9 +150,6 @@ export class ApiService {
     );
   }
 
-  /**
-   * File download with automatic message handling
-   */
   download(endpoint: string, options: ApiOptions = {}): Observable<Blob> {
     const url = this.buildUrl(endpoint);
     const requestOptions = {
@@ -193,9 +163,6 @@ export class ApiService {
     );
   }
 
-  /**
-   * Generic request method with automatic message handling
-   */
   private request<T>(
     method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
     endpoint: string,
@@ -209,7 +176,6 @@ export class ApiService {
       withCredentials: options.withCredentials || false
     };
 
-    // Add responseType if specified
     if (options.responseType) {
       requestOptions.responseType = options.responseType;
     }
@@ -240,33 +206,18 @@ export class ApiService {
     );
   }
 
-  /**
-   * Handle HTTP errors - no automatic message handling here
-   * Messages are handled by execute() method only
-   */
   private handleError(error: any, options: ApiOptions = {}): Observable<never> {
-    // No automatic message handling here to avoid duplicates
-    // All message handling is done in execute() method
     return throwError(() => error);
   }
 
-  /**
-   * Determine if success message should be shown (default: true)
-   */
   private shouldShowSuccessMessage(options: ApiOptions): boolean {
     return options.showSuccessMessage !== false;
   }
 
-  /**
-   * Determine if error message should be shown (default: true)
-   */
   private shouldShowErrorMessage(options: ApiOptions): boolean {
     return options.showErrorMessage !== false;
   }
 
-  /**
-   * Get authenticated URL for direct use (for streaming, etc.)
-   */
   getAuthenticatedUrl(endpoint: string): string {
     const url = this.buildUrl(endpoint);
     const token = this.storage.getItem<string>('token');
@@ -274,22 +225,16 @@ export class ApiService {
     return `${url}${separator}Authorization=Bearer ${token}`;
   }
 
-  /**
-   * Build full URL from endpoint
-   */
   private buildUrl(endpoint: string): string {
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
     return `${this.baseUrl}/${cleanEndpoint}`;
   }
 
-  /**
-   * Build HTTP headers
-   */
   private buildHeaders(headers?: HttpHeaders | { [header: string]: string | string[] }): HttpHeaders {
     let httpHeaders = new HttpHeaders({
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Accept-Language': 'el'  // Force Greek language
+      'Accept-Language': 'el'
     });
 
     if (headers) {
@@ -313,9 +258,6 @@ export class ApiService {
     return httpHeaders;
   }
 
-  /**
-   * Check if response follows unified format
-   */
   private isUnifiedResponse(response: any): response is UnifiedResponse {
     return response && 
            typeof response === 'object' && 
@@ -323,11 +265,7 @@ export class ApiService {
            'message_type' in response;
   }
 
-  /**
-   * Build query parameters for pagination
-   */
   buildPaginationParams(page: number = 1, perPage: number = 10, filters?: Record<string, any>): HttpParams {
-    // Ensure valid page and perPage values
     const validPage = isNaN(page) || page < 1 ? 1 : page;
     const validPerPage = isNaN(perPage) || perPage < 1 ? 10 : perPage;
     
@@ -347,9 +285,6 @@ export class ApiService {
     return params;
   }
 
-  /**
-   * Check if endpoint requires authentication
-   */
   isProtectedEndpoint(endpoint: string): boolean {
     const publicEndpoints = [
       '/auth/login',
@@ -364,24 +299,15 @@ export class ApiService {
     );
   }
 
-  /**
-   * Get base URL for building full URLs
-   */
   getBaseUrl(): string {
     return this.baseUrl;
   }
 
-  /**
-   * Get authenticated file URL with proper base URL
-   */
   getAuthenticatedFileUrl(endpoint: string): string {
     return this.buildUrl(endpoint);
   }
 }
 
-/**
- * Utility function for one-liner API calls with automatic message handling
- */
 export function apiCall<T>(
   apiService: ApiService,
   method: 'get' | 'post' | 'put' | 'patch' | 'delete',

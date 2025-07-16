@@ -26,16 +26,15 @@ class Wav2Vec2Model:
     def _get_device(self) -> str:
         """Detect optimal device"""
         if torch.cuda.is_available():
-            logger.info("🔥 Using CUDA for wav2vec2")
+            logger.info("Using CUDA for wav2vec2")
             return "cuda"
         else:
-            logger.info("💻 Using CPU for wav2vec2")
+            logger.info("Using CPU for wav2vec2")
             return "cpu"
     
     async def load(self) -> None:
-        """Load wav2vec2 model with garbage collection"""
+        """Load wav2vec2 model"""
         try:
-            # Pre-loading memory cleanup
             import gc
             gc.collect()
             if self.device == "cuda":
@@ -43,17 +42,12 @@ class Wav2Vec2Model:
             
             logger.info(f"Loading wav2vec2 model: {self.model_name}")
             
-            # Load processor first
             self.processor = Wav2Vec2Processor.from_pretrained(self.model_name)
-            
-            # Load model with standard settings (no complex optimizations)
             self.model = Wav2Vec2ForCTC.from_pretrained(self.model_name)
             
-            # Move to device
             self.model = self.model.to(self.device)
-            self.model.eval()  # Set to evaluation mode
+            self.model.eval()
             
-            # Post-loading memory cleanup
             gc.collect()
             if self.device == "cuda":
                 torch.cuda.empty_cache()

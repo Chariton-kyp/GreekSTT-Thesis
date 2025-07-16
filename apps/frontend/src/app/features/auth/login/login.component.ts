@@ -59,10 +59,8 @@ export class LoginComponent extends BaseComponent {
     try {
       await this.authService.login({ email, password, remember_me });
 
-      // Wait for auth service to be fully initialized after login
       await this.waitForAuthInitialization();
 
-      // Check if user needs email verification
       const currentUser = this.authService.currentUser();
       
       console.log('[LoginComponent] Post-login user state:', {
@@ -73,7 +71,6 @@ export class LoginComponent extends BaseComponent {
       });
       
       if (currentUser && !currentUser.email_verified) {
-        // Get return URL from query params or use default
         const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/app/dashboard';
         
         this.router.navigate(['/auth/verify-email'], {
@@ -86,7 +83,6 @@ export class LoginComponent extends BaseComponent {
         return;
       }
 
-      // Get return URL from query params or use default
       const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/app/dashboard';
       
       console.log('[LoginComponent] Navigating to:', returnUrl);
@@ -97,9 +93,6 @@ export class LoginComponent extends BaseComponent {
     }
   }
 
-  /**
-   * Wait for auth service to complete initialization
-   */
   private async waitForAuthInitialization(): Promise<void> {
     return new Promise<void>((resolve) => {
       if (this.authService.isInitialized()) {

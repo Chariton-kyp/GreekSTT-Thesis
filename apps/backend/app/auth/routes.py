@@ -45,31 +45,19 @@ def register(validated_data):
         email = validated_data['email']
         username = validated_data['username']
         
-        logger.info(
-            f"🔐 USER REGISTRATION STARTED | "
-            f"email={email} | "
-            f"username={username} | "
-            f"client_ip={request.remote_addr} | "
-            f"user_agent={request.headers.get('User-Agent', 'unknown')[:50]}..."
-        )
+        logger.info(f"User registration started: {email}")
         
         user = auth_service.register_user(validated_data)
         
-        logger.info(
-            f"✅ USER REGISTRATION SUCCESS | "
-            f"user_id={user.id} | "
-            f"email={email} | "
-            f"username={username} | "
-            f"type=student"
-        )
+        logger.info(f"User registration successful: {user.id}")
         
         # Send verification email if enabled
         if current_app.config.get('ENABLE_EMAIL_VERIFICATION'):
-            logger.info(f"📧 SENDING VERIFICATION EMAIL | user_id={user.id} | email={email}")
+            logger.info(f"Sending verification email to {email}")
             auth_service.send_verification_email(user)
             message = get_auth_message('REGISTRATION_SUCCESSFUL')
             
-            logger.info(f"🔑 CREATING LIMITED SESSION | user_id={user.id} | verification_required=true")
+            logger.info(f"Creating limited session for unverified user {user.id}")
             
             # Create limited-access session for unverified user (hybrid approach)
             additional_claims = {

@@ -1,0 +1,38 @@
+# FastAPI Core
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+pydantic[email]==2.5.0
+pydantic-settings==2.1.0
+aiofiles==23.2.1
+httpx==0.27.0
+
+# wav2vec2 Specific Requirements
+transformers==4.36.0                # Stable version for wav2vec2-large-xlsr-53-greek
+datasets==2.14.0                   # Compatible with transformers 4.36.0
+sentencepiece>=0.1.99
+protobuf>=4.25.1
+safetensors>=0.4.0
+accelerate>=0.27.0                  # Required for efficient model loading
+
+# Audio Processing (wav2vec2 optimized)
+librosa==0.10.1
+soundfile==0.12.1
+scipy==1.11.4
+webrtcvad==2.0.10
+ffmpeg-python==0.2.0
+pydub==0.25.1
+
+# Core ML Dependencies
+numpy==1.26.4                      # Compatible with transformers 4.36.0
+pandas==2.0.3
+scikit-learn>=1.3.0
+
+# Utilities
+loguru==0.7.2
+nltk>=3.9.1
+
+# Remove faster-whisper dependencies (not needed for wav2vec2)
+# Remove ctranslate2 (not needed for wav2vec2)
+# Remove onnxruntime-gpu (not needed for wav2vec2)
+# Remove matplotlib (not needed for inference)

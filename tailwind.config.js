@@ -1,6 +1,5 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  // Use the dark class for dark mode
   darkMode: 'class',
   content: [
     './apps/frontend/src/**/*.{html,ts}',
@@ -10,7 +9,6 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Primary color palette (blue-gray)
         primary: {
           50: '#f8fafc',
           100: '#f1f5f9',
@@ -24,20 +22,17 @@ module.exports = {
           900: '#0f172a',
           950: '#020617'
         },
-        // Accent colors
         accent: {
           primary: '#06b6d4',
           hover: '#0891b2',
           light: '#67e8f9',
           dark: '#0e7490'
         },
-        // Supporting colors
         supporting: {
           blue: '#3b82f6',
           green: '#10b981',
           gold: '#f59e0b'
         },
-        // Sector-specific colors
         medical: {
           light: '#10b981',
           dark: '#059669'

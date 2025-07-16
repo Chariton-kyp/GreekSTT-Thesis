@@ -11,7 +11,6 @@ try:
         RevokedTokenError, FreshTokenRequired, UserLookupError
     )
 except ImportError:
-    # Fallback if these don't exist in the current version
     InvalidHeaderError = None
     ExpiredSignatureError = None
     DecodeError = None
@@ -27,12 +26,9 @@ logger = logging.getLogger(__name__)
 
 def register_error_handlers(app):
     """Register error handlers for the application."""
-    
-    # JWT Error Handlers (only register if available)
     if NoAuthorizationError:
         @app.errorhandler(NoAuthorizationError)
         def handle_no_authorization_error(e):
-            """Handle missing Authorization header."""
             return auth_error_response(
                 message_key='AUTHORIZATION_REQUIRED',
                 error_code='MISSING_AUTHORIZATION_HEADER',
@@ -42,7 +38,6 @@ def register_error_handlers(app):
     if InvalidHeaderError:
         @app.errorhandler(InvalidHeaderError)
         def handle_invalid_header_error(e):
-            """Handle invalid Authorization header format."""
             return auth_error_response(
                 message_key='INVALID_AUTHORIZATION_HEADER',
                 error_code='INVALID_AUTHORIZATION_HEADER', 

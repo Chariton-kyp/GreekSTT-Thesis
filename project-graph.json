@@ -1,0 +1,585 @@
+{
+  "graph": {
+    "nodes": {
+      "wav2vec2-service": {
+        "name": "wav2vec2-service",
+        "type": "app",
+        "data": {
+          "root": "apps/wav2vec2-service",
+          "name": "wav2vec2-service",
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "projectType": "application",
+          "sourceRoot": "apps/wav2vec2-service",
+          "tags": [
+            "scope:wav2vec2",
+            "type:app"
+          ],
+          "targets": {
+            "serve": {
+              "executor": "@nx/node:execute",
+              "options": {
+                "command": "cd apps/wav2vec2-service && python -m uvicorn app.main:app --host 0.0.0.0 --port 8002 --reload",
+                "env": {
+                  "ENVIRONMENT": "development",
+                  "PYTHONPATH": "apps/wav2vec2-service"
+                }
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "@nx/node:package",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/apps/wav2vec2-service",
+                "main": "apps/wav2vec2-service/app/main.py",
+                "assets": [
+                  "apps/wav2vec2-service/requirements.txt",
+                  "apps/wav2vec2-service/app",
+                  "apps/wav2vec2-service/models"
+                ]
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ]
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "configurations": {},
+              "options": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "apps/wav2vec2-service/jest.config.ts"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "docker-build": {
+              "executor": "@nx/node:execute",
+              "options": {
+                "command": "docker build -t greekstt-wav2vec2-service -f apps/wav2vec2-service/Dockerfile ."
+              },
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
+      "whisper-service": {
+        "name": "whisper-service",
+        "type": "app",
+        "data": {
+          "root": "apps/whisper-service",
+          "name": "whisper-service",
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "projectType": "application",
+          "sourceRoot": "apps/whisper-service",
+          "tags": [
+            "scope:whisper",
+            "type:app"
+          ],
+          "targets": {
+            "serve": {
+              "executor": "@nx/node:execute",
+              "options": {
+                "command": "cd apps/whisper-service && python -m uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload",
+                "env": {
+                  "ENVIRONMENT": "development",
+                  "PYTHONPATH": "apps/whisper-service"
+                }
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "@nx/node:package",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/apps/whisper-service",
+                "main": "apps/whisper-service/app/main.py",
+                "assets": [
+                  "apps/whisper-service/requirements.txt",
+                  "apps/whisper-service/app",
+                  "apps/whisper-service/models"
+                ]
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ]
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "configurations": {},
+              "options": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "apps/whisper-service/jest.config.ts"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "docker-build": {
+              "executor": "@nx/node:execute",
+              "options": {
+                "command": "docker build -t greekstt-whisper-service -f apps/whisper-service/Dockerfile ."
+              },
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
+      "shared-config": {
+        "name": "shared-config",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/config",
+          "name": "shared-config",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/config/src",
+          "projectType": "library",
+          "tags": [
+            "scope:shared",
+            "type:config"
+          ],
+          "targets": {
+            "build": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/shared/config",
+                "main": "libs/shared/config/src/index.ts",
+                "tsConfig": "libs/shared/config/tsconfig.lib.json",
+                "assets": [
+                  "libs/shared/config/*.md"
+                ]
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ]
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "configurations": {},
+              "options": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/shared/config/jest.config.ts"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
+      "shared-models": {
+        "name": "shared-models",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/models",
+          "name": "shared-models",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/models/src",
+          "projectType": "library",
+          "tags": [
+            "scope:shared",
+            "type:models"
+          ],
+          "targets": {
+            "build": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/shared/models",
+                "main": "libs/shared/models/src/index.ts",
+                "tsConfig": "libs/shared/models/tsconfig.lib.json",
+                "assets": [
+                  "libs/shared/models/*.md"
+                ]
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ]
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "configurations": {},
+              "options": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/shared/models/jest.config.ts"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
+      "shared-utils": {
+        "name": "shared-utils",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/utils",
+          "name": "shared-utils",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/utils/src",
+          "projectType": "library",
+          "tags": [
+            "scope:shared",
+            "type:utils"
+          ],
+          "targets": {
+            "build": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/shared/utils",
+                "main": "libs/shared/utils/src/index.ts",
+                "tsConfig": "libs/shared/utils/tsconfig.lib.json",
+                "assets": [
+                  "libs/shared/utils/*.md"
+                ]
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ]
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "configurations": {},
+              "options": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/shared/utils/jest.config.ts"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
+      "frontend": {
+        "name": "frontend",
+        "type": "app",
+        "data": {
+          "root": "apps/frontend",
+          "name": "frontend",
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "projectType": "application",
+          "prefix": "vs",
+          "sourceRoot": "apps/frontend/src",
+          "tags": [
+            "scope:frontend",
+            "type:app"
+          ],
+          "targets": {
+            "build": {
+              "executor": "@angular-devkit/build-angular:application",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/apps/frontend",
+                "index": "apps/frontend/src/index.html",
+                "browser": "apps/frontend/src/main.ts",
+                "server": "apps/frontend/src/main.server.ts",
+                "polyfills": [],
+                "tsConfig": "apps/frontend/tsconfig.app.json",
+                "assets": [
+                  {
+                    "glob": "**/*",
+                    "input": "apps/frontend/public"
+                  },
+                  {
+                    "glob": "**/*",
+                    "input": "apps/frontend/src/assets",
+                    "output": "assets/"
+                  }
+                ],
+                "styles": [
+                  "apps/frontend/src/styles.scss"
+                ],
+                "scripts": []
+              },
+              "configurations": {
+                "production": {
+                  "budgets": [
+                    {
+                      "type": "initial",
+                      "maximumWarning": "500kb",
+                      "maximumError": "1mb"
+                    },
+                    {
+                      "type": "anyComponentStyle",
+                      "maximumWarning": "2kb",
+                      "maximumError": "4kb"
+                    }
+                  ],
+                  "outputHashing": "all"
+                },
+                "development": {
+                  "optimization": false,
+                  "extractLicenses": false,
+                  "sourceMap": true,
+                  "allowedCommonJsDependencies": [
+                    "quill",
+                    "chart.js",
+                    "moment",
+                    "rxjs",
+                    "primeng",
+                    "primeicons",
+                    "@primeng/themes",
+                    "ngx-quill",
+                    "socket.io-client",
+                    "file-saver",
+                    "date-fns"
+                  ],
+                  "budgets": [
+                    {
+                      "type": "initial",
+                      "maximumWarning": "5mb",
+                      "maximumError": "10mb"
+                    },
+                    {
+                      "type": "anyComponentStyle",
+                      "maximumWarning": "500kb",
+                      "maximumError": "1000kb"
+                    }
+                  ]
+                }
+              },
+              "defaultConfiguration": "development",
+              "parallelism": true,
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ]
+            },
+            "serve": {
+              "executor": "@angular-devkit/build-angular:dev-server",
+              "configurations": {
+                "production": {
+                  "buildTarget": "frontend:build:production"
+                },
+                "development": {
+                  "buildTarget": "frontend:build:development",
+                  "port": 4200,
+                  "host": "0.0.0.0"
+                }
+              },
+              "defaultConfiguration": "development",
+              "options": {},
+              "parallelism": true
+            },
+            "extract-i18n": {
+              "executor": "@angular-devkit/build-angular:extract-i18n",
+              "options": {
+                "buildTarget": "frontend:build"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "configurations": {},
+              "options": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "apps/frontend/jest.config.ts"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "serve-static": {
+              "executor": "@nx/web:file-server",
+              "options": {
+                "buildTarget": "frontend:build",
+                "port": 4200
+              },
+              "configurations": {},
+              "parallelism": true,
+              "continuous": true
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
+      "backend": {
+        "name": "backend",
+        "type": "app",
+        "data": {
+          "root": "apps/backend",
+          "name": "backend",
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "projectType": "application",
+          "sourceRoot": "apps/backend",
+          "tags": [
+            "scope:backend",
+            "type:app"
+          ],
+          "targets": {
+            "serve": {
+              "executor": "@nx/node:execute",
+              "options": {
+                "buildTarget": "backend:build",
+                "file": "apps/backend/run.py",
+                "env": {
+                  "FLASK_ENV": "development",
+                  "FLASK_APP": "run.py"
+                }
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "@nx/node:package",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/apps/backend",
+                "main": "apps/backend/run.py",
+                "tsConfig": "apps/backend/tsconfig.app.json",
+                "assets": [
+                  "apps/backend/requirements.txt",
+                  "apps/backend/migrations",
+                  "apps/backend/app/templates",
+                  "apps/backend/certs"
+                ]
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ]
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "configurations": {},
+              "options": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "apps/backend/jest.config.ts"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true
+            },
+            "docker-build": {
+              "executor": "@nx/node:execute",
+              "options": {
+                "command": "docker build -t greekstt-research-backend -f apps/backend/Dockerfile ."
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "migration": {
+              "executor": "@nx/node:execute",
+              "options": {
+                "command": "cd apps/backend && python manage_migrations.py upgrade"
+              },
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "implicitDependencies": []
+        }
+      }
+    },
+    "dependencies": {
+      "wav2vec2-service": [],
+      "whisper-service": [],
+      "shared-config": [],
+      "shared-models": [],
+      "shared-utils": [],
+      "frontend": [],
+      "backend": []
+    }
+  }
+}

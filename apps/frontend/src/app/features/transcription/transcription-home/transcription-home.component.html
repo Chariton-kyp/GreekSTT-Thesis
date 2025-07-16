@@ -1,7 +1,5 @@
-<!-- Enhanced Transcription Home Page with Unified Cards -->
 <div class="transcription-hub">
   
-  <!-- Onboarding Overlay -->
   @if (showOnboarding()) {
     <div class="onboarding-overlay">
       <div class="onboarding-content">
@@ -49,7 +47,6 @@
     </div>
   }
 
-  <!-- Header Section -->
   <div class="hub-header">
     <div class="header-main">
       <h1 class="hub-title">
@@ -68,7 +65,6 @@
     </div>
   </div>
 
-  <!-- Model Selection Section -->
   <div class="model-selection-section">
     <h2 class="section-title">
       <i class="pi pi-brain"></i>
@@ -77,7 +73,6 @@
     <p class="section-subtitle">Επιλέξτε το μοντέλο τεχνητής νοημοσύνης για την ανάλυση του περιεχομένου σας</p>
     
     <div class="model-cards-grid">
-      <!-- Whisper Model Card -->
       <div class="model-card" 
            [class.selected]="selectedModel() === 'whisper'"
            (click)="selectedModel.set('whisper')"
@@ -122,7 +117,6 @@
         </div>
       </div>
 
-      <!-- Wav2Vec2 Model Card -->
       <div class="model-card" 
            [class.selected]="selectedModel() === 'wav2vec2'"
            (click)="selectedModel.set('wav2vec2')"
@@ -167,7 +161,6 @@
         </div>
       </div>
 
-      <!-- Comparison Mode Card -->
       <div class="model-card comparison-card" 
            [class.selected]="selectedModel() === 'both'"
            (click)="selectedModel.set('both')"
@@ -213,7 +206,6 @@
       </div>
     </div>
 
-    <!-- Selected Model Summary -->
     <div class="selected-model-summary">
       @switch (selectedModel()) {
         @case ('whisper') {
@@ -253,11 +245,9 @@
     </div>
   </div>
 
-  <!-- Unified Method Cards -->
   <div class="transcription-methods">
     <div class="methods-grid">
       
-      <!-- Upload Method Card -->
       <div class="method-card upload-card">
         <div class="card-header">
           <div class="method-icon">
@@ -332,7 +322,6 @@
         </div>
       </div>
 
-      <!-- URL Method Card -->
       <div class="method-card url-card">
         <div class="card-header">
           <div class="method-icon">
@@ -403,7 +392,6 @@
         </div>
       </div>
 
-      <!-- Recording Method Card -->
       <div class="method-card record-card">
         <div class="card-header">
           <div class="method-icon">
@@ -418,7 +406,6 @@
         </div>
 
         <div class="card-form">
-          <!-- Microphone Selection -->
           @if (devicePermissionGranted() && availableAudioDevices().length > 1) {
             <div class="microphone-selection">
               <label>Επιλογή Μικροφώνου:</label>
@@ -466,7 +453,6 @@
                   <i class="pi pi-microphone"></i>
                   @if (isRecording()) {
                     <div class="pulse-ring"></div>
-                    <!-- Circular waveform visualization -->
                     <div class="circular-waveform">
                       @for (bar of activeBars(); track bar.id) {
                         <div 
@@ -491,7 +477,6 @@
 
               @if (recordedAudio() && !isRecording()) {
                 <div class="audio-preview">
-                  <!-- Custom Audio Player -->
                   <div class="custom-audio-player">
                     <audio 
                       #audioElement
@@ -608,7 +593,6 @@
       </div>
     </div>
 
-  <!-- Recent Transcriptions with Enhanced Filtering -->
   <div class="recent-transcriptions-section">
     <div class="section-header">
       <h2>📄 Πρόσφατες μεταγραφές</h2>
@@ -624,7 +608,6 @@
       </div>
     </div>
 
-    <!-- Enhanced Filters - Collapsible Panel -->
     <div class="filters-container">
       <div class="filters-header" (click)="toggleFilters()">
         <h3 class="filters-title">
