@@ -40,7 +40,6 @@ auth_service = AuthService()
 @validate_request(RegisterSchema)
 @log_business_operation('user_registration', {'method': 'email_password'})
 def register(validated_data):
-    """Register a new user."""
     try:
         email = validated_data['email']
         username = validated_data['username']
@@ -51,7 +50,6 @@ def register(validated_data):
         
         logger.info(f"User registration successful: {user.id}")
         
-        # Send verification email if enabled
         if current_app.config.get('ENABLE_EMAIL_VERIFICATION'):
             logger.info(f"Sending verification email to {email}")
             auth_service.send_verification_email(user)
@@ -59,7 +57,6 @@ def register(validated_data):
             
             logger.info(f"Creating limited session for unverified user {user.id}")
             
-            # Create limited-access session for unverified user (hybrid approach)
             additional_claims = {
                 'login_method': 'registration',
                 'registration_time': user.created_at.isoformat() if user.created_at else None,
@@ -87,13 +84,11 @@ def register(validated_data):
         else:
             logger.info(f"🔑 AUTO-LOGIN AFTER REGISTRATION | user_id={user.id} | verification_disabled=true")
             
-            # If email verification is disabled, automatically log the user in
             additional_claims = {
                 'login_method': 'registration',
                 'registration_time': user.created_at.isoformat() if user.created_at else None
             }
             
-            # Create session for the new user
             user, jti = auth_service.authenticate_and_create_session(
                 validated_data['email'],
                 validated_data['password']
@@ -145,7 +140,6 @@ def register(validated_data):
 @validate_request(LoginSchema)
 @log_business_operation('user_login', {'method': 'email_password'})
 def login(validated_data):
-    """Login a user."""
     try:
         email = validated_data['email']
         remember_me = validated_data.get('remember_me', False)
@@ -160,7 +154,6 @@ def login(validated_data):
         
         from app.users.models import User
         
-        # First, find user by email to check for lockout
         user = User.query.filter_by(email=email, is_active=True).first()
         
         if user:
@@ -168,7 +161,6 @@ def login(validated_data):
         else:
             logger.warning(f"⚠️ USER NOT FOUND | email={email} | client_ip={request.remote_addr}")
         
-        # Attempt to authenticate user and create session
         logger.info(f"🔍 AUTHENTICATING USER | email={email} | attempting_authentication=true")
         
         authenticated_user, jti = auth_service.authenticate_and_create_session(
@@ -197,10 +189,9 @@ def login(validated_data):
             f"remember_me={remember_me}"
         )
         
-        # Create authentication response with custom JWT claims
         additional_claims = {
             'login_method': 'password',
-            'login_time': datetime.utcnow().isoformat(),  # Use current time for simplified thesis version
+            'login_time': datetime.utcnow().isoformat(),
             'remember_me': remember_me
         }
         
@@ -224,7 +215,6 @@ def login(validated_data):
         return jsonify(auth_response), 200
         
     except Exception as e:
-        # Log system error during login with detailed traceback
         import traceback
         error_details = traceback.format_exc()
         logger.error(f"🚨 LOGIN SYSTEM ERROR: {str(e)}")
@@ -242,7 +232,6 @@ def login(validated_data):
 @jwt_required()
 @log_business_operation('user_logout')
 def logout():
-    """Logout a user by blacklisting their token."""
     try:
         user_id = get_jwt_identity()
         jti = get_jwt()['jti']
@@ -257,14 +246,12 @@ def logout():
             f"client_ip={request.remote_addr}"
         )
         
-        # Add token to blacklist
         blacklist_token = BlacklistToken(jti=jti)
         db.session.add(blacklist_token)
         db.session.commit()
         
         logger.info(f"🔒 JWT TOKEN BLACKLISTED | user_id={user_id} | jti={jti[:8]}...")
         
-        # Terminate session if present
         session_terminated = False
         if session_id:
             session_terminated = auth_service.logout_user_session(user_id, session_id)
@@ -297,7 +284,6 @@ def logout():
 @auth_bp.route('/refresh', methods=['POST'])
 @jwt_required(refresh=True)
 def refresh():
-    """Refresh an access token with updated custom claims."""
     try:
         user_id = get_jwt_identity()
         jwt_claims = get_jwt()

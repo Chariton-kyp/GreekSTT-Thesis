@@ -170,7 +170,7 @@ export class EnhancedRecentTranscriptionsComponent {
   }
 
   downloadTranscription(id: string): void {
-    // TODO: Implement download functionality
+    // Download functionality not implemented in academic version
     console.log('Download transcription:', id);
   }
 

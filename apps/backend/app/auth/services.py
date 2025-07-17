@@ -22,18 +22,14 @@ logger = logging.getLogger(__name__)
 
 
 class AuthService:
-    """Service for authentication operations."""
     
     def register_user(self, data: dict) -> User:
-        """Register a new user."""
-        # Check if user already exists
         if User.query.filter_by(email=data['email']).first():
             raise ValueError(AUTH_MESSAGES['EMAIL_ALREADY_REGISTERED'])
         
         if User.query.filter_by(username=data['username']).first():
             raise ValueError(AUTH_MESSAGES['USERNAME_ALREADY_EXISTS'])
         
-        # Create new user
         user = User(
             email=data['email'],
             username=data['username'],
@@ -50,8 +46,6 @@ class AuthService:
         return user
     
     def authenticate_user(self, email: str, password: str) -> Optional[User]:
-        """Authenticate a user with email and password."""
-        # SECURITY: Only get active, non-deleted users
         user = User.query.filter_by(
             email=email,
             is_active=True,
@@ -59,7 +53,6 @@ class AuthService:
         ).first()
         
         if user and user.password_hash and check_password_hash(user.password_hash, password):
-            # Commit successful authentication (no last_login tracking for simplified version)
             db.session.commit()
             logger.info(f"User {email} authenticated successfully")
             return user
@@ -77,29 +70,18 @@ class AuthService:
         password: str,
         remember_me: bool = False
     ) -> tuple[Optional[User], Optional[str]]:
-        """
-        Authenticate user and create simple session.
-        
-        Returns:
-            tuple: (user, jti)
-        """
-        # First authenticate the user
         user = self.authenticate_user(email, password)
         if not user:
             return None, None
         
-        # Get request information for session creation
         ip_address = request.remote_addr or '127.0.0.1'
         user_agent = request.headers.get('User-Agent', 'Unknown')
         
-        # Set session duration based on remember_me
         from datetime import timedelta
         expires_at = datetime.utcnow() + (timedelta(days=90) if remember_me else timedelta(hours=24))
         
-        # Generate unique JWT ID
         jti = str(uuid.uuid4())
         
-        # Create simplified session
         session = session_service.create_session(
             user=user,
             jti=jti,
@@ -111,29 +93,16 @@ class AuthService:
         return user, jti
     
     def logout_user_session(self, user_id: int, jti: str) -> bool:
-        """
-        Logout user by deleting their session.
-        
-        Args:
-            user_id: The user ID
-            jti: The JWT ID to delete
-            
-        Returns:
-            bool: True if session was deleted successfully
-        """
         return session_service.delete_session(jti)
     
     def send_verification_email(self, user: User) -> Dict[str, Any]:
-        """Send 6-digit verification code to user email."""
-        # Invalidate any existing verification codes for this user
         existing_verifications = EmailVerification.query.filter_by(
             user_id=user.id, 
             verified=False
         ).all()
         for verification in existing_verifications:
-            verification.verified = True  # Mark as used to prevent reuse
+            verification.verified = True
         
-        # Create new verification record with 6-digit code
         verification = EmailVerification(
             user_id=user.id,
             verification_type='email'
@@ -141,17 +110,15 @@ class AuthService:
         db.session.add(verification)
         db.session.commit()
         
-        # Send email using enhanced email service
         result = email_service.send_verification_email(user, verification.code, 'el')
         
         return {
             'code_id': verification.id,
             'expires_in': verification.get_remaining_time(),
-            'can_resend_in': 120  # 2 minutes cooldown
+            'can_resend_in': 120
         }
     
     def verify_email_code(self, user_id: int, code: str) -> Dict[str, Any]:
-        """Verify email with 6-digit code."""
         # Find the latest verification for this user (including expired ones)
         verification = EmailVerification.query.filter_by(
             user_id=user_id,
@@ -181,7 +148,7 @@ class AuthService:
         
         # Check if the code matches first (regardless of expiration)
         if verification.code != code:
-            db.session.commit()  # Save the incremented attempts
+            db.session.commit()
             return {
                 'success': False,
                 'error': AUTH_MESSAGES['INVALID_VERIFICATION_CODE'],
@@ -192,7 +159,7 @@ class AuthService:
         
         # Code is correct, now check if it's expired
         if verification.expires_at <= datetime.utcnow():
-            db.session.commit()  # Save the incremented attempts
+            db.session.commit()
             return {
                 'success': False,
                 'error': 'Verification code has expired. Please request a new code.',
@@ -214,7 +181,6 @@ class AuthService:
         }
     
     def verify_email(self, token: str) -> bool:
-        """Verify email with token (legacy method for backward compatibility)."""
         verification = EmailVerification.query.filter_by(token=token).first()
         
         if verification and verification.is_valid():
@@ -227,7 +193,6 @@ class AuthService:
         return False
     
     def resend_verification_email(self, email: str) -> Dict[str, Any]:
-        """Resend verification email with 6-digit code."""
         user = User.query.filter_by(email=email).first()
         
         if not user:
@@ -266,11 +231,9 @@ class AuthService:
         return result
     
     def request_password_reset(self, email: str) -> Dict[str, Any]:
-        """Request password reset with 6-digit code."""
         user = User.query.filter_by(email=email).first()
         
         if not user:
-            # Don't reveal if user exists for security
             return {
                 'success': True,
                 'message': 'If the email exists, a reset code has been sent.',
@@ -319,17 +282,6 @@ class AuthService:
         }
     
     def create_user_auth_response(self, user: User, additional_claims: Optional[Dict[str, Any]] = None, jti: str = None, remember_me: bool = False) -> Dict[str, Any]:
-        """Create a complete authentication response with tokens and user data.
-        
-        Args:
-            user: User model instance
-            additional_claims: Optional additional claims for JWT
-            jti: JWT ID to include in JWT claims
-            
-        Returns:
-            Dict containing tokens and user information
-        """
-        # Add JWT ID to claims if provided
         if jti and additional_claims:
             additional_claims['jti'] = jti
         elif jti:
@@ -338,19 +290,9 @@ class AuthService:
         return create_auth_response(user, additional_claims, remember_me)
     
     def create_user_tokens_only(self, user: User, additional_claims: Optional[Dict[str, Any]] = None) -> Dict[str, str]:
-        """Create access and refresh tokens for a user.
-        
-        Args:
-            user: User model instance
-            additional_claims: Optional additional claims for JWT
-            
-        Returns:
-            Dict containing access_token and refresh_token
-        """
         return create_user_tokens(user, additional_claims)
     
     def verify_reset_code(self, email: str, code: str) -> Dict[str, Any]:
-        """Verify password reset code."""
         user = User.query.filter_by(email=email).first()
         
         if not user:
@@ -393,7 +335,7 @@ class AuthService:
                 'user_id': user.id
             }
         else:
-            db.session.commit()  # Save the incremented attempts
+            db.session.commit()
             
             return {
                 'success': False,
@@ -404,7 +346,6 @@ class AuthService:
             }
     
     def reset_password_with_token(self, reset_token: int, new_password: str) -> Dict[str, Any]:
-        """Reset password after code verification using token."""
         reset = PasswordReset.query.filter_by(id=reset_token, used=True).first()
         
         if not reset:
@@ -443,7 +384,6 @@ class AuthService:
         }
     
     def reset_password(self, token: str, new_password: str) -> bool:
-        """Reset password with token (legacy method for backward compatibility)."""
         reset = PasswordReset.query.filter_by(token=token).first()
         
         if reset and reset.is_valid():
@@ -456,7 +396,6 @@ class AuthService:
         return False
     
     def verify_password_reset_code(self, email: str, code: str) -> Dict[str, Any]:
-        """Verify a 6-digit password reset code."""
         user = User.query.filter_by(email=email).first()
         
         if not user:
@@ -499,7 +438,7 @@ class AuthService:
                 'user_id': user.id
             }
         else:
-            db.session.commit()  # Save the incremented attempts
+            db.session.commit()
             
             return {
                 'success': False,
@@ -510,7 +449,6 @@ class AuthService:
             }
     
     def reset_password_with_code(self, email: str, code: str, new_password: str) -> Dict[str, Any]:
-        """Reset password using verified code."""
         user = User.query.filter_by(email=email).first()
         
         if not user:
@@ -564,7 +502,7 @@ class AuthService:
                 'user_id': user.id
             }
         else:
-            db.session.commit()  # Save the incremented attempts
+            db.session.commit()
             
             return {
                 'success': False,
@@ -605,7 +543,7 @@ class AuthService:
         
         # Check if the code matches first (regardless of expiration)
         if verification.code != code:
-            db.session.commit()  # Save the incremented attempts
+            db.session.commit()
             return {
                 'success': False,
                 'error': AUTH_MESSAGES['INVALID_VERIFICATION_CODE'],
@@ -616,7 +554,7 @@ class AuthService:
         
         # Code is correct, now check if it's expired
         if verification.expires_at <= datetime.utcnow():
-            db.session.commit()  # Save the incremented attempts
+            db.session.commit()
             return {
                 'success': False,
                 'error': 'Verification code has expired. Please request a new code.',

@@ -29,7 +29,6 @@ class TranscriptionService:
         """Create a new transcription job with metadata."""
         logger.info(f"Creating transcription job for audio file {audio_file_id}")
         
-        # Get audio file
         audio_file = AudioFile.query.get(audio_file_id)
         if not audio_file:
             logger.error(f"Audio file not found | audio_file_id={audio_file_id}")
@@ -37,7 +36,6 @@ class TranscriptionService:
         
         logger.info(f"Audio file loaded: {audio_file.original_filename}")
         
-        # Create transcription record with metadata (academic version - no template support)
         transcription = Transcription(
             audio_file_id=audio_file_id,
             user_id=user_id,
@@ -64,7 +62,6 @@ class TranscriptionService:
         
         logger.info(f"Transcription job created with metadata | transcription_id={transcription.id} | status=pending")
         
-        # Start async transcription process
         self._process_transcription_async(transcription.id)
         
         return transcription
@@ -74,7 +71,6 @@ class TranscriptionService:
         """Create a new transcription job."""
         logger.info(f"Creating transcription job | audio_file_id={audio_file_id} | user_id={user_id} | language={language}")
         
-        # Get audio file
         audio_file = AudioFile.query.get(audio_file_id)
         if not audio_file:
             logger.error(f"Audio file not found | audio_file_id={audio_file_id}")
@@ -82,7 +78,6 @@ class TranscriptionService:
         
         logger.info(f"Audio file loaded: {audio_file.original_filename}")
         
-        # Create transcription record (academic version - no template support)
         transcription = Transcription(
             audio_file_id=audio_file_id,
             user_id=user_id,
@@ -106,25 +101,19 @@ class TranscriptionService:
         
         logger.info(f"Transcription job created | transcription_id={transcription.id} | status=pending")
         
-        # Start async transcription process
         self._process_transcription_async(transcription.id)
         
         return transcription
     
     def _process_transcription_async(self, transcription_id: int):
         """Process transcription asynchronously."""
-        # In production, this would be handled by Celery or similar
-        # For now, we'll use a simple thread
         import threading
         from flask import current_app
         
-        # Capture the current app instance
         app = current_app._get_current_object()
         
         def process():
-            # Run with Flask application context using captured app
             with app.app_context():
-                # Call synchronous processing function
                 self._process_transcription(transcription_id, app)
         
         thread = threading.Thread(target=process)
@@ -137,11 +126,9 @@ class TranscriptionService:
         if not transcription:
             return
         
-        # Get progress manager for WebSocket updates (inside Flask app context)
         from app.websocket.manager import get_progress_manager
         progress_manager = get_progress_manager()
         
-        # Import SocketIO to ensure proper context handling
         from app.extensions import socketio
         
         def on_progress(stage: str, percentage: int, message: str):
@@ -310,44 +297,33 @@ class TranscriptionService:
                         )
                         db.session.add(segment)
             
-            # Structured data functionality removed for academic version
-            
-            # Calculate credits used
             transcription.credits_used = self._calculate_credits(
                 transcription.duration_seconds
             )
             
-            # Academic Mode: Track usage for research analytics only
             current_app.logger.info("Academic mode - recording usage for research analytics only")
             current_app.logger.info(f"Academic transcription completed: {transcription.duration_seconds}s, "
                                   f"{transcription.credits_used} research units processed")
             
-            # Note: In academic version, we track statistics for research purposes
-            
             on_progress('finalizing', 95, 'Ολοκλήρωση μεταγραφής...')
             
-            # Mark as completed
             transcription.status = 'completed'
             transcription.completed_at = datetime.utcnow()
             
-            # Update audio file status
             audio_file.status = 'completed'
             
             db.session.commit()
             
-            # Invalidate analytics cache when transcription is completed
             try:
                 from app.analytics.services import AnalyticsService
                 analytics_service = AnalyticsService()
-                # Invalidate user-specific cache
                 analytics_service._invalidate_cache_pattern(f'user_{user_id}')
-                analytics_service._invalidate_cache_pattern('user_stats')  # User stats cache
+                analytics_service._invalidate_cache_pattern('user_stats')
                 analytics_service._invalidate_cache_pattern('system')
                 logger.info(f"Analytics cache invalidated for user {user_id}")
             except Exception as cache_error:
                 logger.warning(f"Failed to invalidate analytics cache: {str(cache_error)}")
             
-            # Broadcast completion via WebSocket
             if progress_manager and socketio:
                 try:
                     completion_data = {
@@ -368,17 +344,14 @@ class TranscriptionService:
             logger.info(f"Transcription completed successfully | transcription_id={transcription_id}")
             
         except Exception as e:
-            # Mark as failed
             transcription.status = 'failed'
             transcription.error_message = str(e)
             transcription.completed_at = datetime.utcnow()
             
-            # Update audio file status
             audio_file.status = 'failed'
             
             db.session.commit()
             
-            # Broadcast error via WebSocket
             if progress_manager and socketio:
                 try:
                     if app:
@@ -904,7 +877,6 @@ class TranscriptionService:
     
     def _calculate_credits(self, duration_seconds: float) -> float:
         """Calculate credits used based on duration."""
-        # Simple calculation: 1 credit per minute
         return duration_seconds / 60.0
     
     def generate_ai_summary(self, transcription_id: int, user_id: int) -> Optional[str]:

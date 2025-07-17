@@ -4,20 +4,17 @@ import { authGuard } from './core/guards/auth.guard';
 import { emailVerificationGuard, optionalEmailVerificationGuard } from './core/guards/email-verification.guard';
 
 export const routes: Routes = [
-  // Public routes
   {
     path: '',
     loadComponent: () => import('./features/landing/landing.component').then(m => m.LandingComponent)
   },
   
   
-  // Authentication routes (public)
   {
     path: 'auth',
     loadChildren: () => import('./features/auth/auth.routes').then(r => r.authRoutes)
   },
   
-  // Protected routes - require authentication
   {
     path: 'app',
     loadComponent: () => import('./layout/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
@@ -48,7 +45,6 @@ export const routes: Routes = [
         redirectTo: 'dashboard',
         pathMatch: 'full'
       },
-      // Not found within app routes
       {
         path: '**',
         loadComponent: () => import('./shared/components/not-found/not-found.component').then(m => m.NotFoundComponent)
@@ -56,14 +52,12 @@ export const routes: Routes = [
     ]
   },
   
-  // Redirect root to landing page
   {
     path: '',
     redirectTo: '',
     pathMatch: 'full'
   },
   
-  // Wildcard route - must be last
   {
     path: '**',
     loadComponent: () => import('./shared/components/not-found/not-found.component').then(m => m.NotFoundComponent)

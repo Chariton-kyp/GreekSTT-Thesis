@@ -15,10 +15,10 @@ export const authGuard: CanActivateFn = (route, state) => {
     // Create a Promise that resolves when initialization is complete
     return new Promise<boolean>((resolve) => {
       // Convert signal to observable and watch for initialization
-      const academic_access = toObservable(authService.isInitialized)
+      const initSubscription = toObservable(authService.isInitialized)
         .pipe(filter((initialized: boolean) => initialized))
         .subscribe(() => {
-          academic_access.unsubscribe();
+          initSubscription.unsubscribe();
           resolve(checkAuthentication(authService, router, state));
         });
     });
@@ -68,10 +68,10 @@ export const guestGuard: CanActivateFn = (route, state) => {
   // Wait for auth service to initialize
   if (!authService.isInitialized()) {
     return new Promise<boolean>((resolve) => {
-      const academic_access = toObservable(authService.isInitialized)
+      const initSubscription = toObservable(authService.isInitialized)
         .pipe(filter((initialized: boolean) => initialized))
         .subscribe(() => {
-          academic_access.unsubscribe();
+          initSubscription.unsubscribe();
           resolve(checkGuestAccess(authService, router));
         });
     });

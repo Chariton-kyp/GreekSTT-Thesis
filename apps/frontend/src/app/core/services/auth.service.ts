@@ -85,20 +85,12 @@ export class AuthService {
 
   private async initializeAuth(): Promise<void> {
     if (!environment.production) {
-      console.log('[AuthService] Starting initialization...');
     }
     
     const token = this.storage.getItem<string>('token');
     const refreshToken = this.storage.getItem<string>('refresh_token');
 
     if (!environment.production) {
-      console.log('[AuthService] Initialization - tokens in storage:', {
-        hasToken: !!token,
-        hasRefreshToken: !!refreshToken,
-        tokenLength: token?.length || 0,
-        refreshTokenLength: refreshToken?.length || 0,
-        refreshTokenValue: refreshToken
-      });
     }
 
     if (token) {
@@ -108,32 +100,27 @@ export class AuthService {
           this._currentClaims.set(claims);
           
           if (!environment.production) {
-            console.log('[AuthService] Token valid, loading user data...');
           }
           try {
             await this.getCurrentUser();
           } catch (error) {
             if (!environment.production) {
-              console.log('[AuthService] getCurrentUser failed during init, but keeping JWT claims:', error);
             }
             // Keep JWT claims even if getCurrentUser fails - allows unverified users to stay authenticated
           }
         } else if (refreshToken) {
           if (!environment.production) {
-            console.log('[AuthService] Token expired, attempting refresh...');
           }
           
           await this.refreshToken();
         } else {
           if (!environment.production) {
-            console.log('[AuthService] Token expired and no refresh token, clearing storage...');
           }
           
           this.clearAuthStorage();
         }
       } catch (error) {
         if (!environment.production) {
-          console.log('[AuthService] Token invalid, clearing storage:', error);
         }
         
         // Token is invalid, clear storage
@@ -141,14 +128,12 @@ export class AuthService {
       }
     } else {
       if (!environment.production) {
-        console.log('[AuthService] No stored tokens found');
       }
     }
 
     this._isInitialized.set(true);
     
     if (!environment.production) {
-      console.log('[AuthService] Initialization complete. Authenticated:', this.isAuthenticated());
     }
   }
 
@@ -157,7 +142,6 @@ export class AuthService {
     this._error.set(null);
 
     if (!environment.production) {
-      console.log('[AuthService] Login attempt for:', credentials.email);
     }
 
     try {
@@ -166,23 +150,14 @@ export class AuthService {
       );
 
       if (!environment.production) {
-        console.log('[AuthService] Login response received:', {
-          hasUser: !!response.user,
-          hasAccessToken: !!response.access_token,
-          hasRefreshToken: !!response.refresh_token,
-          refreshTokenValue: response.refresh_token,
-          responseKeys: Object.keys(response)
-        });
       }
 
       this.handleAuthResponse(response);
       
       if (!environment.production) {
-        console.log('[AuthService] Login successful for:', credentials.email);
       }
     } catch (error: any) {
       if (!environment.production) {
-        console.log('[AuthService] Login failed for:', credentials.email, error);
       }
       
       this._error.set(this.getErrorMessage(error));
@@ -224,7 +199,6 @@ export class AuthService {
     this._isLoading.set(true);
 
     if (!environment.production) {
-      console.log('[AuthService] Logout started...');
     }
 
     try {
@@ -235,16 +209,13 @@ export class AuthService {
         );
         
         if (!environment.production) {
-          console.log('[AuthService] Server-side logout successful');
         }
       } else {
         if (!environment.production) {
-          console.log('[AuthService] Skipping server-side logout (no valid token)');
         }
       }
     } catch (error) {
       if (!environment.production) {
-        console.warn('[AuthService] Logout API call failed (continuing with client-side logout):', error);
       }
     }
 
@@ -253,7 +224,6 @@ export class AuthService {
     this._isLoading.set(false);
     
     if (!environment.production) {
-      console.log('[AuthService] Logout complete');
     }
     
     await this.router.navigate(['/']);
@@ -360,7 +330,6 @@ export class AuthService {
         this.handleAuthResponse(response);
         
         if (!environment.production) {
-          console.log('[AuthService] Auto-login after password reset successful');
         }
         
         return { 
@@ -421,7 +390,6 @@ export class AuthService {
       const responseData = response as any;
       if (responseData.access_token && responseData.refresh_token) {
         if (!environment.production) {
-          console.log('[AuthService] Email verification success - updating tokens');
         }
         
         this.storage.setItem('token', responseData.access_token);
@@ -432,7 +400,6 @@ export class AuthService {
         if (claims) {
           this._currentClaims.set(claims);
           if (!environment.production) {
-            console.log('[AuthService] Updated JWT claims - email_verified:', claims.email_verified);
           }
         }
       }
@@ -441,7 +408,6 @@ export class AuthService {
       await this.getCurrentUser();
       
       if (!environment.production) {
-        console.log('[AuthService] Email verification complete - isEmailVerified:', this.isEmailVerified());
       }
       
       // Emit event for components that need to react to email verification changes
@@ -512,13 +478,12 @@ export class AuthService {
    */
   async refreshUserData(): Promise<void> {
     if (!environment.production) {
-      console.log('[AuthService] Refreshing user data...');
     }
     
     try {
       const response = await this.api.execute(
         () => this.api.get<any>('/users/me'),
-        { showSuccessMessage: false } // Don't show success for refresh
+        { showSuccessMessage: false }
       );
       
       // Handle both old and new response formats
@@ -526,11 +491,9 @@ export class AuthService {
       this._currentUser.set(userData);
       
       if (!environment.production) {
-        console.log('[AuthService] User data refreshed successfully', userData);
       }
     } catch (error) {
       if (!environment.production) {
-        console.error('[AuthService] Failed to refresh user data:', error);
       }
       // Only clear user if we don't have valid JWT claims
       if (!this.currentClaims()) {
@@ -615,18 +578,10 @@ export class AuthService {
     
     // Debug logging for refresh token
     if (!environment.production) {
-      console.log('[AuthService] Storing tokens:', {
-        hasAccessToken: !!response.access_token,
-        hasRefreshToken: !!response.refresh_token,
-        refreshTokenLength: response.refresh_token?.length || 0,
-        refreshTokenValue: response.refresh_token,
-        responseKeys: Object.keys(response)
-      });
     }
     
     // Check if refresh_token exists in response
     if (!response.refresh_token) {
-      console.error('[AuthService] WARNING: No refresh_token in response!', response);
     }
     
     this.storage.setItem('refresh_token', response.refresh_token);
@@ -643,13 +598,6 @@ export class AuthService {
       : new Date(Date.now() + ((response.expires_in || 3600) * 1000));
     
     if (!environment.production) {
-      console.log('[AuthService] Token expiration calculation:', {
-        claimsExp: claims?.exp,
-        claimsExpDate: claims?.exp ? new Date(claims.exp * 1000) : null,
-        responseExpiresIn: response.expires_in,
-        calculatedExpiresAt: expiresAt,
-        now: new Date()
-      });
     }
     
     this.storage.setItem('token_expires_at', expiresAt.toISOString());
@@ -683,14 +631,6 @@ export class AuthService {
     const refreshTime = Math.max(timeUntilExpiry - (5 * 60 * 1000), 0);
 
     if (!environment.production) {
-      console.log('[AuthService] Token refresh schedule:', {
-        expiresAt: expiresAt,
-        expirationTime: new Date(expirationTime),
-        now: new Date(now),
-        timeUntilExpiry: Math.round(timeUntilExpiry / 1000 / 60), // minutes
-        refreshTime: Math.round(refreshTime / 1000 / 60), // minutes
-        willSchedule: refreshTime > 0
-      });
     }
 
     if (refreshTime > 0) {
@@ -698,7 +638,6 @@ export class AuthService {
         try {
           await this.refreshToken();
         } catch (error) {
-          console.error('Automatic token refresh failed:', error);
         }
       }, refreshTime);
     }

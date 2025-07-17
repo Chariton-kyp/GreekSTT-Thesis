@@ -56,7 +56,7 @@ class CallbackService:
             "status": "completed" if not error else "failed",
             "result": processed_result if not error else None,
             "error_message": error,
-            "source": "asr-service"
+            "source": "wav2vec2-service"
         }
         
         # Add small delay to ensure backend is ready (especially after long processing)
@@ -115,8 +115,8 @@ class CallbackService:
                 # Add retry-specific headers
                 headers = {
                     "Content-Type": "application/json",
-                    "User-Agent": "asr-service-callback/1.0",
-                    "X-Service-Source": "asr-service"
+                    "User-Agent": "wav2vec2-service-callback/1.0",
+                    "X-Service-Source": "wav2vec2-service"
                 }
                 
                 # Log payload size for debugging and check if too large
@@ -145,7 +145,7 @@ class CallbackService:
                             }
                         } if callback_data.get("result") else None,
                         "error_message": callback_data["error_message"],
-                        "source": "asr-service"
+                        "source": "wav2vec2-service"
                     }
                     response = await client.post(
                         f"{self.backend_url}/api/internal/transcription-callback",

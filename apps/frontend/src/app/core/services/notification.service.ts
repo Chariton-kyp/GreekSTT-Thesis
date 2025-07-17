@@ -17,9 +17,6 @@ export class NotificationService {
 
   constructor() {}
 
-  /**
-   * Show success notification
-   */
   success(message: string, detail?: string, options: NotificationOptions = {}): void {
     this.messageService.add({
       severity: 'success',
@@ -32,9 +29,6 @@ export class NotificationService {
     });
   }
 
-  /**
-   * Show error notification
-   */
   error(message: string, detail?: string, options: NotificationOptions = {}): void {
     this.messageService.add({
       severity: 'error',
@@ -47,9 +41,6 @@ export class NotificationService {
     });
   }
 
-  /**
-   * Show warning notification
-   */
   warning(message: string, detail?: string, options: NotificationOptions = {}): void {
     this.messageService.add({
       severity: 'warn',
@@ -62,9 +53,6 @@ export class NotificationService {
     });
   }
 
-  /**
-   * Show info notification
-   */
   info(message: string, detail?: string, options: NotificationOptions = {}): void {
     this.messageService.add({
       severity: 'info',
@@ -77,9 +65,6 @@ export class NotificationService {
     });
   }
 
-  /**
-   * Show custom notification
-   */
   custom(
     severity: 'success' | 'info' | 'warn' | 'error',
     message: string,
@@ -97,16 +82,10 @@ export class NotificationService {
     });
   }
 
-  /**
-   * Clear all notifications
-   */
   clear(key?: string): void {
     this.messageService.clear(key);
   }
 
-  /**
-   * Show authentication success message
-   */
   authSuccess(action: 'login' | 'register' | 'logout'): void {
     const messages = {
       login: 'Συνδεθήκατε επιτυχώς',
@@ -116,87 +95,51 @@ export class NotificationService {
     this.success(messages[action]);
   }
 
-  /**
-   * Show authentication error message
-   */
   authError(error: string): void {
     this.error('Σφάλμα ταυτοποίησης', error);
   }
 
-  /**
-   * Show file upload success message
-   */
   uploadSuccess(filename: string): void {
     this.success('Επιτυχής μεταφόρτωση', `Το αρχείο "${filename}" μεταφορτώθηκε επιτυχώς`);
   }
 
-  /**
-   * Show file upload error message
-   */
   uploadError(error: string): void {
     this.error('Σφάλμα μεταφόρτωσης', error);
   }
 
-  /**
-   * Show transcription completed message
-   */
   transcriptionCompleted(): void {
     this.success('Μεταγραφή ολοκληρώθηκε', 'Η μεταγραφή του αρχείου σας ολοκληρώθηκε επιτυχώς');
   }
 
-  /**
-   * Show transcription error message
-   */
   transcriptionError(error: string): void {
     this.error('Σφάλμα μεταγραφής', error);
   }
 
-  /**
-   * Show profile update success message
-   */
   profileUpdateSuccess(): void {
     this.success('Προφίλ ενημερώθηκε', 'Τα στοιχεία του προφίλ σας ενημερώθηκαν επιτυχώς');
   }
 
-  /**
-   * Show password change success message
-   */
   passwordChangeSuccess(): void {
     this.success('Κωδικός άλλαξε', 'Ο κωδικός σας άλλαξε επιτυχώς');
   }
 
-  /**
-   * Show network error message
-   */
   networkError(): void {
     this.error('Σφάλμα δικτύου', 'Παρουσιάστηκε πρόβλημα σύνδεσης. Παρακαλώ δοκιμάστε ξανά');
   }
 
-  /**
-   * Show validation error message
-   */
   validationError(errors: string[]): void {
     const detail = errors.join(', ');
     this.error('Σφάλμα επικύρωσης', detail);
   }
 
-  /**
-   * Show session expired message
-   */
   sessionExpired(): void {
     this.warning('Η συνεδρία έληξε', 'Παρακαλώ συνδεθείτε ξανά');
   }
 
-  /**
-   * Show maintenance mode message
-   */
   maintenanceMode(): void {
     this.info('Λειτουργία συντήρησης', 'Η υπηρεσία βρίσκεται σε λειτουργία συντήρησης');
   }
 
-  /**
-   * Alias methods for compatibility
-   */
   showSuccess(message: string, detail?: string, options?: NotificationOptions): void {
     this.success(message, detail, options);
   }

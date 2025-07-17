@@ -40,10 +40,8 @@ class CallbackService:
             logger.warning("No transcription_id provided for callback - skipping notification")
             return False
             
-        # Prepare callback data
         processed_result = result
         if result and not error:
-            # Reduce large segment arrays if necessary
             if "segments" in result and len(result["segments"]) > 200:
                 logger.info(f"Large segment count ({len(result['segments'])}), truncating for callback")
                 processed_result = result.copy()
@@ -56,19 +54,16 @@ class CallbackService:
             "status": "completed" if not error else "failed",
             "result": processed_result if not error else None,
             "error_message": error,
-            "source": "asr-service"
+            "source": "whisper-service"
         }
         
-        # Add small delay to ensure backend is ready
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.5)  # Brief delay to ensure backend readiness
         
-        # Pre-check: verify backend connectivity
         if await self.check_backend_health():
             logger.debug(f"Backend health check passed for transcription {transcription_id}")
         else:
             logger.warning(f"Backend health check failed for transcription {transcription_id} - will still attempt callback")
 
-        # Try to send callback with retries
         last_error = None
         for attempt in range(self.max_retries):
             try:
@@ -77,7 +72,6 @@ class CallbackService:
                     logger.info(f"Callback sent successfully for transcription {transcription_id} on attempt {attempt + 1}")
                     return True
                 
-                # Calculate exponential backoff delay
                 delay = self.base_delay * (2 ** attempt)
                 logger.info(f"Callback attempt {attempt + 1} failed, retrying in {delay}s...")
                 await asyncio.sleep(delay)
@@ -87,17 +81,15 @@ class CallbackService:
                 error_type = type(e).__name__
                 logger.warning(f"Callback attempt {attempt + 1}/{self.max_retries} failed ({error_type}): {e}")
                 
-                # Don't wait after the last attempt
                 if attempt < self.max_retries - 1:
                     delay = self.base_delay * (2 ** attempt)
                     logger.info(f"Retrying callback in {delay}s...")
                     await asyncio.sleep(delay)
         
-        # Log final failure
         if last_error:
-            logger.error(f"❌ Failed to send callback for transcription {transcription_id} after {self.max_retries} attempts. Last error: {type(last_error).__name__}: {last_error}")
+            logger.error(f"Failed to send callback for transcription {transcription_id} after {self.max_retries} attempts. Last error: {type(last_error).__name__}: {last_error}")
         else:
-            logger.error(f"❌ Failed to send callback for transcription {transcription_id} after {self.max_retries} attempts. All attempts returned failure status.")
+            logger.error(f"Failed to send callback for transcription {transcription_id} after {self.max_retries} attempts. All attempts returned failure status.")
         return False
     
     async def _send_callback(self, callback_data: Dict[str, Any]) -> bool:
@@ -115,8 +107,8 @@ class CallbackService:
                 # Add retry-specific headers
                 headers = {
                     "Content-Type": "application/json",
-                    "User-Agent": "asr-service-callback/1.0",
-                    "X-Service-Source": "asr-service"
+                    "User-Agent": "whisper-service-callback/1.0",
+                    "X-Service-Source": "whisper-service"
                 }
                 
                 # Log payload size for debugging and check if too large
@@ -145,7 +137,7 @@ class CallbackService:
                             }
                         } if callback_data.get("result") else None,
                         "error_message": callback_data["error_message"],
-                        "source": "asr-service"
+                        "source": "whisper-service"
                     }
                     response = await client.post(
                         f"{self.backend_url}/api/internal/transcription-callback",

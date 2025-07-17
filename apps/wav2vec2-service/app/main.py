@@ -1,33 +1,24 @@
 """
-ASR Service for GreekSTT Research Platform
-Handles Whisper and wav2vec2 models with transformers 4.36
+wav2vec2 ASR Service for GreekSTT Research Platform
+Handles wav2vec2 models with transformers 4.36
 """
 import logging
 import sys
 import os
 from contextlib import asynccontextmanager
 
-# Environment variables for model stability
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "0"
 os.environ["TRANSFORMERS_VERBOSITY"] = "error"
 os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "1"
-
-# CUDA optimizations
 os.environ["TORCH_CUDNN_V8_API_ENABLED"] = "1"
 
-# wav2vec2 service configuration
-import sys
-import os
 from pathlib import Path
-
-# CPU mode override
 if os.environ.get("FORCE_CPU_MODE", "false").lower() == "true":
     os.environ["CUDA_VISIBLE_DEVICES"] = ""
 else:
-
-# wav2vec2 configuration
+    pass  # CUDA environment already configured
 os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "max_split_size_mb:512,expandable_segments:True")
 os.environ.setdefault("TRANSFORMERS_CACHE", "/app/models/transformers_cache")
 os.environ.setdefault("WAV2VEC2_CACHE_DIR", "/app/models/wav2vec2")
@@ -67,13 +58,11 @@ async def lifespan(app: FastAPI):
     logger.info("Model: wav2vec2-large-xlsr-53-greek")
     logger.info("Library: transformers + PyTorch")
     
-    # Pre-download and initialize wav2vec2 model
     try:
         logger.info("Pre-downloading and initializing wav2vec2 Greek model...")
         from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
         import torch
         
-        # GPU availability check
         if torch.cuda.is_available():
             device = "cuda"
             logger.info(f"GPU detected: {torch.cuda.get_device_name(0)}")
@@ -81,13 +70,11 @@ async def lifespan(app: FastAPI):
             device = "cpu"
             logger.info("No GPU detected, using CPU")
         
-        # Initialize processor
         processor = Wav2Vec2Processor.from_pretrained(
             "lighteternal/wav2vec2-large-xlsr-53-greek",
             cache_dir="/app/models/wav2vec2"
         )
         
-        # Initialize model
         model = Wav2Vec2ForCTC.from_pretrained(
             "lighteternal/wav2vec2-large-xlsr-53-greek",
             cache_dir="/app/models/wav2vec2"
@@ -96,8 +83,6 @@ async def lifespan(app: FastAPI):
         logger.info(f"✅ wav2vec2 Greek model ready on {device.upper()}")
         logger.info(f"📊 Memory usage: {torch.cuda.memory_allocated() / 1024**3:.2f}GB" if device == "cuda" else "")
         
-        # Keep models loaded for immediate use
-        # Store in app state for reuse
         app.state.wav2vec2_processor = processor
         app.state.wav2vec2_model = model
         app.state.device = device
@@ -111,10 +96,9 @@ async def lifespan(app: FastAPI):
     
     yield
     
-    logger.info("🔄 Shutting down GreekSTT wav2vec2 Service")
+    logger.info("Shutting down GreekSTT wav2vec2 Service")
 
 
-# Create FastAPI app
 app = FastAPI(
     title="GreekSTT wav2vec2 Service",
     description="Academic wav2vec2 service for Greek language research",
@@ -124,7 +108,6 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -133,13 +116,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
 app.include_router(transcription_router)
 
 
 @app.get("/")
 async def root():
-    """Root endpoint"""
+    """Root endpoint - returns service information and available endpoints"""
     return JSONResponse(content={
         "service": "GreekSTT wav2vec2 Service",
         "version": "1.0.0-wav2vec2",
@@ -155,7 +137,7 @@ async def root():
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
-    """Global exception handler"""
+    """Global exception handler - catches and logs all unhandled exceptions"""
     logger.error(f"Unhandled exception: {exc}")
     return JSONResponse(
         status_code=500,
@@ -168,7 +150,7 @@ if __name__ == "__main__":
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",
-        port=8001,
+        port=8002,
         reload=True,
         log_level="info"
     )

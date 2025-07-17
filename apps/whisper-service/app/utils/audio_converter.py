@@ -26,7 +26,6 @@ class AudioConverter:
     def convert_to_wav(cls, video_path: str, target_sample_rate: int = 16000) -> str:
         """Convert video file to WAV format for ASR processing"""
         try:
-            # Create temporary WAV file
             temp_dir = tempfile.gettempdir()
             temp_wav = tempfile.NamedTemporaryFile(
                 suffix='.wav', 
@@ -41,7 +40,6 @@ class AudioConverter:
             
             logger.info(f"Converting {file_ext} to WAV: {file_size_mb:.1f}MB -> {temp_wav_path}")
             
-            # FFmpeg conversion to WAV format
             ffmpeg_cmd = [
                 'ffmpeg',
                 '-i', video_path,
@@ -116,7 +114,6 @@ class AudioConverter:
             Path to temporary WAV file
         """
         try:
-            # Create temporary WAV file
             temp_dir = tempfile.gettempdir()
             temp_wav = tempfile.NamedTemporaryFile(
                 suffix='.wav', 

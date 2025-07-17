@@ -24,7 +24,11 @@ class Wav2Vec2Model:
         self.model_name = "lighteternal/wav2vec2-large-xlsr-53-greek"
         
     def _get_device(self) -> str:
-        """Detect optimal device"""
+        """Detect optimal device for wav2vec2 processing
+        
+        Returns:
+            str: Device type - 'cuda' if available, 'cpu' otherwise
+        """
         if torch.cuda.is_available():
             logger.info("Using CUDA for wav2vec2")
             return "cuda"
@@ -33,7 +37,11 @@ class Wav2Vec2Model:
             return "cpu"
     
     async def load(self) -> None:
-        """Load wav2vec2 model"""
+        """Load wav2vec2 model and processor
+        
+        Raises:
+            Exception: If model loading fails
+        """
         try:
             import gc
             gc.collect()
@@ -52,17 +60,17 @@ class Wav2Vec2Model:
             if self.device == "cuda":
                 torch.cuda.empty_cache()
             
-            logger.info(f"✅ wav2vec2 loaded successfully on {self.device}")
+            logger.info(f"wav2vec2 loaded successfully on {self.device}")
             
         except Exception as e:
-            logger.error(f"❌ Failed to load wav2vec2: {e}")
+            logger.error(f"Failed to load wav2vec2: {e}")
             raise
     
     def unload(self) -> None:
         """Unload model with aggressive garbage collection"""
         try:
             if self.model is not None:
-                logger.info("🗑️ Unloading wav2vec2 model...")
+                logger.info("Unloading wav2vec2 model...")
                 del self.model
                 self.model = None
                 
@@ -268,7 +276,6 @@ class Wav2Vec2Model:
                     segments.append((current_start, i))
                     current_start = None
             except:
-                # Frame issue, continue
                 continue
         
         # Handle last segment

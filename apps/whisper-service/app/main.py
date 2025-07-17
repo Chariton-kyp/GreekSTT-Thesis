@@ -1,45 +1,32 @@
 """
-ASR Service for GreekSTT Research Platform
-Handles Whisper and wav2vec2 models with transformers 4.36
+Whisper Service for GreekSTT Research Platform
+Handles Whisper model with faster-whisper library
 """
 import logging
 import sys
 import os
 from contextlib import asynccontextmanager
 
-# Environment variables for model stability
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "0"
 os.environ["TRANSFORMERS_VERBOSITY"] = "error"
 os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "1"
-
-# CUDA optimizations
 os.environ["TORCH_CUDNN_V8_API_ENABLED"] = "1"
 
-# cuDNN library path fix
-import sys
-import os
 from pathlib import Path
-
-# ctranslate2 library path setup
 try:
     import ctranslate2
     ct2_path = Path(ctranslate2.__file__).parent / "libs"
     if ct2_path.exists():
-        # Add to LD_LIBRARY_PATH
         current_ld_path = os.environ.get("LD_LIBRARY_PATH", "")
         if str(ct2_path) not in current_ld_path:
             os.environ["LD_LIBRARY_PATH"] = f"{ct2_path}:{current_ld_path}" if current_ld_path else str(ct2_path)
 except ImportError:
     pass
 
-# CPU mode override
 if os.environ.get("FORCE_CPU_MODE", "false").lower() == "true":
     os.environ["CUDA_VISIBLE_DEVICES"] = ""
-else:
-
-# Whisper configuration
 os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "max_split_size_mb:512,expandable_segments:True")
 os.environ.setdefault("WHISPER_CACHE_DIR", "/app/models/whisper")
 os.environ.setdefault("HF_HOME", "/app/models")
@@ -84,7 +71,6 @@ async def lifespan(app: FastAPI):
         from faster_whisper import WhisperModel
         import torch
         
-        # GPU availability check
         if torch.cuda.is_available():
             device = "cuda"
             compute_type = "float16"
@@ -94,7 +80,6 @@ async def lifespan(app: FastAPI):
             compute_type = "int8"
             logger.info("No GPU detected, using CPU")
         
-        # Download and initialize model with optimal device
         model = WhisperModel(
             "large-v3", 
             device=device, 
@@ -103,24 +88,21 @@ async def lifespan(app: FastAPI):
             num_workers=1
         )
         
-        logger.info(f"✅ Whisper large-v3 model ready on {device.upper()}")
-        logger.info(f"📊 Memory usage: {torch.cuda.memory_allocated() / 1024**3:.2f}GB" if device == "cuda" else "")
+        logger.info(f"Whisper large-v3 model ready on {device.upper()}")
+        logger.info(f"Memory usage: {torch.cuda.memory_allocated() / 1024**3:.2f}GB" if device == "cuda" else "")
         
-        # Keep model loaded for immediate use
-        # Store in app state for reuse
         app.state.whisper_model = model
         
     except Exception as e:
-        logger.error(f"❌ Failed to initialize Whisper model: {e}")
-        logger.info("⚠️  Model will be loaded on first request")
+        logger.error(f"Failed to initialize Whisper model: {e}")
+        logger.info("Model will be loaded on first request")
         app.state.whisper_model = None
     
     yield
     
-    logger.info("🔄 Shutting down GreekSTT Whisper Service")
+    logger.info("Shutting down GreekSTT Whisper Service")
 
 
-# Create FastAPI app
 app = FastAPI(
     title="GreekSTT Whisper Service",
     description="Academic Whisper service for Greek language research",
@@ -130,7 +112,6 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -139,13 +120,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
 app.include_router(transcription_router)
 
 
 @app.get("/")
 async def root():
-    """Root endpoint"""
+    """Root endpoint - returns service information and available endpoints"""
     return JSONResponse(content={
         "service": "GreekSTT Whisper Service",
         "version": "1.0.0-whisper",
@@ -161,7 +141,7 @@ async def root():
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
-    """Global exception handler"""
+    """Global exception handler - catches and logs all unhandled exceptions"""
     logger.error(f"Unhandled exception: {exc}")
     return JSONResponse(
         status_code=500,

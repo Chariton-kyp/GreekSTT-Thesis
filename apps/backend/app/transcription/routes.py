@@ -23,21 +23,18 @@ transcription_service = TranscriptionService()
 @jwt_required()
 @log_business_operation('get_user_transcriptions')
 def get_user_transcriptions():
-    """Get all transcriptions for the current user with optional date filtering."""
     try:
         user_id = get_jwt_identity()
         
-        # Support both pagination styles
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', request.args.get('limit', 20), type=int)
         status = request.args.get('status')
         sort = request.args.get('sort', 'created_at')
         order = request.args.get('order', 'desc')
         
-        # Date range filtering (dates in YYYY-MM-DD format from frontend)
-        start_date = request.args.get('start_date')  # Frontend sends local date as YYYY-MM-DD
-        end_date = request.args.get('end_date')      # Frontend sends local date as YYYY-MM-DD
-        search = request.args.get('search')          # Text search in title/description
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        search = request.args.get('search')
         
         transcriptions, pagination = transcription_service.get_user_transcriptions(
             user_id, page, per_page, status, sort, order, start_date, end_date, search
@@ -48,7 +45,7 @@ def get_user_transcriptions():
             data={
                 'transcriptions': [t.to_dict() for t in transcriptions],
                 'pagination': pagination,
-                'academic_mode': True  # Always in academic research mode
+                'academic_mode': True
             }
         )
         
@@ -65,7 +62,6 @@ def get_user_transcriptions():
 @jwt_required()
 @log_business_operation('get_transcription')
 def get_transcription(transcription_id):
-    """Get a specific transcription."""
     try:
         user_id = get_jwt_identity()
         transcription = transcription_service.get_transcription(transcription_id, user_id)
@@ -77,19 +73,17 @@ def get_transcription(transcription_id):
                 status_code=404
             )
         
-        # Get segments if requested
         include_segments = request.args.get('include_segments', 'false').lower() == 'true'
         
         result = transcription.to_dict()
         if include_segments:
-            # Segments are now automatically ordered by start_time via relationship
             result['segments'] = [s.to_dict() for s in transcription.segments]
         
         return success_response(
             message_key='OPERATION_SUCCESSFUL',
             data={
                 'transcription': result,
-                'academic_mode': True  # Always in academic research mode
+                'academic_mode': True
             }
         )
         
@@ -106,10 +100,9 @@ def get_transcription(transcription_id):
 @jwt_required()
 @log_business_operation('download_transcription')
 def download_transcription(transcription_id):
-    """Download transcription in various formats."""
     try:
         user_id = get_jwt_identity()
-        format_type = request.args.get('format', 'txt')  # txt, docx, pdf, srt
+        format_type = request.args.get('format', 'txt')
         
         file_data, filename, mimetype = transcription_service.export_transcription(
             transcription_id, user_id, format_type
@@ -152,7 +145,6 @@ def download_transcription(transcription_id):
 @validate_request(UpdateTranscriptionTextSchema)
 @log_business_operation('update_transcription')
 def update_transcription(transcription_id, validated_data):
-    """Update transcription text (manual corrections)."""
     try:
         user_id = get_jwt_identity()
         
@@ -185,7 +177,6 @@ def update_transcription(transcription_id, validated_data):
 @jwt_required()
 @log_business_operation('delete_transcription')
 def delete_transcription(transcription_id):
-    """Delete a transcription."""
     try:
         user_id = get_jwt_identity()
         
@@ -217,10 +208,8 @@ def retry_transcription(transcription_id):
     try:
         user_id = get_jwt_identity()
         
-        # Academic Mode: Always allow retry for research purposes
         current_app.logger.info("Academic mode - unlimited retry access granted for research")
         
-        # Academic validation: Ensure transcription exists and belongs to user
         transcription = transcription_service.get_transcription(transcription_id, user_id)
         if transcription and transcription.audio_file:
             current_app.logger.info(f"Academic retry: processing {transcription.audio_file.duration_seconds}s audio")
@@ -238,7 +227,7 @@ def retry_transcription(transcription_id):
             message_key='TRANSCRIPTION_RETRY_STARTED',
             data={
                 'transcription': transcription.to_dict(),
-                'academic_mode': True  # Always in academic research mode
+                'academic_mode': True
             }
         )
         
@@ -275,7 +264,6 @@ def generate_summary(transcription_id):
                 status_code=400
             )
         
-        # Generate summary using AI service
         summary = transcription_service.generate_ai_summary(transcription_id, user_id)
         
         if not summary:
@@ -316,7 +304,6 @@ def get_transcription_segments(transcription_id):
                 status_code=404
             )
         
-        # Ensure segments are ordered by start_time (should be automatic now with relationship order_by)
         segments = [s.to_dict() for s in transcription.segments]
         
         return success_response(
@@ -359,7 +346,6 @@ def update_segment(transcription_id, segment_index):
                 status_code=404
             )
         
-        # Update segment
         success = transcription_service.update_segment(
             transcription_id, segment_index, data['text'], user_id
         )
@@ -411,11 +397,9 @@ def validate_url():
         
         logger.info(f"URL validation request | user_id={user_id} | url={url}")
         
-        # Import URL service
         from app.transcription.url_service import URLProcessingService
         url_service = URLProcessingService()
         
-        # Check if URL is from a supported platform
         if not url_service.is_supported_url(url):
             return error_response(
                 message='Unsupported video platform. Supported platforms: YouTube, Vimeo',
@@ -423,7 +407,6 @@ def validate_url():
                 status_code=400
             )
         
-        # Extract metadata
         try:
             metadata = url_service.extract_metadata(url)
             
@@ -464,7 +447,6 @@ def transcribe_from_url():
         user_id = get_jwt_identity()
         data = request.get_json()
         
-        # Validate required fields
         required_fields = ['url', 'title', 'language']
         for field in required_fields:
             if not data.get(field):
@@ -480,7 +462,6 @@ def transcribe_from_url():
         language = data.get('language', 'el')
         ai_model = data.get('ai_model', 'whisper-large-v3')
         
-        # Validate fields
         if len(title) < 3:
             return error_response(
                 message='Title must be at least 3 characters long',
@@ -509,7 +490,6 @@ def transcribe_from_url():
                 status_code=400
             )
         
-        # Use same validation as upload routes for consistency
         valid_models = ['whisper', 'wav2vec2', 'both', 'whisper-large-v3', 'whisper-medium', 'wav2vec2-greek', 'compare']
         if ai_model not in valid_models:
             return error_response(
@@ -518,7 +498,6 @@ def transcribe_from_url():
                 status_code=400
             )
         
-        # Normalize legacy model names to simplified versions (same as upload routes)
         if ai_model in ['whisper-large-v3', 'whisper-medium']:
             ai_model = 'whisper'
         elif ai_model == 'wav2vec2-greek':
@@ -528,14 +507,12 @@ def transcribe_from_url():
         
         logger.info(f"URL transcription request | user_id={user_id} | url={url} | title={title} | language={language} | ai_model={ai_model}")
         
-        # Import services
         from app.transcription.url_service import URLProcessingService
         from app.audio.services import AudioService
         
         url_service = URLProcessingService()
         audio_service = AudioService()
         
-        # Check if URL is supported
         if not url_service.is_supported_url(url):
             return error_response(
                 message='Unsupported video platform',
@@ -543,7 +520,6 @@ def transcribe_from_url():
                 status_code=400
             )
         
-        # Extract metadata first to validate URL
         try:
             metadata = url_service.extract_metadata(url)
             logger.info(f"URL metadata extracted | duration={metadata['duration_string']} | platform={metadata['platform']}")
@@ -554,19 +530,15 @@ def transcribe_from_url():
                 status_code=400
             )
         
-        # Academic Mode: Unlimited URL transcription access for research purposes
         current_app.logger.info("Academic mode enabled - unlimited URL transcription access for research")
         
-        # Academic logging: Record URL processing details for research tracking
-        duration = metadata.get('duration', 60)  # Default to 1 minute if unknown
+        duration = metadata.get('duration', 60)
         current_app.logger.info(f"Academic URL processing: {duration}s duration content from {metadata.get('platform', 'unknown')} platform")
         
-        # Download audio in background
         try:
             logger.info(f"Starting audio download from URL | user_id={user_id}")
             audio_file_path = url_service.download_audio(url, user_id, title)
             
-            # Save audio file to the system
             audio_file = audio_service.save_audio_from_path(
                 file_path=audio_file_path,
                 original_filename=f"{title}.mp3",
@@ -577,7 +549,6 @@ def transcribe_from_url():
             
             logger.info(f"Audio file saved | user_id={user_id} | audio_file_id={audio_file.id} | duration={audio_file.duration_seconds}s")
             
-            # Clean up temporary file
             url_service.cleanup_temp_file(audio_file_path)
             
         except Exception as e:
@@ -588,7 +559,6 @@ def transcribe_from_url():
                 status_code=500
             )
         
-        # Create transcription job (academic version - no template support)
         try:
             transcription = transcription_service.create_transcription_with_metadata(
                 audio_file_id=audio_file.id,
@@ -607,7 +577,7 @@ def transcribe_from_url():
                     'transcription': transcription.to_dict(),
                     'audio_file': audio_file.to_dict(),
                     'source_metadata': metadata,
-                    'academic_mode': True  # Always in academic research mode
+                    'academic_mode': True
                 },
                 status_code=201
             )
@@ -630,7 +600,6 @@ def transcribe_from_url():
 
 
 # =============================================================================
-# WER/CER EVALUATION ENDPOINTS
 # =============================================================================
 
 @transcription_bp.route('/<int:transcription_id>/evaluate', methods=['POST'])
@@ -659,7 +628,6 @@ def evaluate_transcription(transcription_id):
                 status_code=400
             )
         
-        # Get transcription
         transcription = transcription_service.get_transcription(transcription_id, user_id)
         if not transcription:
             return error_response(
@@ -668,7 +636,6 @@ def evaluate_transcription(transcription_id):
                 status_code=404
             )
         
-        # Perform evaluation
         evaluation_results = transcription.evaluate_with_ground_truth(
             ground_truth=ground_truth,
             user_id=user_id,
@@ -702,7 +669,6 @@ def get_transcription_wer_cer(transcription_id):
     try:
         user_id = get_jwt_identity()
         
-        # Get transcription
         transcription = transcription_service.get_transcription(transcription_id, user_id)
         if not transcription:
             return error_response(
@@ -711,36 +677,30 @@ def get_transcription_wer_cer(transcription_id):
                 status_code=404
             )
         
-        # Return enhanced evaluation data with all detailed metrics
         evaluation_data = {
             'has_evaluation': transcription.evaluation_completed,
             'ground_truth_text': transcription.ground_truth_text,
             
-            # Basic WER/CER metrics
             'whisper_wer': transcription.whisper_wer,
             'whisper_cer': transcription.whisper_cer,
             'wav2vec_wer': transcription.wav2vec_wer,
             'wav2vec_cer': transcription.wav2vec_cer,
             
-            # Academic analysis
             'academic_accuracy_score': transcription.academic_accuracy_score,
             'best_performing_model': transcription.best_performing_model,
             'evaluation_date': transcription.evaluation_date.isoformat() if transcription.evaluation_date else None,
             'evaluation_notes': transcription.evaluation_notes,
             
-            # Pre-calculated accuracy scores (calculated in backend during evaluation)
             'whisper_accuracy': transcription.whisper_accuracy,
             'wav2vec_accuracy': transcription.wav2vec_accuracy,
             'whisper_char_accuracy': transcription.whisper_char_accuracy,
             'wav2vec_char_accuracy': transcription.wav2vec_char_accuracy,
             
-            # Greek-specific accuracy metrics
             'whisper_diacritic_accuracy': transcription.whisper_diacritic_accuracy,
             'wav2vec_diacritic_accuracy': transcription.wav2vec_diacritic_accuracy,
             'whisper_greek_char_accuracy': transcription.whisper_greek_char_accuracy,
             'wav2vec_greek_char_accuracy': transcription.wav2vec_greek_char_accuracy,
             
-            # Detailed error analysis
             'whisper_substitutions': transcription.whisper_substitutions,
             'whisper_deletions': transcription.whisper_deletions,
             'whisper_insertions': transcription.whisper_insertions,

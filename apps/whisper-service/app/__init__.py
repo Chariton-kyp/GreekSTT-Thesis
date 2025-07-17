@@ -1,1 +1,1 @@
-# ASR Service for GreekSTT Research Platform
+"""ASR Service for GreekSTT Research Platform"""

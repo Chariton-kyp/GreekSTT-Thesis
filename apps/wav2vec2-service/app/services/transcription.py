@@ -19,7 +19,6 @@ class Wav2Vec2Service:
         logger.info("wav2vec2 Service initialized - model will load on demand")
 
 
-# Global service instance
 _wav2vec2_service = None
 
 

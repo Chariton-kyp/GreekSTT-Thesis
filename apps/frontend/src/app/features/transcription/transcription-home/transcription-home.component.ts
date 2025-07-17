@@ -121,7 +121,7 @@ type TranscriptionMethod = 'upload' | 'url' | 'record' | null;
 export class TranscriptionHomeComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private transcriptionService = inject(TranscriptionService);
-  protected authService = inject(AuthService); // Protected so template can access isEmailVerified()
+  protected authService = inject(AuthService);
   private notificationService = inject(NotificationService);
   private messageService = inject(MessageService);
   private apiService = inject(ApiService);
@@ -305,16 +305,13 @@ export class TranscriptionHomeComponent implements OnInit, OnDestroy {
       clearInterval(this.recordingTimer);
     }
     
-    // Clean up audio visualization
     if (this.visualizationAnimationId) {
       cancelAnimationFrame(this.visualizationAnimationId);
     }
     
-    // Clean up audio progress tracking
     this.stopSmoothProgressTracking();
     this.stopSimulatedProgress();
     
-    // Clean up debounce timer
     if (this.filterDebounceTimer) {
       clearTimeout(this.filterDebounceTimer);
     }
@@ -323,23 +320,17 @@ export class TranscriptionHomeComponent implements OnInit, OnDestroy {
     this.wsSubscriptions.forEach(sub => sub.unsubscribe());
     this.wsSubscriptions = [];
     
-    // Clean up blob URL to prevent memory leaks
     const audioUrl = this.recordedAudio();
     if (audioUrl) {
       URL.revokeObjectURL(audioUrl);
     }
     
-    // Clean up auto-refresh
-    // Clean up WebSocket subscriptions
     this.wsSubscriptions.forEach(sub => sub.unsubscribe());
     this.wsSubscriptions = [];
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  // Email verification is now handled reactively in the constructor with effect()
-
-  // Enhanced File Upload Section Methods
   onDragEnter(event: DragEvent) {
     event.preventDefault();
     event.stopPropagation();
@@ -354,7 +345,6 @@ export class TranscriptionHomeComponent implements OnInit, OnDestroy {
     event.preventDefault();
     event.stopPropagation();
     
-    // Visual feedback based on file type
     const items = event.dataTransfer?.items;
     if (items && items.length > 0) {
       const item = items[0];
@@ -387,13 +377,11 @@ export class TranscriptionHomeComponent implements OnInit, OnDestroy {
 
   private isValidFileType(mimeType: string): boolean {
     const validTypes = [
-      // Audio formats
       'audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/x-wav', 'audio/wave',
       'audio/x-m4a', 'audio/m4a', 'audio/mp4', 'audio/x-mp4', 'audio/mp4a-latm',
       'audio/flac', 'audio/x-flac', 'audio/ogg', 'audio/webm',
       'audio/x-ms-wma', 'audio/wma', 'audio/aac', 'audio/x-aac', 'audio/aacp',
       'audio/opus', 'audio/x-opus',
-      // Video formats (for audio extraction)
       'video/mp4', 'video/mpeg', 'video/quicktime', 'video/x-msvideo',
       'video/x-matroska', 'video/mkv', 'video/x-ms-wmv', 'video/wmv', 'video/webm'
     ];
@@ -416,10 +404,8 @@ export class TranscriptionHomeComponent implements OnInit, OnDestroy {
       extension: file.name.split('.').pop()?.toLowerCase()
     });
 
-    // Clear previous validation error
     this.fileValidationError.set(null);
 
-    // Enhanced file validation
     const validationResult = this.validateFile(file);
     console.log('Validation result:', validationResult);
     
@@ -449,7 +435,6 @@ export class TranscriptionHomeComponent implements OnInit, OnDestroy {
       isValid: isValidExt 
     });
     
-    // Check file type (OR logic - either MIME type OR extension must be valid)
     if (!isValidMimeType && !isValidExt) {
       console.log('❌ Both MIME type and extension validation failed');
       return {
@@ -458,7 +443,6 @@ export class TranscriptionHomeComponent implements OnInit, OnDestroy {
       };
     }
 
-    // Check file size with progressive warnings
     if (file.size > this.maxFileSize) {
       return {
         isValid: false,
@@ -466,12 +450,10 @@ export class TranscriptionHomeComponent implements OnInit, OnDestroy {
       };
     }
 
-    // Warn for large files (>1GB)
     if (file.size > 1024 * 1024 * 1024) {
       this.notificationService.warning('Μεγάλο αρχείο - η επεξεργασία μπορεί να διαρκέσει περισσότερο');
     }
 
-    // Check for very small files
     if (file.size < 1024) {
       return {
         isValid: false,
@@ -483,7 +465,6 @@ export class TranscriptionHomeComponent implements OnInit, OnDestroy {
   }
 
   private showFilePreview(file: File) {
-    // Show file details for user confirmation
     this.notificationService.info(
       `Αρχείο επιλέχθηκε: ${file.name} (${this.formatFileSize(file.size)})`
     );

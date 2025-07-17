@@ -1,16 +1,16 @@
 """
-Configuration for GreekSTT ASR Service
-Settings for Whisper + wav2vec2 transcription
+Configuration for GreekSTT Whisper Service
+Settings for Whisper transcription service
 """
 import os
 
 
 class Config:
-    """Configuration class for ASR service"""
+    """Configuration class for Whisper service"""
     
     # App info
-    APP_TITLE = "GreekSTT ASR Service"
-    APP_DESCRIPTION = "Academic ASR service for Whisper and wav2vec2 models"
+    APP_TITLE = "GreekSTT Whisper Service"
+    APP_DESCRIPTION = "Academic ASR service for Whisper model"
     APP_VERSION = "1.0.0-academic"
     
     # API
@@ -26,7 +26,6 @@ class Config:
     
     # Models
     WHISPER_MODEL = "large-v3"
-    WAV2VEC2_MODEL = "lighteternal/wav2vec2-large-xlsr-53-greek"
     
     # Language
     LANGUAGE = "el"
@@ -42,5 +41,4 @@ class Config:
     ACADEMIC_MODE = True
 
 
-# Global config instance
 config = Config()

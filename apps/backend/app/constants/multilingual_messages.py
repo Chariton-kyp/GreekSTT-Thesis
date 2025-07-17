@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Multilingual message system for GreekSTT Research Platform
 Supports Greek (default) and English languages

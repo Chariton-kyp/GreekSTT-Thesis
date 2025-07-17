@@ -1,4 +1,4 @@
-"""GPU memory monitoring utilities for ASR service"""
+"""GPU memory monitoring utilities for wav2vec2 service"""
 import torch
 import logging
 from typing import Dict, Any

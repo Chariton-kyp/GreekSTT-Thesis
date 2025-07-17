@@ -1,18 +1,9 @@
 """
 Clean Audio Converter for Video Containers
-Converts video files to WAV format optimized for faster-whisper processing
+Converts video files to WAV format optimized for wav2vec2 processing
 
-DESIGN PHILOSOPHY:
-- Clean, minimal conversion to avoid artifacts
-- No aggressive filtering that might degrade speech quality
-- 16kHz mono PCM 16-bit WAV format (optimal for faster-whisper)
-- Preserves original audio quality for best ASR results
-
-RATIONALE:
-- faster-whisper performs its own internal preprocessing
-- Aggressive filtering (highpass/lowpass) can remove important speech features
-- Volume normalization can create artifacts
-- Simple format conversion produces the best transcription quality
+Clean, minimal conversion optimized for ASR processing.
+Uses 16kHz mono PCM format to preserve speech quality.
 """
 import logging
 import tempfile
@@ -37,10 +28,10 @@ class AudioConverter:
     @classmethod
     def convert_to_wav(cls, video_path: str, target_sample_rate: int = 16000) -> str:
         """
-        Convert video file to clean WAV file for faster-whisper processing
+        Convert video file to clean WAV file for wav2vec2 processing
         
         Clean conversion approach:
-        - 16kHz sample rate (optimal for faster-whisper)
+        - 16kHz sample rate (optimal for wav2vec2)
         - Mono channel conversion (better for ASR)
         - PCM 16-bit format for maximum compatibility
         - NO aggressive filtering to preserve speech quality
@@ -51,7 +42,7 @@ class AudioConverter:
             target_sample_rate: Target sample rate (default: 16000 for optimal ASR)
             
         Returns:
-            Path to temporary clean WAV file optimized for faster-whisper
+            Path to temporary clean WAV file optimized for wav2vec2
             
         Raises:
             RuntimeError: If conversion fails
@@ -70,8 +61,8 @@ class AudioConverter:
             file_ext = Path(video_path).suffix.lower()
             file_size_mb = os.path.getsize(video_path) / (1024 * 1024)
             
-            logger.info(f"🎬 Converting {file_ext} to clean WAV for faster-whisper: {file_size_mb:.1f}MB → {temp_wav_path}")
-            logger.info(f"🔧 Clean conversion: 16kHz mono PCM 16-bit, no aggressive filtering")
+            logger.info(f"Converting {file_ext} to clean WAV for wav2vec2: {file_size_mb:.1f}MB → {temp_wav_path}")
+            logger.info(f"Clean conversion: 16kHz mono PCM 16-bit, no aggressive filtering")
             
             # Clean FFmpeg conversion to WAV - no filtering for better transcription quality
             ffmpeg_cmd = [
@@ -119,9 +110,9 @@ class AudioConverter:
             # Get actual audio duration from converted file
             actual_duration, actual_sample_rate = get_audio_info(temp_wav_path)
             
-            logger.info(f"✅ Clean audio conversion successful: {output_size_mb:.1f}MB WAV file created")
-            logger.info(f"📊 Audio specs: 16kHz mono, PCM 16-bit, optimal for faster-whisper")
-            logger.info(f"⏱️ Actual audio duration: {actual_duration:.2f}s ({actual_duration/60:.1f}min)")
+            logger.info(f"Clean audio conversion successful: {output_size_mb:.1f}MB WAV file created")
+            logger.info(f"Audio specs: 16kHz mono, PCM 16-bit, optimal for wav2vec2")
+            logger.info(f"Actual audio duration: {actual_duration:.2f}s ({actual_duration/60:.1f}min)")
             
             return temp_wav_path
             

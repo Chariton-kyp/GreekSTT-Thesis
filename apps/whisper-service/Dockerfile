@@ -1,5 +1,5 @@
 # GreekSTT Academic Research Platform - Whisper Service
-# Handles only Whisper model with transformers 4.36
+# Handles only Whisper model with faster-whisper library
 
 # Use CUDA 12.1 with cuDNN 8 base, then upgrade cuDNN via pip packages
 FROM nvidia/cuda:12.1.1-cudnn8-devel-ubuntu22.04 AS base

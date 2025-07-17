@@ -32,7 +32,4 @@ scikit-learn>=1.3.0
 loguru==0.7.2
 nltk>=3.9.1
 
-# Remove faster-whisper dependencies (not needed for wav2vec2)
-# Remove ctranslate2 (not needed for wav2vec2)
-# Remove onnxruntime-gpu (not needed for wav2vec2)
 # Remove matplotlib (not needed for inference)

@@ -31,24 +31,19 @@ export class TranscriptionService {
   private readonly notificationService = inject(NotificationService);
   private readonly wsService = inject(WebSocketService);
 
-  // Subscription cleanup management
   private transcriptionSubscriptions = new Map<string, Subject<void>>();
-
-  // State signals
   private readonly _transcriptions = signal<Transcription[]>([]);
   private readonly _currentTranscription = signal<Transcription | null>(null);
   private readonly _isLoading = signal<boolean>(false);
   private readonly _uploadProgress = signal<UploadProgress | null>(null);
   private readonly _paginationTotal = signal<number>(0);
 
-  // Public readonly signals
   readonly transcriptions = this._transcriptions.asReadonly();
   readonly currentTranscription = this._currentTranscription.asReadonly();
   readonly isLoading = this._isLoading.asReadonly();
   readonly uploadProgress = this._uploadProgress.asReadonly();
   readonly paginationTotal = this._paginationTotal.asReadonly();
 
-  // Computed signals
   readonly totalTranscriptions = computed(() => this.transcriptions()?.length || 0);
   readonly completedTranscriptions = computed(() => 
     this.transcriptions()?.filter(t => t.status === TranscriptionStatus.COMPLETED).length || 0
@@ -57,7 +52,6 @@ export class TranscriptionService {
     this.transcriptions()?.filter(t => t.status === TranscriptionStatus.PROCESSING).length || 0
   );
 
-  // Polling subjects for real-time updates
   private pollingSubject = new BehaviorSubject<boolean>(false);
 
   /**
@@ -70,7 +64,6 @@ export class TranscriptionService {
     
     return this.apiService.get<TranscriptionListResponse>('/transcriptions', { params }).pipe(
       tap(response => {
-        // Backend returns { data: { transcriptions: [...], pagination: {...} } }
         const data = response.data || response;
         const transcriptions = data.transcriptions || data || [];
         const pagination = data.pagination || {};
@@ -78,7 +71,7 @@ export class TranscriptionService {
         this._paginationTotal.set(pagination.total || 0);
         this._isLoading.set(false);
       }),
-      map(response => response), // Return the full response for pagination data
+      map(response => response),
       catchError(error => {
         this._isLoading.set(false);
         this._transcriptions.set([]);
@@ -121,7 +114,7 @@ export class TranscriptionService {
     if (fileOrFormData instanceof FormData) {
       // New unified interface: uploadAndTranscribe(formData, progressCallback?)
       formData = fileOrFormData;
-      fileName = 'file'; // Default name when using FormData directly
+      fileName = 'file';
       progressCallback = transcriptionRequestOrProgressCallback as ((progress: UploadProgress) => void) | undefined;
       
       // Try to extract filename from FormData if possible
@@ -145,7 +138,6 @@ export class TranscriptionService {
       formData.append('ai_model', transcriptionRequest.ai_model);
     }
 
-    // Reset upload progress
     const initialProgress: UploadProgress = {
       fileName,
       progress: 0,
@@ -235,8 +227,8 @@ export class TranscriptionService {
       description: params.description || '',
       language: params.language,
       template_id: params.template_id?.toString() || '',
-      ai_model: params.ai_model || params.model || 'whisper-large-v3', // Use proper backend model name
-      model: params.model || params.ai_model || 'whisper-large-v3',     // Use proper backend model name
+      ai_model: params.ai_model || params.model || 'whisper-large-v3',
+      model: params.model || params.ai_model || 'whisper-large-v3',
       enable_comparison: params.enable_comparison || false
     };
 
@@ -430,9 +422,6 @@ export class TranscriptionService {
     );
   }
 
-  /**
-   * Create share link for transcription
-   */
   createShareLink(transcriptionId: string): Observable<{ link: string; expiresAt: string }> {
     return this.apiService.post<{ link: string; expiresAt: string }>(`/transcriptions/${transcriptionId}/share`, {}).pipe(
       catchError(error => {
@@ -454,7 +443,6 @@ export class TranscriptionService {
     const destroy$ = new Subject<void>();
     this.transcriptionSubscriptions.set(transcriptionId, destroy$);
 
-    console.log(`🚀 Starting WebSocket tracking for transcription: ${transcriptionId}`);
 
     // Ensure WebSocket is connected
     if (!this.wsService.getConnectionStatus()) {
@@ -465,7 +453,6 @@ export class TranscriptionService {
     this.wsService.getErrorEvents(transcriptionId).pipe(
       takeUntil(destroy$),
       tap(error => {
-        console.error(`🔥 WebSocket Error received for ${transcriptionId}:`, error);
         this._uploadProgress.set({
           fileName: this._uploadProgress()?.fileName || '',
           progress: 0,
@@ -480,18 +467,16 @@ export class TranscriptionService {
         this.cleanupTranscriptionSubscriptions(transcriptionId);
       })
     ).subscribe({
-      error: (err) => console.error(`❌ Error in error subscription for ${transcriptionId}:`, err)
+      error: (err) => {}
     });
 
     // Join transcription room for real-time updates
     this.wsService.joinTranscriptionRoom(transcriptionId).then(() => {
-      console.log(`✅ Joined transcription room: ${transcriptionId}`);
       
       // Subscribe to progress updates
       this.wsService.getProgressUpdates(transcriptionId).pipe(
         takeUntil(destroy$),
         tap(progress => {
-          console.log(`📊 Progress update for ${transcriptionId}: ${progress.stage} - ${progress.percentage}%`);
           this._uploadProgress.set({
             fileName: this._uploadProgress()?.fileName || '',
             progress: progress.percentage,
@@ -500,14 +485,13 @@ export class TranscriptionService {
           });
         })
       ).subscribe({
-        error: (err) => console.error(`❌ Error in progress subscription for ${transcriptionId}:`, err)
+        error: (err) => {}
       });
 
       // Subscribe to completion events
       this.wsService.getCompletionEvents(transcriptionId).pipe(
         takeUntil(destroy$),
         tap(completion => {
-          console.log(`✅ Transcription completed: ${transcriptionId}`);
           this._uploadProgress.set({
             fileName: this._uploadProgress()?.fileName || '',
             progress: 100,
@@ -522,11 +506,10 @@ export class TranscriptionService {
           this.cleanupTranscriptionSubscriptions(transcriptionId);
         })
       ).subscribe({
-        error: (err) => console.error(`❌ Error in completion subscription for ${transcriptionId}:`, err)
+        error: (err) => {}
       });
       
     }).catch(error => {
-      console.warn(`❌ Failed to join transcription room for ${transcriptionId}, falling back to polling:`, error);
       this.startPollingForTranscription(transcriptionId);
     });
   }
@@ -537,7 +520,6 @@ export class TranscriptionService {
   private cleanupTranscriptionSubscriptions(transcriptionId: string): void {
     const destroy$ = this.transcriptionSubscriptions.get(transcriptionId);
     if (destroy$) {
-      console.log(`🧹 Cleaning up subscriptions for transcription: ${transcriptionId}`);
       destroy$.next();
       destroy$.complete();
       this.transcriptionSubscriptions.delete(transcriptionId);
@@ -639,7 +621,7 @@ export class TranscriptionService {
    * Validate file for upload
    */
   validateFile(file: File): { valid: boolean; error?: string } {
-    const maxSize = 8 * 1024 * 1024 * 1024; // 8GB for large files
+    const maxSize = 8 * 1024 * 1024 * 1024;
 
     if (file.size > maxSize) {
       return { valid: false, error: 'Το αρχείο είναι πολύ μεγάλο. Μέγιστο μέγεθος: 8GB' };
@@ -744,9 +726,6 @@ export class TranscriptionService {
     return response;
   }
 
-  /**
-   * Create share link for transcription
-   */
   async shareTranscription(id: string, options?: {
     expiresInDays?: number;
     allowDownload?: boolean;
@@ -880,7 +859,6 @@ export class TranscriptionService {
     }).pipe(
       tap((response: any) => {
         try {
-          console.log('Evaluate response in service:', response);
           
           // Update current transcription if it matches - handle direct response format
           const current = this._currentTranscription();
@@ -902,7 +880,6 @@ export class TranscriptionService {
             }
           }
         } catch (error) {
-          console.warn('Error updating transcription state after evaluation:', error);
           // Don't throw - let the response continue to the component
         }
       })

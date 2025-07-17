@@ -9,7 +9,6 @@ from flask_caching import Cache
 from flask_mail import Mail
 from flask_restx import Api
 from flask_socketio import SocketIO
-# from celery import Celery  # Removed for academic demo
 
 # Initialize extensions
 db = SQLAlchemy()
@@ -65,5 +64,3 @@ cache = Cache(config={
 })
 
 
-# Celery configuration removed for academic demo
-# Background tasks will be handled manually or via cron jobs

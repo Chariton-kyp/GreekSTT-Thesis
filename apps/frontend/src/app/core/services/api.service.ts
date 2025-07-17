@@ -38,7 +38,7 @@ export class ApiService {
   private readonly storage = inject(StorageService);
   
   private readonly baseUrl = environment.apiUrl;
-  private readonly defaultTimeout = 30000; // 30 seconds
+  private readonly defaultTimeout = 30000;
 
   get<T>(endpoint: string, options: ApiOptions = {}): Observable<T> {
     return this.request<T>('GET', endpoint, null, options);
@@ -71,7 +71,6 @@ export class ApiService {
                 message_type: 'success'
               });
             } else if (this.isUnifiedResponse(response)) {
-              console.log('🎉 SUCCESS RESPONSE:', response);
               this.messageService.showSuccess(response);
             }
           }
@@ -126,14 +125,10 @@ export class ApiService {
       observe: 'events' as const
     };
 
-    console.log('API Service: Making upload request to:', url);
-    console.log('API Service: Request options:', requestOptions);
-    console.log('API Service: FormData entries count:', Array.from(formData.entries()).length);
 
     return this.http.post<T>(url, formData, requestOptions).pipe(
       timeout(options.timeout || 300000),
       tap((event: any) => {
-        console.log('API Service: HTTP event received:', event.type, event);
         if (event.type === 4 && !options.silentRequest) {
           if (this.shouldShowSuccessMessage(options) && this.isUnifiedResponse(event.body)) {
             this.messageService.showSuccess(event.body);
@@ -141,10 +136,6 @@ export class ApiService {
         }
       }),
       catchError((error) => {
-        console.error('API Service: Upload error caught:', error);
-        console.error('API Service: Error status:', error.status);
-        console.error('API Service: Error name:', error.name);
-        console.error('API Service: Error message:', error.message);
         return this.handleError(error, options);
       })
     );

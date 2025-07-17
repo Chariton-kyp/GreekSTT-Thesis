@@ -25,7 +25,18 @@ router = APIRouter(prefix="/api/v1", tags=["wav2vec2 Transcription"])
 
 
 async def transcribe_with_wav2vec2(processor, model, device: str, audio_path: str, filename: str) -> Dict[str, Any]:
-    """Transcribe audio with wav2vec2 model using VAD-based intelligent chunking (consistent with original asr-service)"""
+    """Transcribe audio with wav2vec2 model using VAD-based intelligent chunking
+    
+    Args:
+        processor: wav2vec2 processor instance
+        model: wav2vec2 model instance
+        device: Target device (cuda/cpu)
+        audio_path: Path to audio file
+        filename: Original filename for result metadata
+        
+    Returns:
+        Dict containing transcription results and metadata
+    """
     import time
     import librosa
     import torch
@@ -34,69 +45,65 @@ async def transcribe_with_wav2vec2(processor, model, device: str, audio_path: st
     
     start_time = time.time()
     
-    # Load and preprocess audio for wav2vec2
-    audio_array, sample_rate = librosa.load(audio_path, sr=16000)  # wav2vec2 requires 16kHz
+    audio_array, sample_rate = librosa.load(audio_path, sr=16000)
     duration = len(audio_array) / sample_rate
     
-    # Use VAD-based intelligent chunking (consistent with original asr-service)
     if duration <= 30.0:
-        # Single processing for short audio (≤30 seconds)
         result = await _transcribe_single_wav2vec2(processor, model, device, audio_array, duration, filename)
     else:
-        # VAD-based chunking for long audio (>30 seconds)
         result = await _transcribe_long_wav2vec2(processor, model, device, audio_array, duration, filename)
     
     processing_time = time.time() - start_time
     result["processing_time"] = processing_time
     result["metadata"]["processing_time_seconds"] = processing_time
     
-    logger.info(f"✅ wav2vec2 transcription completed: {len(result['text'])} chars in {processing_time:.2f}s")
+    logger.info(f"wav2vec2 transcription completed: {len(result['text'])} chars in {processing_time:.2f}s")
     
     return result
 
 
 async def _transcribe_single_wav2vec2(processor, model, device: str, audio_array: np.ndarray, duration: float, filename: str) -> Dict[str, Any]:
-    """Transcribe single audio file (≤30 seconds)"""
+    """Transcribe single audio file (≤30 seconds)
+    
+    Args:
+        processor: wav2vec2 processor instance
+        model: wav2vec2 model instance
+        device: Target device (cuda/cpu)
+        audio_array: Audio data as numpy array
+        duration: Audio duration in seconds
+        filename: Original filename for result metadata
+        
+    Returns:
+        Dict containing transcription results and metadata
+    """
     import torch
     
-    # Process audio using processor (consistent with original asr-service)
     input_dict = processor(
         audio_array, 
         return_tensors="pt", 
         sampling_rate=16000
     )
     
-    # Move to device
     input_values = input_dict.input_values.to(device)
     
-    # Run inference
     with torch.no_grad():
         logits = model(input_values).logits
     
-    # CTC Decoding - get predictions
     predicted_ids = torch.argmax(logits, dim=-1)
-    
-    # Decode using processor
     transcription = processor.decode(predicted_ids[0])
     
-    # Calculate confidence score
     probabilities = torch.softmax(logits, dim=-1)
     confidence = torch.max(probabilities, dim=-1).values.mean().item()
     
-    # Immediate cleanup of large tensors
     del input_values, logits, probabilities, predicted_ids
     import gc
     gc.collect()
     if device == "cuda":
         torch.cuda.empty_cache()
     
-    # Clean up transcription (consistent with original asr-service)
     transcription = _clean_wav2vec2_transcription(transcription)
     
-    # Calculate average confidence as accuracy estimate
     estimated_accuracy = min(95.0, max(60.0, confidence * 100))
-    
-    # Build result
     result = {
         "text": transcription,
         "segments": [{
@@ -116,7 +123,7 @@ async def _transcribe_single_wav2vec2(processor, model, device: str, audio_array
             "accuracy": round(estimated_accuracy, 1),
             "memory_managed": True,
             "single_processing": True,
-            "vad_chunking": False,  # Single processing, no chunking needed
+            "vad_chunking": False,
             "duration_seconds": duration,
             "greek_optimized": True
         }

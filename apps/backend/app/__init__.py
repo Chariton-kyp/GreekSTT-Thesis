@@ -15,18 +15,15 @@ def create_app(config_name=None):
     """Create and configure the Flask application."""
     app = Flask(__name__)
     
-    # Load configuration
     if config_name is None:
         config_name = 'development'
     
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
     
-    # JSON Configuration for proper Greek character encoding
     app.config['JSON_AS_ASCII'] = False
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
     
-    # Override Flask's default JSON behavior for Unicode
     from flask.json.provider import DefaultJSONProvider
     
     class UnicodeJSONProvider(DefaultJSONProvider):
@@ -36,28 +33,23 @@ def create_app(config_name=None):
     
     app.json = UnicodeJSONProvider(app)
     
-    # JWT Configuration
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
     app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
     app.config['JWT_ALGORITHM'] = 'HS256'
     app.config['JWT_HEADER_NAME'] = 'Authorization'  
     app.config['JWT_HEADER_TYPE'] = 'Bearer'
     
-    # Additional JWT security settings
     app.config['JWT_ERROR_MESSAGE_KEY'] = 'error'
     app.config['JWT_BLACKLIST_ENABLED'] = True
     app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
     
-    # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db, directory='migrations')
     jwt.init_app(app)
     mail.init_app(app)
     cache.init_app(app)
-    # Use threading mode for simplicity and stability
     async_mode = 'threading'
     
-    # Configure WebSocket with proper settings
     socketio_kwargs = {
         'async_mode': async_mode,
         'cors_allowed_origins': '*',
@@ -69,22 +61,17 @@ def create_app(config_name=None):
         'always_connect': True
     }
     
-    # Add websocket_ping_interval for better connection handling
     if async_mode == 'gevent':
         socketio_kwargs['websocket_ping_interval'] = 10
     
     socketio.init_app(app, **socketio_kwargs)
     
-    # Log the async mode being used
     app.logger.info(f"WebSocket initialized with async_mode='{async_mode}'")
     
-    # Celery removed for academic demo
     
-    # Initialize API documentation (only in development)
     if app.config.get('ENVIRONMENT') == 'development':
         api.init_app(app)
         
-        # Register API namespaces for documentation
         from .api_docs import (
             auth_ns, users_ns, audio_ns, transcription_ns, 
             templates_ns, health_ns
@@ -98,7 +85,6 @@ def create_app(config_name=None):
         api.add_namespace(transcription_ns, path='/transcriptions')
         api.add_namespace(templates_ns, path='/templates')
     
-    # Initialize CORS
     cors.init_app(app, resources={
         r"/api/*": {
             "origins": [
@@ -112,25 +98,20 @@ def create_app(config_name=None):
         }
     })
     
-    # Register error handlers
     register_error_handlers(app)
     
-    # Configure logging with datetime format matching AI service
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s | %(levelname)s | %(name)s | %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S,%f'
     )
     
-    # Initialize request logging middleware
     from .utils.logging_middleware import RequestLoggingMiddleware
     RequestLoggingMiddleware(app)
     
-    # Initialize security middleware
     from .common.security_middleware import init_security_middleware
     init_security_middleware(app)
     
-    # Custom formatter to match AI service datetime format exactly
     class CustomFormatter(logging.Formatter):
         def formatTime(self, record, datefmt=None):
             ct = self.converter(record.created)
@@ -141,30 +122,25 @@ def create_app(config_name=None):
                 s = f"{t},{int(record.msecs):03d}"
             return s
     
-    # Apply custom formatter to all handlers
     formatter = CustomFormatter(
         fmt='%(asctime)s | %(levelname)s | %(name)s | %(message)s'
     )
     
-    # Update all existing handlers
     for handler in logging.root.handlers:
         handler.setFormatter(formatter)
     
-    # Set logging level based on environment and suppress HTTP library noise
     if app.debug or app.config.get('ENVIRONMENT') == 'development':
-        logging.getLogger().setLevel(logging.INFO)  # Changed from DEBUG to INFO
+        logging.getLogger().setLevel(logging.INFO)
         logging.getLogger('app').setLevel(logging.INFO)
     else:
         logging.getLogger().setLevel(logging.INFO)
         logging.getLogger('app').setLevel(logging.INFO)
     
-    # Always suppress HTTP library debug logs (development and production)
     logging.getLogger('httpx').setLevel(logging.WARNING)
     logging.getLogger('httpcore').setLevel(logging.WARNING)
     logging.getLogger('urllib3').setLevel(logging.WARNING)
     logging.getLogger('requests').setLevel(logging.WARNING)
     
-    # Import models to ensure they're registered with SQLAlchemy
     with app.app_context():
         from .auth import models as auth_models
         from .users import models as users_models
@@ -173,7 +149,6 @@ def create_app(config_name=None):
         from .sessions import models as session_models
         from .analytics import models as analytics_models
         
-        # Auto-run migrations on startup (only if migrations exist)
         try:
             import os
             migrations_dir = os.path.join(app.root_path, '..', 'migrations')
@@ -187,9 +162,7 @@ def create_app(config_name=None):
                 
         except Exception as e:
             app.logger.error(f"Failed to run migrations: {e}")
-            # Don't fail the app startup, just log the error
     
-    # JWT callbacks
     from .models import BlacklistToken
     from .common.responses import auth_error_response
     
@@ -205,7 +178,6 @@ def create_app(config_name=None):
         identity = jwt_data["sub"]
         return User.query.filter_by(id=identity).one_or_none()
     
-    # Custom JWT error callbacks for standardized responses
     @jwt.expired_token_loader
     def expired_token_callback(jwt_header, jwt_payload):
         """Handle expired JWT tokens."""
@@ -251,7 +223,6 @@ def create_app(config_name=None):
             status_code=401
         )
     
-    # Register blueprints
     from .auth.routes import auth_bp
     from .users.routes import users_bp
     from .audio.routes import audio_bp
@@ -267,31 +238,25 @@ def create_app(config_name=None):
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(users_bp, url_prefix='/api/users')
     app.register_blueprint(audio_bp, url_prefix='/api/audio')
-    app.register_blueprint(mkv_bp, url_prefix='/api/audio')  # MKV conversion routes
-    app.register_blueprint(chunked_bp, url_prefix='/api/audio')  # Chunked upload routes
+    app.register_blueprint(mkv_bp, url_prefix='/api/audio')
+    app.register_blueprint(chunked_bp, url_prefix='/api/audio')
     app.register_blueprint(transcription_bp, url_prefix='/api/transcriptions')
-    app.register_blueprint(upload_bp, url_prefix='/api/transcriptions')  # Upload and transcribe endpoint
+    app.register_blueprint(upload_bp, url_prefix='/api/transcriptions')
     app.register_blueprint(analytics_bp, url_prefix='/api/analytics')
     app.register_blueprint(sessions_bp, url_prefix='/api/sessions')
     app.register_blueprint(comparison_bp, url_prefix='/api/comparison')
-    app.register_blueprint(export_bp)  # Export routes already have /api/export prefix
-    # Removed blueprint registrations: analysis, voice_notes, templates, insights (thesis simplification)
+    app.register_blueprint(export_bp)
     
-    # Internal API for service-to-service communication
     from app.api.internal import internal_bp
-    app.register_blueprint(internal_bp)  # Internal routes with /api/internal prefix
+    app.register_blueprint(internal_bp)
     
-    # Initialize WebSocket support
     from app.websocket.manager import init_progress_manager
     from app.websocket.events import register_websocket_events
     
-    # Initialize progress manager
     init_progress_manager(socketio)
     
-    # Register WebSocket events
     register_websocket_events(socketio, jwt)
     
-    # Health check endpoint (simple, no decorators to avoid rate limiting conflicts)
     def health_check_handler():
         """Health check endpoint - completely bypasses rate limiting."""
         return {
@@ -301,11 +266,10 @@ def create_app(config_name=None):
             'timestamp': datetime.utcnow().isoformat(),
             'uptime': '0d 3h 45m',
             'database': 'connected',
-            'cache': 'connected',  # SimpleCache for academic demo
+            'cache': 'connected',
             'ai_service': 'available'
         }, 200
     
-    # Register health check without any decorators
     app.add_url_rule('/api/health', 'health_check', health_check_handler, methods=['GET'])
     
     return app, socketio

@@ -1,5 +1,5 @@
 """
-Core logging setup for GreekSTT ASR Service
+Core logging setup for GreekSTT wav2vec2 Service
 Simple logging configuration for academic use
 """
 import logging
@@ -36,5 +36,4 @@ def get_logger(name: str) -> logging.Logger:
     return logging.getLogger(name)
 
 
-# Initialize basic logging
 logger = setup_basic_logging()

@@ -15,16 +15,23 @@ class WhisperService:
         self.whisper_model = None
         
     async def initialize(self):
-        """Initialize Whisper model on demand"""
+        """Initialize Whisper model on demand
+        
+        Model loading is deferred until first transcription request
+        to optimize startup time and memory usage.
+        """
         logger.info("Whisper Service initialized - model will load on demand")
 
 
-# Global service instance
 _whisper_service = None
 
 
 def get_asr_service() -> WhisperService:
-    """Get or create the global Whisper service instance"""
+    """Get or create the global Whisper service instance
+    
+    Returns:
+        WhisperService: Singleton instance of the Whisper service
+    """
     global _whisper_service
     if _whisper_service is None:
         _whisper_service = WhisperService()

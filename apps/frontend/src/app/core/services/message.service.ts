@@ -17,9 +17,6 @@ export interface UnifiedMessage {
 export class MessageService {
   private readonly notificationService = inject(NotificationService);
 
-  /**
-   * Handle any HTTP response or error and show appropriate toast
-   */
   handleResponse(responseOrError: any, showNotification: boolean = true): UnifiedMessage {
     const result = this.extractMessage(responseOrError);
     
@@ -30,67 +27,45 @@ export class MessageService {
     return result;
   }
 
-  /**
-   * Extract message and type from any response or error
-   */
   extractMessage(responseOrError: any): UnifiedMessage {
-    // Handle successful responses
     if (this.isSuccessResponse(responseOrError)) {
       return this.extractFromSuccessResponse(responseOrError);
     }
     
-    // Handle error responses
     return this.extractFromErrorResponse(responseOrError);
   }
 
-  /**
-   * Show success message with extracted data
-   */
   showSuccess(response: any): void {
     const result = this.extractFromSuccessResponse(response);
     this.showMessage(result);
   }
 
-  /**
-   * Show error message with extracted data
-   */
   showError(error: any): void {
     const result = this.extractFromErrorResponse(error);
     this.showMessage(result);
   }
 
-  /**
-   * Check if response is a success response
-   */
   private isSuccessResponse(response: any): boolean {
-    // Check for HTTP error response
     if (response instanceof HttpErrorResponse || response?.status >= 400) {
       return false;
     }
     
-    // Check for explicit success field
     if (response?.success !== undefined) {
       return response.success === true;
     }
     
-    // Check for error field (indicates error response)
     if (response?.error !== undefined) {
       return false;
     }
     
-    // Default to success if no clear indicators
     return true;
   }
 
-  /**
-   * Extract message from success response
-   */
   private extractFromSuccessResponse(response: any): UnifiedMessage {
     let message = 'Η ενέργεια ολοκληρώθηκε επιτυχώς';
     let type: MessageType = 'success';
     let details: any;
 
-    // Extract from unified response format
     if (response?.message) {
       message = response.message;
     }
@@ -106,27 +81,21 @@ export class MessageService {
     return { message, type, details };
   }
 
-  /**
-   * Extract message from error response
-   */
   private extractFromErrorResponse(error: any): UnifiedMessage {
     let message = 'Παρουσιάστηκε ένα σφάλμα';
     let type: MessageType = 'error';
     let details: any;
 
-    // Handle HttpErrorResponse
     if (error instanceof HttpErrorResponse) {
       const errorData = error.error;
       
-      // Extract from unified response format
-      if (errorData?.message) {
+        if (errorData?.message) {
         message = errorData.message;
       }
       
       if (errorData?.message_type) {
         type = errorData.message_type as MessageType;
       } else {
-        // Fallback: determine type from status code
         type = this.getMessageTypeFromStatus(error.status);
       }
       
@@ -134,7 +103,6 @@ export class MessageService {
         details = errorData.details || errorData.errors;
       }
     }
-    // Handle direct error objects
     else if (error?.error) {
       const errorData = error.error;
       
@@ -150,7 +118,6 @@ export class MessageService {
         details = errorData.details || errorData.errors;
       }
     }
-    // Handle simple error objects
     else if (error?.message) {
       message = error.message;
       
@@ -158,7 +125,6 @@ export class MessageService {
         type = error.message_type as MessageType;
       }
     }
-    // Handle string errors
     else if (typeof error === 'string') {
       message = error;
     }
@@ -166,9 +132,6 @@ export class MessageService {
     return { message, type, details };
   }
 
-  /**
-   * Determine message type from HTTP status code
-   */
   private getMessageTypeFromStatus(status: number): MessageType {
     if (status >= 500) {
       return 'error';
@@ -185,9 +148,6 @@ export class MessageService {
     }
   }
 
-  /**
-   * Show message using notification service based on type
-   */
   private showMessage(result: UnifiedMessage): void {
     const { message, type, details } = result;
     
@@ -206,7 +166,6 @@ export class MessageService {
         break;
       case 'validation':
         if (details) {
-          // Format validation errors
           const validationErrors = this.formatValidationErrors(details);
           this.notificationService.showError(message, validationErrors);
         } else {
@@ -218,9 +177,6 @@ export class MessageService {
     }
   }
 
-  /**
-   * Format validation errors for display
-   */
   private formatValidationErrors(details: any): string {
     if (typeof details === 'string') {
       return details;

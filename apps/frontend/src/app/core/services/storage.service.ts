@@ -11,9 +11,6 @@ export class StorageService {
 
   constructor() {}
 
-  /**
-   * Get item from localStorage with type safety
-   */
   getItem<T>(key: string): T | null {
     if (!this.isBrowser) {
       return null;
@@ -25,53 +22,26 @@ export class StorageService {
       }
       return JSON.parse(item);
     } catch (error) {
-      console.error('Error getting item from localStorage:', error);
       return null;
     }
   }
 
-  /**
-   * Set item in localStorage with type safety
-   */
   setItem<T>(key: string, value: T): boolean {
     if (!this.isBrowser) {
       return false;
     }
     try {
-      // Enhanced debug logging
-      if (key === 'refresh_token' || key === 'token') {
-        console.log(`[StorageService] Setting ${key}:`, {
-          key: this.PREFIX + key,
-          originalValue: value,
-          valueType: typeof value,
-          isUndefined: value === undefined,
-          isNull: value === null
-        });
-      }
       
       const serialized = JSON.stringify(value);
       localStorage.setItem(this.PREFIX + key, serialized);
       
-      // Verify storage
-      const stored = localStorage.getItem(this.PREFIX + key);
-      if (key === 'refresh_token' || key === 'token') {
-        console.log(`[StorageService] Verification for ${key}:`, {
-          serialized: serialized,
-          stored: stored,
-          parsedBack: stored ? JSON.parse(stored) : null
-        });
-      }
       
       return true;
     } catch (error) {
-      console.error('Error setting item in localStorage:', error);
       return false;
     }
   }
 
-  /**
-   * Remove item from localStorage
-   */
   removeItem(key: string): boolean {
     if (!this.isBrowser) {
       return false;
@@ -80,14 +50,10 @@ export class StorageService {
       localStorage.removeItem(this.PREFIX + key);
       return true;
     } catch (error) {
-      console.error('Error removing item from localStorage:', error);
       return false;
     }
   }
 
-  /**
-   * Clear all GreekSTT Research Platform items from localStorage
-   */
   clear(): boolean {
     if (!this.isBrowser) {
       return false;
@@ -101,14 +67,10 @@ export class StorageService {
       });
       return true;
     } catch (error) {
-      console.error('Error clearing localStorage:', error);
       return false;
     }
   }
 
-  /**
-   * Get item from sessionStorage with type safety
-   */
   getSessionItem<T>(key: string): T | null {
     if (!this.isBrowser) {
       return null;
@@ -117,14 +79,10 @@ export class StorageService {
       const item = sessionStorage.getItem(this.PREFIX + key);
       return item ? JSON.parse(item) : null;
     } catch (error) {
-      console.error('Error getting item from sessionStorage:', error);
       return null;
     }
   }
 
-  /**
-   * Set item in sessionStorage with type safety
-   */
   setSessionItem<T>(key: string, value: T): boolean {
     if (!this.isBrowser) {
       return false;
@@ -133,14 +91,10 @@ export class StorageService {
       sessionStorage.setItem(this.PREFIX + key, JSON.stringify(value));
       return true;
     } catch (error) {
-      console.error('Error setting item in sessionStorage:', error);
       return false;
     }
   }
 
-  /**
-   * Remove item from sessionStorage
-   */
   removeSessionItem(key: string): boolean {
     if (!this.isBrowser) {
       return false;
@@ -149,14 +103,10 @@ export class StorageService {
       sessionStorage.removeItem(this.PREFIX + key);
       return true;
     } catch (error) {
-      console.error('Error removing item from sessionStorage:', error);
       return false;
     }
   }
 
-  /**
-   * Check if localStorage is available
-   */
   isLocalStorageAvailable(): boolean {
     if (!this.isBrowser) {
       return false;
@@ -171,9 +121,6 @@ export class StorageService {
     }
   }
 
-  /**
-   * Check if sessionStorage is available
-   */
   isSessionStorageAvailable(): boolean {
     if (!this.isBrowser) {
       return false;

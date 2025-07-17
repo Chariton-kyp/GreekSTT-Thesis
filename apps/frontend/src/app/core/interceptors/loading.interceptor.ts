@@ -8,71 +8,53 @@ import { LoadingService } from '../services/loading.service';
 export const loadingInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
   const loadingService = inject(LoadingService);
   
-  // Skip loading indicator for certain requests
   if (shouldSkipLoading(req)) {
     return next(req);
   }
   
-  // Generate a unique key for this request
   const requestKey = generateRequestKey(req);
   
-  // Show loading
   loadingService.show(requestKey, getLoadingMessage(req));
   
   return next(req).pipe(
     tap(event => {
-      // Handle upload progress
       if (event.type === HttpEventType.UploadProgress && event.total) {
         const progress = Math.round(100 * event.loaded / event.total);
         loadingService.updateProgress(requestKey, progress, 'Μεταφόρτωση...');
       }
       
-      // Handle download progress
       if (event.type === HttpEventType.DownloadProgress && event.total) {
         const progress = Math.round(100 * event.loaded / event.total);
         loadingService.updateProgress(requestKey, progress, 'Λήψη...');
       }
     }),
     finalize(() => {
-      // Hide loading when request completes (success or error)
       loadingService.hide(requestKey);
     })
   );
 };
 
-/**
- * Check if loading indicator should be skipped for this request
- */
 function shouldSkipLoading(req: HttpRequest<unknown>): boolean {
-  // Skip loading for specific endpoints
   const skipEndpoints = [
-    '/auth/refresh', // Don't show loading for token refresh
-    '/health',       // Don't show loading for health checks
-    '/ping'          // Don't show loading for ping requests
+    '/auth/refresh',
+    '/health',
+    '/ping'
   ];
   
   return skipEndpoints.some(endpoint => req.url.includes(endpoint)) ||
-         req.headers.has('Skip-Loading'); // Allow explicit skip via header
+         req.headers.has('Skip-Loading');
 }
 
-/**
- * Generate a unique key for the request
- */
 function generateRequestKey(req: HttpRequest<unknown>): string {
-  // Use method + URL + timestamp to create unique key
   const timestamp = Date.now();
-  const url = req.url.split('?')[0]; // Remove query params for key
+  const url = req.url.split('?')[0];
   return `${req.method}_${url}_${timestamp}`;
 }
 
-/**
- * Get appropriate loading message based on request
- */
 function getLoadingMessage(req: HttpRequest<unknown>): string {
   const url = req.url;
   const method = req.method;
   
-  // Authentication requests
   if (url.includes('/auth/login')) {
     return 'Σύνδεση...';
   }
@@ -83,7 +65,6 @@ function getLoadingMessage(req: HttpRequest<unknown>): string {
     return 'Αποσύνδεση...';
   }
   
-  // File operations
   if (url.includes('/upload') || method === 'POST' && req.body instanceof FormData) {
     return 'Μεταφόρτωση αρχείου...';
   }
@@ -91,7 +72,6 @@ function getLoadingMessage(req: HttpRequest<unknown>): string {
     return 'Λήψη αρχείου...';
   }
   
-  // Transcription operations
   if (url.includes('/transcriptions')) {
     switch (method) {
       case 'POST':
@@ -106,7 +86,6 @@ function getLoadingMessage(req: HttpRequest<unknown>): string {
     }
   }
   
-  // User profile operations
   if (url.includes('/users/me')) {
     switch (method) {
       case 'PUT':
@@ -117,17 +96,14 @@ function getLoadingMessage(req: HttpRequest<unknown>): string {
     }
   }
   
-  // Template operations
   if (url.includes('/templates')) {
     return 'Φόρτωση προτύπων...';
   }
   
-  // Research operations
   if (url.includes('/research')) {
     return 'Φόρτωση στατιστικών...';
   }
   
-  // Generic messages based on HTTP method
   switch (method) {
     case 'POST':
       return 'Δημιουργία...';

@@ -80,7 +80,6 @@ export class WebSocketService {
         this.socket = io(environment.wsUrl, socketOptions);
 
         this.socket.on('connect', () => {
-          console.log('WebSocket connected successfully');
           this.isConnected.set(true);
           this.connectionSubject.next(true);
           this.connectionError.set(null);
@@ -88,11 +87,9 @@ export class WebSocketService {
         });
 
         this.socket.on('connected', (data) => {
-          console.log('Server confirmed connection:', data);
         });
 
         this.socket.on('connect_error', (error) => {
-          console.error('WebSocket connection error:', error);
           const errorMsg = error.message || 'Connection failed';
           this.connectionError.set(`${errorMsg} - retrying...`);
           this.isConnected.set(false);
@@ -103,14 +100,12 @@ export class WebSocketService {
         });
 
         this.socket.on('auth_error', (data) => {
-          console.error('WebSocket authentication error:', data);
           this.connectionError.set(data.message || 'Authentication failed');
           this.disconnect();
           reject(new Error(data.message));
         });
 
         this.socket.on('disconnect', (reason) => {
-          console.log('WebSocket disconnected:', reason);
           this.isConnected.set(false);
           this.connectionSubject.next(false);
           
@@ -123,53 +118,42 @@ export class WebSocketService {
         });
 
         this.socket.on('transcription_progress', (data: TranscriptionProgress) => {
-          console.log('Progress update received:', data);
           this.progressSubject.next(data);
         });
 
         this.socket.on('transcription_completed', (data: TranscriptionCompletion) => {
-          console.log('Transcription completed:', data);
           this.completionSubject.next(data);
         });
 
         this.socket.on('transcription_error', (data: TranscriptionError) => {
-          console.error('Transcription error:', data);
           this.errorSubject.next(data);
         });
 
         this.socket.on('room_joined', (data) => {
-          console.log('Joined transcription room:', data);
         });
 
         this.socket.on('room_left', (data) => {
-          console.log('Left transcription room:', data);
         });
 
         this.socket.on('error', (data) => {
-          console.error('WebSocket error:', data);
           this.connectionError.set(data.message || 'Unknown error');
         });
         
         this.socket.on('reconnect', (attemptNumber) => {
-          console.log('WebSocket reconnected after', attemptNumber, 'attempts');
         });
         
         this.socket.on('reconnect_attempt', (attemptNumber) => {
-          console.log('WebSocket reconnection attempt', attemptNumber);
           this.connectionError.set(`Reconnecting... (attempt ${attemptNumber})`);
         });
         
         this.socket.on('reconnect_error', (error) => {
-          console.error('WebSocket reconnection error:', error);
         });
         
         this.socket.on('reconnect_failed', () => {
-          console.error('WebSocket reconnection failed');
           this.connectionError.set('Failed to reconnect after multiple attempts');
         });
 
       } catch (error) {
-        console.error('Failed to create WebSocket connection:', error);
         this.connectionError.set('Failed to create connection');
         reject(error);
       }
@@ -311,7 +295,6 @@ export class WebSocketService {
   autoConnect(): void {
     if (!this.isConnected()) {
       this.connect().catch(error => {
-        console.warn('Auto-connect failed:', error);
       });
     }
   }

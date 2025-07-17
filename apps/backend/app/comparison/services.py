@@ -5,7 +5,6 @@ import logging
 from typing import Dict, List, Optional, Any
 import httpx
 from datetime import datetime
-# ML models handled by AI service - removed torch/transformers imports for clean architecture
 
 from app.utils.correlation_logger import get_correlation_logger
 
@@ -13,18 +12,14 @@ logger = get_correlation_logger(__name__)
 
 
 class ModelComparisonService:
-    """Service for comparing ASR models for academic research purposes."""
     
     def __init__(self):
-        """Initialize the academic comparison service."""
-        self.asr_service_url = "http://asr-service:8001"  # ASR service URL
-        self.timeout = 3600  # 60 minutes for long academic research files
+        self.asr_service_url = "http://asr-service:8001"
+        self.timeout = 3600
     
     def _check_ai_service_health(self):
-        """Check if ASR service is available for processing."""
         try:
             import requests
-            # Check ASR service only
             asr_response = requests.get(f"{self.asr_service_url}/api/v1/health", timeout=5)
             return asr_response.status_code == 200
         except Exception:
@@ -33,16 +28,6 @@ class ModelComparisonService:
     async def process_whisper_only(self, audio_file: bytes, language: str = "el", 
                                    title: str = "Whisper Transcription", description: str = "", 
                                    user_id: str = None, academic_mode: bool = True) -> Dict[str, Any]:
-        """
-        Process audio with Whisper model only (NO ENSEMBLE).
-        
-        Args:
-            audio_file: Audio file bytes
-            language: Language code (default: 'el' for Greek)
-            
-        Returns:
-            Dictionary with Whisper transcription results
-        """
         try:
             logger.info("Processing audio with Whisper model only", {
                 'audio_size': len(audio_file),
@@ -80,16 +65,6 @@ class ModelComparisonService:
     async def process_wav2vec_only(self, audio_file: bytes, language: str = "el",
                                    title: str = "wav2vec2 Transcription", description: str = "",
                                    user_id: str = None, academic_mode: bool = True) -> Dict[str, Any]:
-        """
-        Process audio with wav2vec2 model only (NO ENSEMBLE).
-        
-        Args:
-            audio_file: Audio file bytes
-            language: Language code (default: 'el' for Greek)
-            
-        Returns:
-            Dictionary with wav2vec2 transcription results
-        """
         try:
             logger.info("Processing audio with wav2vec2 model only", {
                 'audio_size': len(audio_file),
@@ -127,23 +102,12 @@ class ModelComparisonService:
     async def compare_models(self, audio_file: bytes, language: str = "el",
                              title: str = "Model Comparison", description: str = "",
                              user_id: str = None, academic_mode: bool = True) -> Dict[str, Any]:
-        """
-        Compare both models side-by-side for academic analysis (NO ENSEMBLE COMBINATION).
-        
-        Args:
-            audio_file: Audio file bytes
-            language: Language code (default: 'el' for Greek)
-            
-        Returns:
-            Dictionary with comparative analysis results
-        """
         try:
             logger.info("Starting academic model comparison", {
                 'audio_size': len(audio_file),
                 'language': language
             })
             
-            # Process with both models in parallel (NOT ensemble combination)
             whisper_task = self.process_whisper_only(audio_file, language)
             wav2vec_task = self.process_wav2vec_only(audio_file, language)
             
@@ -151,7 +115,6 @@ class ModelComparisonService:
                 whisper_task, wav2vec_task, return_exceptions=True
             )
             
-            # Handle potential errors
             if isinstance(whisper_result, Exception):
                 logger.error("Whisper failed in comparison", {'error': str(whisper_result)})
                 whisper_result = {"error": str(whisper_result), "text": "", "confidence": 0}
@@ -160,7 +123,6 @@ class ModelComparisonService:
                 logger.error("wav2vec2 failed in comparison", {'error': str(wav2vec_result)})
                 wav2vec_result = {"error": str(wav2vec_result), "text": "", "confidence": 0}
             
-            # Generate academic comparison analysis
             comparison_analysis = self._analyze_model_comparison(whisper_result, wav2vec_result)
             
             result = {
@@ -189,15 +151,6 @@ class ModelComparisonService:
             raise Exception(f"Failed to compare models: {str(e)}")
     
     def _analyze_model_comparison(self, whisper_result: Dict, wav2vec_result: Dict) -> Dict[str, Any]:
-        """
-        Analyze differences between model results for academic insights.
-        
-        Args:
-            whisper_result: Whisper transcription result
-            wav2vec_result: wav2vec2 transcription result
-            
-        Returns:
-            Dictionary with comparison metrics
         """
         try:
             whisper_text = whisper_result.get('text', '').strip()

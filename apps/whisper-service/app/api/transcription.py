@@ -23,7 +23,16 @@ router = APIRouter(prefix="/api/v1", tags=["Whisper Transcription"])
 
 
 async def transcribe_with_whisper(whisper_model, audio_path: str, filename: str) -> Dict[str, Any]:
-    """Transcribe audio with Whisper model"""
+    """Transcribe audio with Whisper model
+    
+    Args:
+        whisper_model: Loaded Whisper model instance
+        audio_path: Path to audio file
+        filename: Original filename for result metadata
+        
+    Returns:
+        Dict containing transcription results and metadata
+    """
     import time
     
     start_time = time.time()
@@ -58,7 +67,6 @@ async def transcribe_with_whisper(whisper_model, audio_path: str, filename: str)
     for segment in segments:
         full_text += segment.text + " "
         
-        # Add word-level timestamps if available
         if hasattr(segment, 'words') and segment.words:
             for word in segment.words:
                 word_level_timestamps.append({
@@ -70,7 +78,6 @@ async def transcribe_with_whisper(whisper_model, audio_path: str, filename: str)
     
     full_text = full_text.strip()
     
-    # Build result
     result = {
         "text": full_text,
         "language": "el",
@@ -94,7 +101,6 @@ async def transcribe_with_whisper(whisper_model, audio_path: str, filename: str)
         }
     }
     
-    # Add word-level timestamps if available
     if word_level_timestamps:
         result["word_timestamps"] = word_level_timestamps
     
@@ -110,19 +116,16 @@ async def transcribe_whisper(
 ) -> JSONResponse:
     """Transcribe audio using Whisper large-v3"""
     
-    # Extract transcription_id from headers for callback support
     transcription_id = request.headers.get("X-Transcription-ID") if request else None
     
     logger.info(f"Whisper endpoint received file: '{file.filename}' | content_type: {file.content_type}")
     if transcription_id:
         logger.info(f"Transcription ID: {transcription_id} (callback enabled)")
     
-    # Validate file
     if not file.filename:
         logger.error("No filename provided")
         raise HTTPException(status_code=400, detail="No file provided")
     
-    # Check file format
     allowed_formats = {
         '.wav', '.mp3', '.m4a', '.flac', '.ogg', '.opus', '.wma', '.aac',
         '.webm', '.mkv', '.mp4', '.avi', '.mov'
@@ -137,7 +140,6 @@ async def transcribe_whisper(
             detail=f"Unsupported format: {file_ext}. Supported: {allowed_formats}"
         )
     
-    # Save temp file and process
     temp_file = None
     converted_audio_path = None
     try:
@@ -148,7 +150,6 @@ async def transcribe_whisper(
         
         logger.info(f"Processing {file.filename} with Whisper")
         
-        # Check if we need to convert video to audio
         processing_path = temp_path
         if AudioConverter.is_video_container(temp_path):
             logger.info("Video file detected, converting to audio...")
@@ -157,11 +158,9 @@ async def transcribe_whisper(
                 processing_path = converted_audio_path
                 logger.info(f"Using converted audio: {processing_path}")
         
-        # Use pre-loaded Whisper model from app state
-        whisper_model = getattr(request.app.state, 'whisper_model', None)
+            whisper_model = getattr(request.app.state, 'whisper_model', None)
         
         if whisper_model is None:
-            # Fallback to manual loading if pre-loading failed
             logger.warning("Pre-loaded model not found, loading manually...")
             from faster_whisper import WhisperModel
             import torch
@@ -177,15 +176,12 @@ async def transcribe_whisper(
                 num_workers=1
             )
         
-        # Transcribe with Whisper model
         result = await transcribe_with_whisper(whisper_model, processing_path, file.filename)
         result["filename"] = file.filename
         result["metadata"]["transformers_version"] = "4.36.0"
         result["metadata"]["service"] = "whisper-service"
         
-        # Add video file metadata and duration info
         if AudioConverter.is_video_container(temp_path):
-            # Get original video duration first
             from app.utils.audio_converter import get_video_duration
             original_duration = get_video_duration(temp_path)
             
@@ -237,11 +233,9 @@ async def transcribe_whisper(
         raise HTTPException(status_code=500, detail=f"Transcription failed: {str(e)}")
     
     finally:
-        # Cleanup original temp file
         if temp_file and os.path.exists(temp_path):
             os.unlink(temp_path)
         
-        # Cleanup converted audio file
         if converted_audio_path:
             AudioConverter.cleanup_temp_file(converted_audio_path)
 
@@ -287,7 +281,7 @@ async def unload_whisper_model() -> JSONResponse:
 
 @router.post("/models/force-cleanup")
 async def force_memory_cleanup() -> JSONResponse:
-    """Force aggressive memory cleanup without unloading models"""
+    """Perform aggressive memory cleanup operations"""
     
     try:
         from app.services.transcription import get_asr_service

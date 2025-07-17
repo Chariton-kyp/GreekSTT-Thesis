@@ -24,14 +24,12 @@ class WhisperModel:
         try:
             import torch
             if torch.cuda.is_available():
-                # Test cuDNN compatibility
                 try:
                     test_tensor = torch.randn(1, 1, 4, 4).cuda()
                     test_conv = torch.nn.Conv2d(1, 1, 3, padding=1).cuda()
                     _ = test_conv(test_tensor)
                     logger.info("CUDA and cuDNN working")
                     
-                    # Test faster-whisper GPU compatibility
                     try:
                         from faster_whisper import WhisperModel
                         import ctranslate2
@@ -82,7 +80,6 @@ class WhisperModel:
         from faster_whisper import WhisperModel
         import gc
         
-        # Clean up any previous memory before loading
         gc.collect()
         if self.device == "cuda":
             try:
@@ -93,18 +90,15 @@ class WhisperModel:
         
         logger.info(f"Loading faster-whisper {self.model_name} on {self.device} (PRIMARY)")
         
-        # High quality settings - use float16 for better accuracy (was int8)
         if self.device == "cuda":
-            # Use float16 for better quality (more memory but worth it for accuracy)
-            compute_type = "float16"  # Better quality than int8
-            # GPU optimizations for CUDA 12
+            compute_type = "float16"
             gpu_kwargs = {
                 "device": self.device,
                 "compute_type": compute_type,
                 "num_workers": 1,  # Single worker for stability
                 "cpu_threads": 2,  # Minimal CPU threads to assist GPU
             }
-            logger.info(f"Using float16 precision for better quality (higher memory usage but better accuracy)")
+            logger.info(f"GPU uses float16 precision for better accuracy")
         else:
             compute_type = "int8"  # Keep int8 for CPU processing
             gpu_kwargs = {
@@ -114,7 +108,7 @@ class WhisperModel:
                 "num_workers": 1
             }
         
-        # IMPORTANT: Use WhisperModel, NOT BatchedInferencePipeline (has segment bugs)
+        # Use WhisperModel for stable segment processing
         self.model = WhisperModel(
             self.model_name,
             **gpu_kwargs
@@ -129,7 +123,6 @@ class WhisperModel:
             if self.model:
                 logger.info(f"Unloading {getattr(self, 'implementation', 'Whisper')} model from GPU memory...")
                 
-                # Store device for cleanup
                 device_type = self.device
                 
                 # Implementation-specific cleanup
@@ -142,16 +135,14 @@ class WhisperModel:
                             except:
                                 pass
                 
-                # Delete model
                 del self.model
                 self.model = None
                 if hasattr(self, 'implementation'):
                     self.implementation = None
                 
-                # Import garbage collection
                 import gc
                 
-                # Thorough garbage collection (5 passes)
+                # Aggressive garbage collection
                 for i in range(5):
                     collected = gc.collect()
                     if collected == 0 and i > 2:  # Stop early if nothing to collect
@@ -165,19 +156,16 @@ class WhisperModel:
                         # Multiple cleanup passes for thorough memory release
                         for i in range(3):
                             torch.cuda.empty_cache()
-                            torch.cuda.synchronize()  # Wait for all operations
+                            torch.cuda.synchronize()
                             gc.collect()
                         
-                        # Force PyTorch to release cached memory
                         if hasattr(torch.cuda, 'reset_max_memory_allocated'):
                             torch.cuda.reset_max_memory_allocated()
                         if hasattr(torch.cuda, 'reset_max_memory_cached'):
                             torch.cuda.reset_max_memory_cached()
                         
-                        # Final aggressive cleanup
                         torch.cuda.empty_cache()
                         
-                        # Log memory status
                         try:
                             allocated = torch.cuda.memory_allocated() / 1024**3
                             cached = torch.cuda.memory_reserved() / 1024**3
@@ -194,7 +182,6 @@ class WhisperModel:
                 
         except Exception as e:
             logger.error(f"Error unloading Whisper model: {e}")
-            # Force cleanup even if error occurred
             self.model = None
             if hasattr(self, 'implementation'):
                 self.implementation = None
@@ -214,7 +201,6 @@ class WhisperModel:
         
         start_time = time.time()
         
-        # Log audio duration for reference
         try:
             import librosa
             audio_duration = librosa.get_duration(path=audio_path)
@@ -238,7 +224,6 @@ class WhisperModel:
         """Transcribe using faster-whisper with video conversion"""
         from app.utils.audio_converter import AudioConverter
         
-        # Audio conversion for video containers
         temp_audio_path = None
         processing_path = audio_path
         original_video_duration = None
@@ -246,88 +231,74 @@ class WhisperModel:
         preprocessed_audio_path = None
         
         try:
-            # If it's a video file, get the original duration first
             if AudioConverter.is_video_container(audio_path):
                 from app.utils.audio_converter import get_video_duration
                 original_video_duration = get_video_duration(audio_path)
                 logger.info(f"📹 Original video duration: {original_video_duration:.2f}s ({original_video_duration/60:.1f}min)")
             
-            # Check if we need to convert video to audio
             temp_audio_path = AudioConverter.smart_convert(audio_path, target_sample_rate=16000)
             if temp_audio_path:
                 processing_path = temp_audio_path
                 logger.info(f"🎬 Using converted audio file for faster-whisper processing")
                 
-            # Apply anti-hallucination preprocessing to remove silence at start
             from app.utils.audio_converter import preprocess_audio_for_whisper
             preprocessed_audio_path = preprocess_audio_for_whisper(processing_path, target_sample_rate=16000)
             if preprocessed_audio_path != processing_path:
                 processing_path = preprocessed_audio_path
-                logger.info(f"🧹 Using preprocessed audio to prevent start-of-audio hallucinations")
+                logger.info(f"Using preprocessed audio to prevent start-of-audio hallucinations")
                 
         except Exception as e:
             logger.warning(f"Audio conversion/preprocessing failed, using original file: {e}")
-            # Continue with original file if conversion fails
         
         try:
-            # Anti-hallucination settings based on 2024 research
             settings = {
-                "language": "el",  # Greek language code
+                "language": "el",
                 "task": "transcribe",
-                "beam_size": 10,  # Keep user requested beam_size=10 for accuracy
-                "best_of": 1,  # Single hypothesis to avoid repetitive patterns
+                "beam_size": 10,
+                "best_of": 1,
                 "patience": 1.0,
                 "length_penalty": 1.0,
-                "temperature": 0.0,  # Single temperature for more deterministic results
+                "temperature": 0.0,
+                "compression_ratio_threshold": 2.0,
+                "no_speech_threshold": 0.2,
+                "hallucination_silence_threshold": 2.5,
+                "condition_on_previous_text": False,
                 
-                # CRITICAL: Anti-hallucination parameters based on research
-                "compression_ratio_threshold": 2.0,  # Balanced for Greek text (was too strict at 1.35)
-                "no_speech_threshold": 0.2,  # Lower = more aggressive silence detection (was 0.5)
-                "hallucination_silence_threshold": 2.5,  # Skip long silences when hallucinating
-                "condition_on_previous_text": False,  # MOST IMPORTANT: Prevents 90% of hallucinations
-                
-                # VAD settings for preventing start-of-audio hallucinations
-                "vad_filter": True,  # Essential for hallucination prevention
+                "vad_filter": True,
                 "vad_parameters": {
                     "threshold": 0.5,
-                    "min_speech_duration_ms": 500,  # Longer minimum to avoid noise
-                    "max_speech_duration_s": 30,  # Split long segments to prevent context poisoning
-                    "min_silence_duration_ms": 2000,  # Longer silence detection
-                    "speech_pad_ms": 400,  # More padding for context
+                    "min_speech_duration_ms": 500,
+                    "max_speech_duration_s": 30,
+                    "min_silence_duration_ms": 2000,
+                    "speech_pad_ms": 400,
                 },
-                
-                # Greek language optimization
-                "initial_prompt": "",  # NO initial prompt to avoid hallucination anchoring
-                "word_timestamps": True,  # Enable for natural pause detection
-                "max_new_tokens": None,  # Let it find natural breaks
-                "chunk_length": None,  # Process full audio to find natural pauses
+                "initial_prompt": "",
+                "word_timestamps": True,
+                "max_new_tokens": None,
+                "chunk_length": None,
             }
             
             settings.update(kwargs)
             
-            # Pre-transcription memory cleanup for consistent results
             import gc
             gc.collect()
             if self.device == "cuda":
                 try:
                     import torch
                     torch.cuda.empty_cache()
-                    torch.cuda.synchronize()  # Ensure all operations complete
+                    torch.cuda.synchronize()
                 except ImportError:
                     pass
             
             logger.info("Pre-transcription cleanup complete, starting processing...")
             
-            # Transcribe with memory management
             try:
                 segments_generator, info = self.model.transcribe(processing_path, **settings)
                 
-                # CRITICAL: Process segments in order as they come
                 segments = []
                 segment_index = 0
                 
                 for segment in segments_generator:
-                    # Log each segment as it's generated
                     logger.info(f"Segment {segment_index}: [{segment.start:.2f}s - {segment.end:.2f}s] = '{segment.text.strip()}'")
                     segments.append(segment)
                     segment_index += 1
@@ -337,7 +308,6 @@ class WhisperModel:
                 logger.error(f"Transcription failed: {e}")
                 raise
             
-            # Debug: Check segment integrity
             logger.info("Checking segment order and gaps:")
             prev_end = 0.0
             for i, seg in enumerate(segments):
@@ -348,13 +318,10 @@ class WhisperModel:
                     logger.error(f"  OVERLAPPING segments! Seg {i} starts at {seg.start:.2f}s but previous ended at {prev_end:.2f}s")
                 prev_end = seg.end
             
-            # Process results with periodic memory cleanup
             text_parts = []
             segment_list = []
             chunk_counter = 0
             
-            # Check if segments are already in correct chronological order
-            # faster-whisper should generate segments in correct order by default
             order_check_failed = False
             prev_start = -1.0
             for i, seg in enumerate(segments):
@@ -363,7 +330,6 @@ class WhisperModel:
                     logger.warning(f"  Segment {i} out of order: {seg.start:.2f}s < previous {prev_start:.2f}s")
                 prev_start = seg.start
             
-            # Only sort if there's actually an ordering problem
             if order_check_failed:
                 logger.warning("SEGMENTS OUT OF ORDER - applying chronological sorting")
                 segments_before = [(i, s.start, s.text[:30] + "...") for i, s in enumerate(segments)]
@@ -379,13 +345,11 @@ class WhisperModel:
             else:
                 logger.info("Segments already in correct chronological order - no sorting needed")
             
-            # Remove overlapping segments (keep the first one)
             filtered_segments = []
             last_end_time = -1.0
             overlap_count = 0
             
             for i, segment in enumerate(segments):
-                # Skip if this segment starts before the last one ended (overlap)
                 if segment.start < last_end_time - 0.1:  # 0.1s tolerance
                     overlap_count += 1
                     logger.warning(f"  Removing overlapping segment {i}: [{segment.start:.2f}s-{segment.end:.2f}s] '{segment.text.strip()}'")
@@ -398,15 +362,12 @@ class WhisperModel:
             segments = filtered_segments
             logger.info(f"Filtering complete: {len(segments)} segments remain (removed {overlap_count} overlapping)")
             
-            # Process segments with natural break detection
             segments = self._process_with_natural_breaks(segments)
             logger.info(f"Natural break processing complete: {len(segments)} final segments")
             
             for segment in segments:
-                # Anti-hallucination: Skip segments with repetitive patterns
                 segment_text = segment.text.strip()
                 
-                # Check for repetitive watermarks like "Υπότιτλοι AUTHORWAVE"
                 if self._is_repetitive_hallucination(segment_text):
                     logger.warning(f"Skipping hallucination segment: '{segment_text[:50]}...'")
                     continue
@@ -419,7 +380,6 @@ class WhisperModel:
                     "confidence": getattr(segment, 'avg_logprob', 0.9)
                 })
                 
-                # Aggressive memory cleanup every 10 segments to prevent accumulation
                 chunk_counter += 1
                 if chunk_counter % 10 == 0:
                     import gc
@@ -433,25 +393,20 @@ class WhisperModel:
             
             full_text = " ".join(text_parts).strip()
             
-            # Remove AUTHORWAVE watermarks from final text
             full_text = self._clean_authorwave_from_text(full_text)
             
-            # Final hallucination check on complete text
             if self._is_only_hallucination(full_text):
                 logger.warning("Entire transcription appears to be hallucination, returning empty")
                 full_text = ""
                 segment_list = []
             
-            # Debug: Log segment order in final result
             logger.info("Final segment order verification:")
             for i, seg in enumerate(segment_list[:5]):  # Show first 5 segments
                 logger.info(f"    Final Seg {i}: [{seg['start']:.2f}s-{seg['end']:.2f}s] = '{seg['text'][:50]}{'...' if len(seg['text']) > 50 else ''}'")
             
-            # Log final assembled text (first 200 chars)
             logger.info(f"Final transcription ({len(full_text)} chars): '{full_text[:200]}{'...' if len(full_text) > 200 else ''}'")
             logger.info(f"Segments in final output: {len(segment_list)}")
             
-            # Debug: Check if final text matches expected order
             if segment_list and len(segment_list) > 1:
                 first_segment_text = segment_list[0]['text'].strip()
                 if first_segment_text and not full_text.startswith(first_segment_text[:20]):
@@ -462,11 +417,9 @@ class WhisperModel:
                 
             processing_time = (time.time() - start_time) * 1000
             
-            # Calculate average confidence as accuracy estimate
             avg_confidence = sum(seg["confidence"] for seg in segment_list) / len(segment_list) if segment_list else 0.0
             estimated_accuracy = min(95.0, max(60.0, avg_confidence * 100))
             
-            # Use original video duration if available, otherwise use processed duration
             final_duration = original_video_duration if original_video_duration and original_video_duration > 0 else info.duration
             
             result = {
@@ -499,7 +452,6 @@ class WhisperModel:
                 }
             }
             
-            # Add video-specific metadata if this was a video conversion
             if AudioConverter.is_video_container(audio_path):
                 result["metadata"]["was_video_converted"] = temp_audio_path is not None
                 result["metadata"]["actual_audio_duration"] = final_duration
@@ -511,7 +463,6 @@ class WhisperModel:
             return result
             
         finally:
-            # Cleanup temporary audio files if created
             if temp_audio_path:
                 AudioConverter.cleanup_temp_file(temp_audio_path)
             if preprocessed_audio_path and preprocessed_audio_path != audio_path and preprocessed_audio_path != temp_audio_path:
@@ -579,7 +530,6 @@ class WhisperModel:
         if not text:
             return text
             
-        # Patterns to remove from the beginning of transcription
         watermark_patterns = [
             r"Υπότιτλοι\s+AUTHORWAVE\s*",
             r"υπότιτλοι\s+authorwave\s*",
@@ -593,12 +543,9 @@ class WhisperModel:
         cleaned_text = text
         
         for pattern in watermark_patterns:
-            # Remove from beginning of text (case insensitive)
             cleaned_text = re.sub(f"^{pattern}", "", cleaned_text, flags=re.IGNORECASE).strip()
-            # Remove standalone occurrences
             cleaned_text = re.sub(f"\\b{pattern}\\b", " ", cleaned_text, flags=re.IGNORECASE).strip()
         
-        # Clean up extra whitespace
         cleaned_text = re.sub(r'\s+', ' ', cleaned_text).strip()
         
         if cleaned_text != text:
@@ -615,10 +562,8 @@ class WhisperModel:
         if not text:
             return False
             
-        # Remove all hallucination patterns and see if anything is left
         cleaned_text = text.lower()
         
-        # Remove known hallucination patterns
         hallucination_phrases = [
             "υπότιτλοι authorwave",
             "υποτιτλοι authorwave",
@@ -630,16 +575,13 @@ class WhisperModel:
         for phrase in hallucination_phrases:
             cleaned_text = cleaned_text.replace(phrase, "")
         
-        # Remove punctuation and whitespace
         cleaned_text = cleaned_text.strip()
         
-        # If nothing meaningful is left, it's all hallucination
-        if len(cleaned_text) < 5:  # Less than 5 characters remaining
+        if len(cleaned_text) < 5:
             return True
             
-        # Check if it's just repetition of the same short phrase
         words = cleaned_text.split()
-        if len(set(words)) <= 2:  # Only 1-2 unique words
+        if len(set(words)) <= 2:
             return True
             
         return False
@@ -658,21 +600,16 @@ class WhisperModel:
         current_end = None
         
         for segment in segments:
-            # If segment has word timestamps, use them for better processing
             if hasattr(segment, 'words') and segment.words:
                 for i, word in enumerate(segment.words):
-                    # Start new segment if needed
                     if current_start is None:
                         current_start = word.start
                         
-                    # Check for natural pause (gap between words)
                     if i > 0:
                         prev_word = segment.words[i-1]
                         pause_duration = word.start - prev_word.end
                         
-                        # Natural break detected (300ms+ pause or punctuation)
-                        if pause_duration > 0.3 or prev_word.word.rstrip().endswith(('.', '!', '?', ';')):
-                            # Save current segment
+                        if pause_duration > 0.3 or prev_word.word.rstrip().endswith(('.', '!', '?', ';')):  # 0.3s pause threshold for natural breaks
                             if current_text:
                                 processed_segments.append({
                                     'start': current_start,
@@ -681,7 +618,6 @@ class WhisperModel:
                                 })
                                 logger.debug(f"  📍 Natural break segment: [{current_start:.2f}-{prev_word.end:.2f}] after '{prev_word.word}'")
                             
-                            # Start new segment
                             current_text = [word.word]
                             current_start = word.start
                         else:
@@ -691,18 +627,14 @@ class WhisperModel:
                     
                     current_end = word.end
             else:
-                # No word timestamps - use segment as-is but check duration
-                if segment.end - segment.start > 30.0:  # Too long, needs splitting
+                if segment.end - segment.start > 30.0:
                     logger.warning(f"  ⚠️ Long segment without word timestamps: {segment.end - segment.start:.1f}s")
                 
-                # Check if we should merge with previous
-                if processed_segments and segment.start - current_end < 0.2:  # Less than 200ms gap
-                    # Merge with previous
+                if processed_segments and segment.start - current_end < 0.2:
                     processed_segments[-1]['end'] = segment.end
                     processed_segments[-1]['text'] += ' ' + segment.text.strip()
                     logger.debug(f"  🔗 Merged segment due to small gap")
                 else:
-                    # Add as new segment
                     processed_segments.append({
                         'start': segment.start,
                         'end': segment.end,
@@ -710,7 +642,6 @@ class WhisperModel:
                     })
                 current_end = segment.end
                 
-        # Don't forget last segment if using word timestamps
         if current_text and current_start is not None:
             processed_segments.append({
                 'start': current_start,
@@ -718,7 +649,6 @@ class WhisperModel:
                 'text': ' '.join(current_text)
             })
         
-        # Convert back to segment-like objects
         class ProcessedSegment:
             def __init__(self, start, end, text):
                 self.start = start
@@ -736,9 +666,9 @@ class WhisperModel:
         try:
             import torch
             if torch.cuda.is_available():
-                allocated = torch.cuda.memory_allocated() / 1024**3  # GB
-                cached = torch.cuda.memory_reserved() / 1024**3     # GB
-                total = torch.cuda.get_device_properties(0).total_memory / 1024**3  # GB
+                allocated = torch.cuda.memory_allocated() / 1024**3
+                cached = torch.cuda.memory_reserved() / 1024**3
+                total = torch.cuda.get_device_properties(0).total_memory / 1024**3
                 return {
                     "allocated_gb": round(allocated, 2),
                     "cached_gb": round(cached, 2),
@@ -752,11 +682,10 @@ class WhisperModel:
             return {"error": str(e)}
     
     def force_memory_cleanup(self) -> Dict[str, Any]:
-        """Force aggressive memory cleanup without unloading model"""
+        """Perform aggressive memory cleanup operations"""
         try:
             import gc
             
-            # Multiple garbage collection passes
             collected_objects = 0
             for i in range(3):
                 collected = gc.collect()
@@ -764,7 +693,6 @@ class WhisperModel:
                 if collected == 0:
                     break
             
-            # GPU cache cleanup
             gpu_cleaned = False
             if self.device == "cuda":
                 try:
@@ -781,7 +709,6 @@ class WhisperModel:
                 "gpu_cache_cleared": gpu_cleaned,
             }
             
-            # Add memory stats if available
             memory_stats = self.get_memory_usage()
             if "error" not in memory_stats:
                 result["memory_after_cleanup"] = memory_stats

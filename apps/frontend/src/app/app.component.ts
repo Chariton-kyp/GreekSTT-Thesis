@@ -2,12 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
-// PrimeNG
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
 
-// Core Services
 import { ThemeService, AuthService } from './core';
 
 @Component({
@@ -25,7 +23,6 @@ import { ThemeService, AuthService } from './core';
 export class AppComponent {
   title = 'greekstt-research-frontend';
 
-  // Inject services (signals work perfectly with zoneless)
   readonly themeService = inject(ThemeService);
   private readonly authService = inject(AuthService);
 }
