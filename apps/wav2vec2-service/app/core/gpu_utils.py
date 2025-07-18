@@ -56,3 +56,19 @@ class GPUMemoryMonitor:
         
         info = self.get_gpu_memory_info()
         return info["free"]
+    
+    def log_memory_status(self, service_name: str = "Service") -> None:
+        """Log detailed memory status"""
+        if not self.device_available:
+            logger.info(f"📊 {service_name} Memory Status: CPU mode")
+            return
+        
+        torch.cuda.synchronize()
+        info = self.get_gpu_memory_info()
+        
+        logger.info(f"📊 {service_name} Memory Status:")
+        logger.info(f"   - Total GPU: {info['total']:.2f}GB")
+        logger.info(f"   - Allocated: {info['allocated']:.2f}GB")
+        logger.info(f"   - Reserved: {info['reserved']:.2f}GB")
+        logger.info(f"   - Free: {info['free']:.2f}GB")
+        logger.info(f"   - Usage: {(info['allocated']/info['total']*100):.1f}%")

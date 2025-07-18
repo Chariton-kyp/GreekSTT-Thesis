@@ -44,20 +44,35 @@ async def transcribe_with_wav2vec2(processor, model, device: str, audio_path: st
     from typing import List, Tuple
     
     start_time = time.time()
+    logger.info(f"Starting wav2vec2 transcription for {filename} at {start_time}")
     
     audio_array, sample_rate = librosa.load(audio_path, sr=16000)
     duration = len(audio_array) / sample_rate
     
+    logger.info(f"Audio loaded: duration={duration:.2f}s, sample_rate={sample_rate}")
+    
     if duration <= 30.0:
+        logger.info("Using single chunk processing (≤30s)")
         result = await _transcribe_single_wav2vec2(processor, model, device, audio_array, duration, filename)
     else:
+        logger.info("Using long audio processing (>30s)")
         result = await _transcribe_long_wav2vec2(processor, model, device, audio_array, duration, filename)
     
-    processing_time = time.time() - start_time
+    end_time = time.time()
+    processing_time = end_time - start_time
+    
+    # Calculate Real-Time Factor (RTF)
+    rtf = processing_time / duration if duration > 0 else 0
+    
     result["processing_time"] = processing_time
     result["metadata"]["processing_time_seconds"] = processing_time
     
-    logger.info(f"wav2vec2 transcription completed: {len(result['text'])} chars in {processing_time:.2f}s")
+    logger.info(f"wav2vec2 transcription completed:")
+    logger.info(f"  - Audio duration: {duration:.2f}s")
+    logger.info(f"  - Processing time: {processing_time:.2f}s")
+    logger.info(f"  - RTF (Real-Time Factor): {rtf:.3f}")
+    logger.info(f"  - Speed: {duration/processing_time:.1f}x faster than real-time" if processing_time > 0 else "  - Speed: N/A")
+    logger.info(f"  - Text length: {len(result['text'])} characters")
     
     return result
 

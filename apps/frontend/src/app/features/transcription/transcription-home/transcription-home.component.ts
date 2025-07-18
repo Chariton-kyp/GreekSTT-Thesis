@@ -1823,7 +1823,7 @@ export class TranscriptionHomeComponent implements OnInit, OnDestroy {
     if (transcription.status === TranscriptionStatus.FAILED) {
       items.push({
         label: 'Επανάληψη',
-        icon: 'pi pi-refresh',
+        icon: 'pi pi-sync',
         command: () => this.retryTranscription(transcription)
       });
 

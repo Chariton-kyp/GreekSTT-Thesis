@@ -24,6 +24,9 @@ class Config:
     # Device detection
     DEVICE = "auto"  # auto, cuda, cpu
     
+    # GPU Memory Management
+    GPU_MEMORY_FRACTION = float(os.getenv("GPU_MEMORY_FRACTION", "0.4"))  # 40% for wav2vec2
+    
     # Models
     WAV2VEC2_MODEL = "lighteternal/wav2vec2-large-xlsr-53-greek"
     

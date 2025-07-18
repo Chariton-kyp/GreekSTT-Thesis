@@ -24,6 +24,9 @@ class Config:
     # Device detection
     DEVICE = "auto"  # auto, cuda, cpu
     
+    # GPU Memory Management
+    GPU_MEMORY_FRACTION = float(os.getenv("GPU_MEMORY_FRACTION", "0.6"))  # 60% for Whisper
+    
     # Models
     WHISPER_MODEL = "large-v3"
     

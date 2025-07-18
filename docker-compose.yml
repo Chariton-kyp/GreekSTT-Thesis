@@ -132,7 +132,8 @@ services:
       - CUDA_VISIBLE_DEVICES=0
       - NVIDIA_VISIBLE_DEVICES=0
       - CUDA_MODULE_LOADING=LAZY
-      # Memory allocation settings
+      # GPU Memory allocation settings (60% of RTX 4080)
+      - GPU_MEMORY_FRACTION=0.6
       - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512,expandable_segments:True
       # Model storage for Whisper models
       - HF_HOME=/app/models
@@ -177,8 +178,11 @@ services:
         reservations:
           devices:
             - driver: nvidia
-              count: 1
+              device_ids: ['0']
               capabilities: [gpu]
+          memory: 16G  # 25% of 64GB RAM allocated to Whisper
+        limits:
+          memory: 20G  # Maximum memory limit
     shm_size: '2gb'
     ipc: host
     stdin_open: true
@@ -202,7 +206,8 @@ services:
       - CUDA_VISIBLE_DEVICES=0
       - NVIDIA_VISIBLE_DEVICES=0
       - CUDA_MODULE_LOADING=LAZY
-      # Memory allocation settings
+      # GPU Memory allocation settings (40% of RTX 4080)
+      - GPU_MEMORY_FRACTION=0.4
       - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512,expandable_segments:True
       # Model storage for wav2vec2 models
       - HF_HOME=/app/models
@@ -244,8 +249,11 @@ services:
         reservations:
           devices:
             - driver: nvidia
-              count: 1
+              device_ids: ['0']
               capabilities: [gpu]
+          memory: 8G   # 12.5% of 64GB RAM allocated to wav2vec2
+        limits:
+          memory: 12G  # Maximum memory limit
     shm_size: '2gb'
     ipc: host
     stdin_open: true

@@ -65,7 +65,19 @@ async def lifespan(app: FastAPI):
         
         if torch.cuda.is_available():
             device = "cuda"
+            
+            # Set GPU memory fraction (40% for wav2vec2 service)
+            from app.core.config import config
+            gpu_fraction = config.GPU_MEMORY_FRACTION
+            total_memory = torch.cuda.get_device_properties(0).total_memory / (1024**3)
+            allocated_memory = total_memory * gpu_fraction
+            
+            # Set memory limit
+            torch.cuda.set_per_process_memory_fraction(gpu_fraction, device=0)
+            
             logger.info(f"GPU detected: {torch.cuda.get_device_name(0)}")
+            logger.info(f"Total GPU memory: {total_memory:.1f}GB")
+            logger.info(f"Allocated to wav2vec2: {allocated_memory:.1f}GB ({gpu_fraction*100:.0f}%)")
         else:
             device = "cpu"
             logger.info("No GPU detected, using CPU")
@@ -81,7 +93,23 @@ async def lifespan(app: FastAPI):
         ).to(device)
         
         logger.info(f"✅ wav2vec2 Greek model ready on {device.upper()}")
-        logger.info(f"📊 Memory usage: {torch.cuda.memory_allocated() / 1024**3:.2f}GB" if device == "cuda" else "")
+        
+        # Check GPU memory usage after model loading
+        if device == "cuda":
+            # Force GPU memory sync
+            torch.cuda.synchronize()
+            
+            # Get current memory usage
+            current_allocated = torch.cuda.memory_allocated() / 1024**3
+            current_reserved = torch.cuda.memory_reserved() / 1024**3
+            
+            logger.info(f"📊 GPU Memory Status:")
+            logger.info(f"   - PyTorch allocated: {current_allocated:.2f}GB")
+            logger.info(f"   - PyTorch reserved: {current_reserved:.2f}GB")
+            logger.info(f"   - Available for use: {allocated_memory - current_reserved:.2f}GB")
+            
+            # wav2vec2 uses PyTorch directly so this should show actual usage
+            logger.info(f"ℹ️  wav2vec2 uses PyTorch directly for GPU memory management")
         
         app.state.wav2vec2_processor = processor
         app.state.wav2vec2_model = model

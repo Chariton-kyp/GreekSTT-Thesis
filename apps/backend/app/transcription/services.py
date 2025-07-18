@@ -199,8 +199,8 @@ class TranscriptionService:
                 
                 # Extract processing times from metadata
                 metadata = result.get('metadata', {})
-                transcription.whisper_processing_time = metadata.get('whisper_processing_time_ms', 0) / 1000.0  # Convert to seconds
-                transcription.wav2vec_processing_time = metadata.get('wav2vec_processing_time_ms', 0) / 1000.0  # Convert to seconds
+                transcription.whisper_processing_time = metadata.get('whisper_processing_time_seconds', 0)
+                transcription.wav2vec_processing_time = metadata.get('wav2vec_processing_time_seconds', 0)
                 
                 # Calculate which model processed quicker
                 transcription.calculate_faster_model()
@@ -271,7 +271,7 @@ class TranscriptionService:
                 transcription.processing_metadata = result.get('metadata', {})
                 
                 # Store model-specific results with processing times
-                processing_time_seconds = result.get('metadata', {}).get('processing_time_ms', 0) / 1000.0
+                processing_time_seconds = result.get('metadata', {}).get('processing_time_seconds', 0)
                 if model == 'whisper':
                     transcription.whisper_text = result['text']
                     transcription.whisper_confidence = result.get('confidence', 0.0)

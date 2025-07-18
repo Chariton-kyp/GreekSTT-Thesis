@@ -34,8 +34,19 @@ async def transcribe_with_whisper(whisper_model, audio_path: str, filename: str)
         Dict containing transcription results and metadata
     """
     import time
+    import os
+    
+    # Get audio duration for RTF calculation
+    try:
+        import librosa
+        audio_duration = librosa.get_duration(filename=audio_path)
+        logger.info(f"Audio duration: {audio_duration:.2f} seconds")
+    except Exception as e:
+        logger.warning(f"Could not get audio duration: {e}")
+        audio_duration = 0
     
     start_time = time.time()
+    logger.info(f"Starting Whisper transcription for {filename} at {start_time}")
     
     segments, info = whisper_model.transcribe(
         audio_path,
@@ -59,8 +70,7 @@ async def transcribe_with_whisper(whisper_model, audio_path: str, filename: str)
         task="transcribe"
     )
     
-    processing_time = time.time() - start_time
-    
+    # Process segments and extract text (this can take time for long audio)
     full_text = ""
     word_level_timestamps = []
     
@@ -77,6 +87,13 @@ async def transcribe_with_whisper(whisper_model, audio_path: str, filename: str)
                 })
     
     full_text = full_text.strip()
+    
+    # Calculate TOTAL processing time (including post-processing)
+    end_time = time.time()
+    processing_time = end_time - start_time
+    
+    # Calculate Real-Time Factor (RTF)
+    rtf = processing_time / audio_duration if audio_duration > 0 else 0
     
     result = {
         "text": full_text,
@@ -104,7 +121,13 @@ async def transcribe_with_whisper(whisper_model, audio_path: str, filename: str)
     if word_level_timestamps:
         result["word_timestamps"] = word_level_timestamps
     
-    logger.info(f"Whisper transcription completed: {len(full_text)} chars in {processing_time:.2f}s")
+    # Log final results with CORRECT processing time
+    logger.info(f"Whisper transcription completed:")
+    logger.info(f"  - Audio duration: {audio_duration:.2f}s")
+    logger.info(f"  - Processing time: {processing_time:.2f}s")
+    logger.info(f"  - RTF (Real-Time Factor): {rtf:.3f}")
+    logger.info(f"  - Speed: {audio_duration/processing_time:.1f}x faster than real-time" if processing_time > 0 else "  - Speed: N/A")
+    logger.info(f"  - Text length: {len(full_text)} characters")
     
     return result
 
@@ -158,7 +181,7 @@ async def transcribe_whisper(
                 processing_path = converted_audio_path
                 logger.info(f"Using converted audio: {processing_path}")
         
-            whisper_model = getattr(request.app.state, 'whisper_model', None)
+        whisper_model = getattr(request.app.state, 'whisper_model', None)
         
         if whisper_model is None:
             logger.warning("Pre-loaded model not found, loading manually...")
@@ -373,10 +396,65 @@ async def health_check() -> JSONResponse:
                 "whisper": "float16"
             }
         }
+        
+        # Add GPU memory info if available
+        if torch and torch.cuda.is_available():
+            torch.cuda.synchronize()
+            health["gpu_memory"] = {
+                "allocated_gb": round(torch.cuda.memory_allocated() / 1024**3, 2),
+                "reserved_gb": round(torch.cuda.memory_reserved() / 1024**3, 2),
+                "total_gb": round(torch.cuda.get_device_properties(0).total_memory / 1024**3, 2)
+            }
+        
         return JSONResponse(content=health)
     
     except Exception as e:
         logger.error(f"Health check failed: {e}")
+        return JSONResponse(
+            status_code=500,
+            content={"status": "error", "message": str(e)}
+        )
+
+
+@router.get("/memory")
+async def get_memory_status() -> JSONResponse:
+    """Get detailed GPU memory status"""
+    
+    try:
+        memory_info = {
+            "service": "whisper-service",
+            "timestamp": None,
+            "cpu_memory": "Not implemented",
+            "gpu_memory": None
+        }
+        
+        if torch and torch.cuda.is_available():
+            torch.cuda.synchronize()
+            
+            allocated = torch.cuda.memory_allocated() / 1024**3
+            reserved = torch.cuda.memory_reserved() / 1024**3
+            total = torch.cuda.get_device_properties(0).total_memory / 1024**3
+            
+            memory_info["gpu_memory"] = {
+                "device": torch.cuda.get_device_name(0),
+                "allocated_gb": round(allocated, 2),
+                "reserved_gb": round(reserved, 2),
+                "total_gb": round(total, 2),
+                "free_gb": round(total - allocated, 2),
+                "utilization_percent": round((allocated / total) * 100, 1),
+                "memory_fraction": 0.6,  # 60% allocation for Whisper
+                "notes": "ctranslate2 memory allocation may not be fully reflected in PyTorch metrics"
+            }
+        else:
+            memory_info["gpu_memory"] = {
+                "status": "GPU not available",
+                "device": "CPU"
+            }
+        
+        return JSONResponse(content=memory_info)
+    
+    except Exception as e:
+        logger.error(f"Memory status check failed: {e}")
         return JSONResponse(
             status_code=500,
             content={"status": "error", "message": str(e)}

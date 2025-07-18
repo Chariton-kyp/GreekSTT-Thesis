@@ -135,6 +135,10 @@ class ModelComparisonService:
                     'models_compared': ['whisper', 'wav2vec2'],
                     'analysis_date': datetime.utcnow().isoformat(),
                     'research_purpose': 'academic_comparison'
+                },
+                'metadata': {
+                    'whisper_processing_time_seconds': whisper_result.get('metadata', {}).get('processing_time_seconds', 0),
+                    'wav2vec_processing_time_seconds': wav2vec_result.get('metadata', {}).get('processing_time_seconds', 0)
                 }
             }
             
@@ -151,7 +155,7 @@ class ModelComparisonService:
             raise Exception(f"Failed to compare models: {str(e)}")
     
     def _analyze_model_comparison(self, whisper_result: Dict, wav2vec_result: Dict) -> Dict[str, Any]:
-        """
+        """Analyze and compare results from both models."""
         try:
             whisper_text = whisper_result.get('text', '').strip()
             wav2vec_text = wav2vec_result.get('text', '').strip()

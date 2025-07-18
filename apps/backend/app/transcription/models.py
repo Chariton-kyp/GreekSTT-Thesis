@@ -246,7 +246,27 @@ class Transcription(BaseModel):
         return data
     
     def _calculate_processing_time(self):
-        """Calculate processing time in seconds."""
+        """Calculate actual AI processing time in seconds."""
+        # Return the actual AI processing time from the model, not the total elapsed time
+        if self.model_used == 'whisper':
+            if self.whisper_processing_time:
+                return self.whisper_processing_time
+            # Fallback to metadata if database value is missing
+            elif self.processing_metadata:
+                return self.processing_metadata.get('processing_time_seconds', 0)
+        elif self.model_used == 'wav2vec2':
+            if self.wav2vec_processing_time:
+                return self.wav2vec_processing_time
+            # Fallback to metadata if database value is missing
+            elif self.processing_metadata:
+                return self.processing_metadata.get('processing_time_seconds', 0)
+        elif self.model_used == 'comparison':
+            # For comparison mode, return the sum of both processing times
+            whisper_time = self.whisper_processing_time or 0
+            wav2vec_time = self.wav2vec_processing_time or 0
+            return whisper_time + wav2vec_time
+        
+        # Final fallback to old calculation if no specific processing time is available
         if self.started_at and self.completed_at:
             return (self.completed_at - self.started_at).total_seconds()
         return None

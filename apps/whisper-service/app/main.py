@@ -74,7 +74,19 @@ async def lifespan(app: FastAPI):
         if torch.cuda.is_available():
             device = "cuda"
             compute_type = "float16"
+            
+            # Set GPU memory fraction (60% for Whisper service)
+            from app.core.config import config
+            gpu_fraction = config.GPU_MEMORY_FRACTION
+            total_memory = torch.cuda.get_device_properties(0).total_memory / (1024**3)
+            allocated_memory = total_memory * gpu_fraction
+            
+            # Set memory limit
+            torch.cuda.set_per_process_memory_fraction(gpu_fraction, device=0)
+            
             logger.info(f"GPU detected: {torch.cuda.get_device_name(0)}")
+            logger.info(f"Total GPU memory: {total_memory:.1f}GB")
+            logger.info(f"Allocated to Whisper: {allocated_memory:.1f}GB ({gpu_fraction*100:.0f}%)")
         else:
             device = "cpu"
             compute_type = "int8"
@@ -88,8 +100,47 @@ async def lifespan(app: FastAPI):
             num_workers=1
         )
         
-        logger.info(f"Whisper large-v3 model ready on {device.upper()}")
-        logger.info(f"Memory usage: {torch.cuda.memory_allocated() / 1024**3:.2f}GB" if device == "cuda" else "")
+        logger.info(f"✅ Whisper large-v3 model ready on {device.upper()}")
+        
+        # Check GPU memory usage after model loading
+        if device == "cuda":
+            # Force GPU memory sync
+            torch.cuda.synchronize()
+            
+            # Get current memory usage
+            current_allocated = torch.cuda.memory_allocated() / 1024**3
+            current_reserved = torch.cuda.memory_reserved() / 1024**3
+            
+            logger.info(f"📊 GPU Memory Status:")
+            logger.info(f"   - PyTorch allocated: {current_allocated:.2f}GB")
+            logger.info(f"   - PyTorch reserved: {current_reserved:.2f}GB")
+            logger.info(f"   - Available for use: {allocated_memory - current_reserved:.2f}GB")
+            
+            # Try to get ctranslate2 memory info
+            try:
+                # Test transcription to trigger ctranslate2 memory allocation
+                logger.info("🔍 Testing ctranslate2 memory allocation...")
+                test_audio = torch.zeros(16000, dtype=torch.float32)  # 1 second of silence
+                test_result = list(model.transcribe(test_audio, language="el"))
+                
+                # Check memory after test transcription
+                torch.cuda.synchronize()
+                post_test_allocated = torch.cuda.memory_allocated() / 1024**3
+                post_test_reserved = torch.cuda.memory_reserved() / 1024**3
+                
+                logger.info(f"📊 Post-transcription Memory Status:")
+                logger.info(f"   - PyTorch allocated: {post_test_allocated:.2f}GB")
+                logger.info(f"   - PyTorch reserved: {post_test_reserved:.2f}GB")
+                logger.info(f"   - Estimated ctranslate2 usage: {post_test_allocated - current_allocated:.2f}GB")
+                
+                if post_test_allocated > current_allocated:
+                    logger.info(f"✅ ctranslate2 memory allocation successful ({post_test_allocated:.2f}GB total)")
+                else:
+                    logger.info(f"ℹ️  ctranslate2 memory will be allocated on actual transcription")
+                
+            except Exception as e:
+                logger.warning(f"⚠️  Could not test ctranslate2 memory: {e}")
+                logger.info(f"ℹ️  ctranslate2 memory will be allocated on first transcription request")
         
         app.state.whisper_model = model
         

@@ -581,7 +581,7 @@
               </p-button>
               <p-button 
                 label="Νέα" 
-                icon="pi pi-refresh"
+                icon="pi pi-sync"
                 [outlined]="true"
                 (onClick)="deleteRecording()"
                 ariaLabel="Διαγραφή τρέχουσας ηχογράφησης και έναρξη νέας"
@@ -598,7 +598,7 @@
       <h2>📄 Πρόσφατες μεταγραφές</h2>
       <div class="header-actions">
         <p-button 
-          icon="pi pi-refresh" 
+          icon="pi pi-sync" 
           [text]="true"
           [loading]="isLoading()"
           (onClick)="refreshTranscriptions()" 
@@ -871,7 +871,7 @@
       <!-- Header Info -->
       <div class="retry-header">
         <div class="retry-icon">
-          <i class="pi pi-refresh"></i>
+          <i class="pi pi-sync"></i>
         </div>
         <div class="retry-info">
           <h3>{{ transcription.title }}</h3>
@@ -935,11 +935,13 @@
       </p-button>
       <p-button 
         label="Επανάληψη Μεταγραφής" 
-        icon="pi pi-refresh"
         [loading]="isRetrying()"
         loadingIcon="pi pi-spin pi-spinner"
         (onClick)="confirmRetry()"
         styleClass="p-button-success retry-confirm-btn">
+        <ng-template pTemplate="icon">
+          <img src="assets/icons/refresh.svg" alt="Refresh" style="width: 16px; height: 16px; margin-right: 8px; filter: brightness(0) invert(1);">
+        </ng-template>
       </p-button>
     </div>
   </ng-template>
