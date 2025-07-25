@@ -164,6 +164,7 @@ async def transcribe_whisper(
         )
     
     temp_file = None
+    temp_path = None
     converted_audio_path = None
     try:
         with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as temp_file:
@@ -256,11 +257,20 @@ async def transcribe_whisper(
         raise HTTPException(status_code=500, detail=f"Transcription failed: {str(e)}")
     
     finally:
-        if temp_file and os.path.exists(temp_path):
-            os.unlink(temp_path)
+        # Clean up temporary files
+        if temp_path and os.path.exists(temp_path):
+            try:
+                os.unlink(temp_path)
+                logger.info(f"Cleaned up temp file: {temp_path}")
+            except Exception as cleanup_error:
+                logger.error(f"Failed to clean up temp file {temp_path}: {cleanup_error}")
         
         if converted_audio_path:
-            AudioConverter.cleanup_temp_file(converted_audio_path)
+            try:
+                AudioConverter.cleanup_temp_file(converted_audio_path)
+                logger.info(f"Cleaned up converted audio file: {converted_audio_path}")
+            except Exception as cleanup_error:
+                logger.error(f"Failed to clean up converted audio file {converted_audio_path}: {cleanup_error}")
 
 
 @router.post("/models/unload")

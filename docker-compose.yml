@@ -170,7 +170,7 @@ services:
       - type: tmpfs
         target: /tmp
         tmpfs:
-          size: 4G
+          size: 8G
     networks:
       - greekstt_network
     deploy:
@@ -241,7 +241,7 @@ services:
       - type: tmpfs
         target: /tmp
         tmpfs:
-          size: 4G
+          size: 8G
     networks:
       - greekstt_network
     deploy:
