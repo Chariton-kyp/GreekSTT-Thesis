@@ -33,7 +33,7 @@ def create_app(config_name=None):
     
     app.json = UnicodeJSONProvider(app)
     
-    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=8)
     app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
     app.config['JWT_ALGORITHM'] = 'HS256'
     app.config['JWT_HEADER_NAME'] = 'Authorization'  

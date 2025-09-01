@@ -1277,9 +1277,9 @@ export class TranscriptionViewComponent implements OnInit, OnDestroy {
     }
     
     const modelUsed = transcription.model_used;
-    if (modelUsed === 'whisper') {
+    if (modelUsed?.includes('whisper') || modelUsed === 'whisper') {
       return 'Αποτελέσματα WER/CER (Whisper)';
-    } else if (modelUsed === 'wav2vec2') {
+    } else if (modelUsed?.includes('wav2vec') || modelUsed === 'wav2vec2') {
       return 'Αποτελέσματα WER/CER (Wav2Vec2)';
     }
     
@@ -1327,17 +1327,39 @@ export class TranscriptionViewComponent implements OnInit, OnDestroy {
       chartData.comparisonWER = comparisonWER;
     } else if (werResult) {
       chartData.werResult = werResult;
-    } else if (this.hasBackendEvaluationData(transcription)) {
-      // Create comparison WER from backend data
-      chartData.comparisonWER = this.createComparisonWERFromBackend(transcription);
-    } else if (this.hasSingleModelEvaluationData(transcription)) {
-      // Create single model WER from backend data for Performance Charts
+      // Even for local werResult, we need to set modelUsed
+      if (transcription.model_used) {
+        chartData.modelUsed = (transcription.model_used?.includes('wav2vec') || transcription.model_used === 'wav2vec2') ? 'wav2vec2' : 'whisper';
+        console.log('🎯 ChartData Debug (Local WER + ModelUsed):', {
+          model_used_original: transcription.model_used,
+          modelUsed_set: chartData.modelUsed,
+          includesWav2vec: transcription.model_used?.includes('wav2vec'),
+          equalsWav2vec2: transcription.model_used === 'wav2vec2',
+          werResult_type: 'local'
+        });
+      }
+    } else if (transcription.has_evaluation && transcription.model_used) {
+      // Check if this is a single model transcription by looking at model_used field
+      // Even if both models have evaluation data, we should respect the original model
       const werResult = this.createWERFromBackend(transcription);
       if (werResult) {
         chartData.werResult = werResult;
         // Determine which model was used for single model charts
-        chartData.modelUsed = transcription.model_used === 'wav2vec2' ? 'wav2vec2' : 'whisper';
+        chartData.modelUsed = (transcription.model_used?.includes('wav2vec') || transcription.model_used === 'wav2vec2') ? 'wav2vec2' : 'whisper';
+        
+        // Debug logging
+        console.log('🎯 ChartData Debug (Fixed Logic):', {
+          model_used_original: transcription.model_used,
+          modelUsed_set: chartData.modelUsed,
+          includesWav2vec: transcription.model_used?.includes('wav2vec'),
+          equalsWav2vec2: transcription.model_used === 'wav2vec2',
+          werResult: !!werResult
+        });
       }
+    } else if (this.hasBackendEvaluationData(transcription)) {
+      // Create comparison WER from backend data (only for true comparison transcriptions)
+      chartData.comparisonWER = this.createComparisonWERFromBackend(transcription);
+      console.log('📊 Using Backend Evaluation Data (Comparison)');
     }
 
     // Add processing times if available
@@ -1434,7 +1456,7 @@ export class TranscriptionViewComponent implements OnInit, OnDestroy {
     // Create WER result from backend calculated data only
     const modelUsed = transcription.model_used;
     
-    if (modelUsed === 'whisper' && transcription.whisper_wer !== null) {
+    if ((modelUsed?.includes('whisper') || modelUsed === 'whisper') && transcription.whisper_wer !== null) {
       return {
         wer: transcription.whisper_wer || 0, // Backend already calculates as decimal
         cer: transcription.whisper_cer || 0, // Backend already calculates as decimal
@@ -1458,7 +1480,7 @@ export class TranscriptionViewComponent implements OnInit, OnDestroy {
         correctCharacters: 0, // Would need to be calculated in backend
         greekCharacterCount: 0 // Would need to be calculated in backend
       };
-    } else if (modelUsed === 'wav2vec2' && transcription.wav2vec_wer !== null) {
+    } else if ((modelUsed?.includes('wav2vec') || modelUsed === 'wav2vec2') && transcription.wav2vec_wer !== null) {
       return {
         wer: transcription.wav2vec_wer || 0, // Backend already calculates as decimal
         cer: transcription.wav2vec_cer || 0, // Backend already calculates as decimal

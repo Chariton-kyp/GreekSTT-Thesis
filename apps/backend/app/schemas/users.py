@@ -9,6 +9,8 @@ class UpdateUserSchema(Schema):
     first_name = fields.Str(required=False, validate=validate.Length(min=1, max=100))
     last_name = fields.Str(required=False, validate=validate.Length(min=1, max=100))
     email = fields.Email(required=False, validate=validate.Length(max=255))
+    phone = fields.Str(required=False, allow_none=True, validate=validate.Length(max=20))
+    organization = fields.Str(required=False, allow_none=True, validate=validate.Length(max=100))
 
 
 class ChangePasswordSchema(Schema):

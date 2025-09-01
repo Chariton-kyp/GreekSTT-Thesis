@@ -297,6 +297,13 @@ export class ComparisonChartsComponent implements OnChanges, OnDestroy {
   private createWERChart(): void {
     if (!this.werChartRef?.nativeElement || (!this.data?.comparisonWER && !this.data?.werResult)) return;
 
+    // Debug logging
+    console.log('🎯 WER Chart Debug:', {
+      modelUsed: this.data?.modelUsed,
+      werResult: !!this.data?.werResult,
+      comparisonWER: !!this.data?.comparisonWER
+    });
+
     this.destroyChart('wer');
 
     const ctx = this.werChartRef.nativeElement.getContext('2d');
@@ -398,8 +405,8 @@ export class ComparisonChartsComponent implements OnChanges, OnDestroy {
       const werData = this.data.werResult;
       
       // Determine model name and color from modelUsed or default to Whisper
-      const modelName = this.data.modelUsed === 'wav2vec2' ? 'Wav2Vec2' : 'Whisper';
-      const modelColor = this.data.modelUsed === 'wav2vec2' ? colors.wav2vecColor : colors.whisperColor;
+      const modelName = (this.data.modelUsed?.includes('wav2vec') || this.data.modelUsed === 'wav2vec2') ? 'Wav2Vec2' : 'Whisper';
+      const modelColor = (this.data.modelUsed?.includes('wav2vec') || this.data.modelUsed === 'wav2vec2') ? colors.wav2vecColor : colors.whisperColor;
       
       config = {
         type: 'bar',
@@ -482,6 +489,13 @@ export class ComparisonChartsComponent implements OnChanges, OnDestroy {
 
   private createPerformanceChart(): void {
     if (!this.performanceChartRef?.nativeElement || (!this.data?.comparisonWER && !this.data?.werResult)) return;
+
+    // Debug logging
+    console.log('🎯 Performance Chart Debug:', {
+      modelUsed: this.data?.modelUsed,
+      werResult: !!this.data?.werResult,
+      comparisonWER: !!this.data?.comparisonWER
+    });
 
     this.destroyChart('performance');
 
@@ -589,8 +603,8 @@ export class ComparisonChartsComponent implements OnChanges, OnDestroy {
       const werData = this.data.werResult;
       
       // Determine model name and color from modelUsed or default to Whisper
-      const modelName = this.data.modelUsed === 'wav2vec2' ? 'Wav2Vec2' : 'Whisper';
-      const modelColor = this.data.modelUsed === 'wav2vec2' ? colors.wav2vecColor : colors.whisperColor;
+      const modelName = (this.data.modelUsed?.includes('wav2vec') || this.data.modelUsed === 'wav2vec2') ? 'Wav2Vec2' : 'Whisper';
+      const modelColor = (this.data.modelUsed?.includes('wav2vec') || this.data.modelUsed === 'wav2vec2') ? colors.wav2vecColor : colors.whisperColor;
       
       config = {
         type: 'radar',
