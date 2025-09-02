@@ -10,3 +10,10 @@ transcription_ns = Namespace('transcriptions', description='Transcription operat
 templates_ns = Namespace('templates', description='Template management operations')
 research_ns = Namespace('research', description='Research analytics and usage operations')
 health_ns = Namespace('health', description='Health check operations')
+
+# Import the endpoint classes to register them
+from .health import *
+from .auth import *
+from .users import *
+from .audio import *
+from .transcriptions import *

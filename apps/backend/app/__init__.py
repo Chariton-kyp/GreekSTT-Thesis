@@ -47,7 +47,9 @@ def create_app(config_name=None):
     migrate.init_app(app, db, directory='migrations')
     jwt.init_app(app)
     mail.init_app(app)
-    cache.init_app(app)
+    
+    # Skip Flask-Cache initialization to avoid Redis conflicts
+    # cache.init_app(app)  # Commented out - using custom TranscriptionCacheService only
     async_mode = 'threading'
     
     socketio_kwargs = {
@@ -70,7 +72,53 @@ def create_app(config_name=None):
     
     
     if app.config.get('ENVIRONMENT') == 'development':
-        api.init_app(app)
+        # Initialize Flask-RESTX API with comprehensive documentation
+        api.init_app(app, 
+                    title='GreekSTT Research Platform API',
+                    version='1.0.0',
+                    description='''
+                    Academic Research Platform for Greek ASR Model Comparison
+                    
+                    ## Overview
+                    This API provides comprehensive functionality for Greek speech recognition research,
+                    including individual model processing (Whisper vs wav2vec2), comparative analysis,
+                    and academic research tools.
+                    
+                    ## Authentication
+                    Most endpoints require authentication using JWT Bearer tokens.
+                    Obtain tokens through the `/auth/login` endpoint.
+                    
+                    ## Performance Characteristics (Research Findings)
+                    - **Whisper (Faster-Whisper)**: ~7x realtime speed, WER ~2.5% on real-world Greek audio
+                    - **wav2vec2**: ~16x realtime speed, optimized for processing throughput
+                    - Tested on authentic YouTube content (non-studio recordings)
+                    - Demonstrates significant accuracy differences in challenging audio conditions
+                    
+                    ## Features
+                    - Individual ASR model processing (NO ensemble/combination)
+                    - Side-by-side model comparison for research
+                    - Greek language optimization and Unicode support
+                    - Real-time processing updates via WebSocket
+                    - Multi-format audio support (MP3, WAV, M4A, FLAC, etc.)
+                    - URL-based transcription (YouTube, etc.)
+                    - WER/CER calculation with ground truth
+                    - Professional export (TXT, SRT, DOCX, PDF)
+                    
+                    ## Academic Use
+                    This platform is designed for academic research and thesis work.
+                    All processing maintains strict model separation for comparative analysis.
+                    ''',
+                    doc='/docs/',
+                    authorizations={
+                        'Bearer': {
+                            'type': 'apiKey',
+                            'in': 'header',
+                            'name': 'Authorization',
+                            'description': 'Add "Bearer " before your JWT token'
+                        }
+                    },
+                    security='Bearer'
+        )
         
         from .api_docs import (
             auth_ns, users_ns, audio_ns, transcription_ns, 
@@ -78,12 +126,13 @@ def create_app(config_name=None):
         )
         from .api_docs.health import HealthCheck, DetailedHealthCheck
         
+        # Add documentation namespaces with /docs prefix to avoid conflicts with real endpoints
         api.add_namespace(health_ns, path='/health')
-        api.add_namespace(auth_ns, path='/auth')
-        api.add_namespace(users_ns, path='/users')
-        api.add_namespace(audio_ns, path='/audio')
-        api.add_namespace(transcription_ns, path='/transcriptions')
-        api.add_namespace(templates_ns, path='/templates')
+        api.add_namespace(auth_ns, path='/docs/auth')
+        api.add_namespace(users_ns, path='/docs/users')
+        api.add_namespace(audio_ns, path='/docs/audio')
+        api.add_namespace(transcription_ns, path='/docs/transcriptions')
+        api.add_namespace(templates_ns, path='/docs/templates')
     
     cors.init_app(app, resources={
         r"/api/*": {
@@ -234,6 +283,7 @@ def create_app(config_name=None):
     from .sessions.routes import sessions_bp
     from .comparison.routes import comparison_bp
     from .export.routes import export_bp
+    from .cache.routes import cache_bp
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(users_bp, url_prefix='/api/users')
@@ -246,6 +296,7 @@ def create_app(config_name=None):
     app.register_blueprint(sessions_bp, url_prefix='/api/sessions')
     app.register_blueprint(comparison_bp, url_prefix='/api/comparison')
     app.register_blueprint(export_bp)
+    app.register_blueprint(cache_bp)
     
     from app.api.internal import internal_bp
     app.register_blueprint(internal_bp)

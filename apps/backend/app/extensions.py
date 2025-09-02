@@ -57,10 +57,19 @@ api = Api(
     }
 )
 
-# Cache configuration - Using SimpleCache (in-memory) instead of Redis
-cache = Cache(config={
-    'CACHE_TYPE': 'simple',
-    'CACHE_DEFAULT_TIMEOUT': 300  # 5 minutes
-})
+# Cache configuration - Using Redis for better scalability
+def get_redis_url():
+    """Get Redis URL with Docker network support."""
+    redis_url = os.environ.get('REDIS_URL')
+    if not redis_url:
+        # Construct from individual environment variables for Docker
+        redis_host = os.environ.get('REDIS_HOST', 'localhost')
+        redis_port = os.environ.get('REDIS_PORT', '6379')
+        redis_db = os.environ.get('REDIS_DB', '0')
+        redis_url = f'redis://{redis_host}:{redis_port}/{redis_db}'
+    return redis_url
+
+# Initialize Cache without config - will be configured in init_app
+cache = Cache()
 
 

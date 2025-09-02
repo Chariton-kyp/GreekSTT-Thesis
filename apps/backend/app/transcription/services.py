@@ -10,6 +10,7 @@ from app.transcription.repositories import TranscriptionRepository
 from app.transcription.ai_client import AIServiceClient
 from app.audio.models import AudioFile
 from app.utils.logging_middleware import log_external_service_call
+from app.cache.redis_service import get_transcription_cache
 import logging
 
 logger = logging.getLogger(__name__)
@@ -21,6 +22,7 @@ class TranscriptionService:
     def __init__(self):
         self.repository = TranscriptionRepository()
         self.ai_client = AIServiceClient()
+        # Note: cache is accessed via method to ensure fresh instances
     
     def create_transcription_with_metadata(self, audio_file_id: int, user_id: int,
                                           title: str, description: str = '',
@@ -314,6 +316,15 @@ class TranscriptionService:
             
             db.session.commit()
             
+            # Cache the completed transcription in Redis
+            try:
+                if get_transcription_cache().cache_transcription(transcription):
+                    logger.info(f"Cached completed transcription {transcription_id} in Redis")
+                else:
+                    logger.warning(f"Failed to cache transcription {transcription_id} in Redis")
+            except Exception as cache_error:
+                logger.warning(f"Redis caching error for transcription {transcription_id}: {str(cache_error)}")
+            
             try:
                 from app.analytics.services import AnalyticsService
                 analytics_service = AnalyticsService()
@@ -373,13 +384,114 @@ class TranscriptionService:
             logger.error(f"Transcription failed | transcription_id={transcription_id} | error={str(e)}")
     
     def get_transcription(self, transcription_id: int, user_id: int) -> Optional[Transcription]:
-        """Get transcription if user has access."""
+        """Get transcription if user has access. Check Redis cache first for faster retrieval."""
+        
+        # First check Redis cache for completed transcriptions
+        try:
+            cached_data = get_transcription_cache().get_cached_transcription(transcription_id, user_id)
+            if cached_data:
+                # Convert cached data back to Transcription object
+                logger.info(f"Retrieved transcription {transcription_id} from Redis cache")
+                cached_transcription = self._create_transcription_from_cache(cached_data)
+                if cached_transcription:
+                    return cached_transcription
+                else:
+                    logger.warning(f"Failed to reconstruct transcription {transcription_id} from cache, falling back to database")
+        except Exception as cache_error:
+            logger.warning(f"Redis cache retrieval error for transcription {transcription_id}: {str(cache_error)}")
+        
+        # Fallback to database
+        logger.debug(f"Fetching transcription {transcription_id} from database")
         transcription = self.repository.get_by_id(transcription_id)
         
         if transcription and transcription.user_id == user_id:
+            # Cache completed transcriptions for future requests
+            if transcription.status == 'completed':
+                try:
+                    get_transcription_cache().cache_transcription(transcription)
+                    logger.debug(f"Cached transcription {transcription_id} after database retrieval")
+                except Exception as cache_error:
+                    logger.warning(f"Failed to cache transcription after DB fetch: {str(cache_error)}")
+            
             return transcription
         
         return None
+    
+    def _create_transcription_from_cache(self, cached_data: Dict[str, Any]) -> Transcription:
+        """Creates a Transcription object from cached data."""
+        try:
+            transcription = Transcription()
+        
+            # Basic fields
+            transcription.id = cached_data.get('id')
+            transcription.title = cached_data.get('title')
+            transcription.description = cached_data.get('description')
+            transcription.text = cached_data.get('text')
+            transcription.language = cached_data.get('language')
+            transcription.status = cached_data.get('status')
+            transcription.model_used = cached_data.get('model_used')
+            transcription.confidence_score = cached_data.get('confidence_score')
+            transcription.word_count = cached_data.get('word_count')
+            transcription.duration_seconds = cached_data.get('duration_seconds')
+            transcription.processing_time = cached_data.get('processing_time')
+            transcription.user_id = cached_data.get('user_id')
+            transcription.audio_file_id = cached_data.get('audio_file_id')
+            transcription.error_message = cached_data.get('error_message')
+            transcription.credits_used = cached_data.get('credits_used')
+        
+            # Comparison data
+            transcription.whisper_text = cached_data.get('whisper_text')
+            transcription.whisper_confidence = cached_data.get('whisper_confidence')
+            transcription.whisper_processing_time = cached_data.get('whisper_processing_time')
+            transcription.wav2vec_text = cached_data.get('wav2vec_text')
+            transcription.wav2vec_confidence = cached_data.get('wav2vec_confidence')
+            transcription.wav2vec_processing_time = cached_data.get('wav2vec_processing_time')
+            
+            # Performance metrics
+            transcription.whisper_wer = cached_data.get('whisper_wer')
+            transcription.whisper_cer = cached_data.get('whisper_cer')
+            transcription.whisper_accuracy = cached_data.get('whisper_accuracy')
+            transcription.wav2vec_wer = cached_data.get('wav2vec_wer')
+            transcription.wav2vec_cer = cached_data.get('wav2vec_cer')
+            transcription.wav2vec_accuracy = cached_data.get('wav2vec_accuracy')
+            transcription.best_performing_model = cached_data.get('best_performing_model')
+            transcription.faster_model = cached_data.get('faster_model')
+            transcription.academic_accuracy_score = cached_data.get('academic_accuracy_score')
+            transcription.evaluation_completed = cached_data.get('evaluation_completed')
+            transcription.ground_truth_text = cached_data.get('ground_truth_text')
+            
+            # Date fields - convert from ISO strings
+            if cached_data.get('created_at'):
+                transcription.created_at = datetime.fromisoformat(cached_data['created_at'])
+            if cached_data.get('completed_at'):
+                transcription.completed_at = datetime.fromisoformat(cached_data['completed_at'])
+            if cached_data.get('started_at'):
+                transcription.started_at = datetime.fromisoformat(cached_data['started_at'])
+            if cached_data.get('updated_at'):
+                transcription.updated_at = datetime.fromisoformat(cached_data['updated_at'])
+            
+            # Mark as cached so we know it came from Redis
+            transcription._is_from_cache = True
+            
+            # Load essential relationships from database for API compatibility
+            from app.transcription.models import TranscriptionSegment
+            from app.audio.models import AudioFile
+            
+            # Load segments if they exist (but don't attach to session)
+            segments = TranscriptionSegment.query.filter_by(transcription_id=transcription.id).all()
+            transcription.segments = segments
+            
+            # Load audio file relationship if it exists
+            if transcription.audio_file_id:
+                audio_file = AudioFile.query.get(transcription.audio_file_id)
+                transcription.audio_file = audio_file
+            
+            return transcription
+            
+        except Exception as e:
+            logger.error(f"Error creating transcription from cache: {str(e)}")
+            # Return None to trigger database fallback
+            return None
     
     def get_user_transcriptions(self, user_id: int, page: int = 1, 
                                per_page: int = 20, 
@@ -425,9 +537,25 @@ class TranscriptionService:
         if not transcription:
             return None
         
+        # Invalidate cache before updating
+        try:
+            get_transcription_cache().invalidate_transcription(transcription_id, user_id)
+            logger.debug(f"Invalidated cache for transcription {transcription_id} before text update")
+        except Exception as cache_error:
+            logger.warning(f"Failed to invalidate cache before update: {str(cache_error)}")
+        
         transcription.text = text
         transcription.word_count = len(text.split())
+        transcription.updated_at = datetime.utcnow()
         db.session.commit()
+        
+        # Re-cache the updated transcription if it's completed
+        if transcription.status == 'completed':
+            try:
+                get_transcription_cache().cache_transcription(transcription)
+                logger.debug(f"Re-cached updated transcription {transcription_id}")
+            except Exception as cache_error:
+                logger.warning(f"Failed to re-cache updated transcription: {str(cache_error)}")
         
         return transcription
     
@@ -437,6 +565,13 @@ class TranscriptionService:
         
         if not transcription:
             return False
+        
+        # Invalidate cache before deletion
+        try:
+            get_transcription_cache().invalidate_transcription(transcription_id, user_id)
+            logger.debug(f"Invalidated cache for transcription {transcription_id} before deletion")
+        except Exception as cache_error:
+            logger.warning(f"Failed to invalidate cache before deletion: {str(cache_error)}")
         
         transcription.soft_delete()
         return True
@@ -566,18 +701,40 @@ class TranscriptionService:
     
     def _export_as_srt(self, transcription: Transcription) -> Tuple[bytes, str, str]:
         """Export as SRT subtitle file."""
-        if not transcription.segments:
-            raise ValueError("No segments available for SRT export")
-        
         srt_content = []
-        for i, segment in enumerate(transcription.segments, 1):
-            start_time = self._seconds_to_srt_time(segment.start_time)
-            end_time = self._seconds_to_srt_time(segment.end_time)
+        
+        if transcription.segments and len(transcription.segments) > 0:
+            # Use actual segments if available
+            for i, segment in enumerate(transcription.segments, 1):
+                start_time = self._seconds_to_srt_time(segment.start_time)
+                end_time = self._seconds_to_srt_time(segment.end_time)
+                
+                srt_content.append(f"{i}")
+                srt_content.append(f"{start_time} --> {end_time}")
+                srt_content.append(segment.text)
+                srt_content.append("")  # Empty line between subtitles
+        else:
+            # Fallback: Create basic segments from full text
+            logger.warning(f"No segments found for transcription {transcription.id}, creating fallback SRT")
             
-            srt_content.append(f"{i}")
-            srt_content.append(f"{start_time} --> {end_time}")
-            srt_content.append(segment.text)
-            srt_content.append("")  # Empty line between subtitles
+            # Split text into sentences for basic segmentation
+            text = transcription.text if transcription.text else "Δεν υπάρχει κείμενο μεταγραφής"
+            sentences = self._split_text_for_srt(text)
+            
+            duration = transcription.duration_seconds if transcription.duration_seconds else 30.0
+            segment_duration = duration / len(sentences) if sentences else duration
+            
+            for i, sentence in enumerate(sentences, 1):
+                start_time = (i - 1) * segment_duration
+                end_time = i * segment_duration
+                
+                start_srt = self._seconds_to_srt_time(start_time)
+                end_srt = self._seconds_to_srt_time(end_time)
+                
+                srt_content.append(f"{i}")
+                srt_content.append(f"{start_srt} --> {end_srt}")
+                srt_content.append(sentence.strip())
+                srt_content.append("")  # Empty line between subtitles
         
         content = '\n'.join(srt_content)
         filename = f"transcription_{transcription.id}.srt"
@@ -874,6 +1031,47 @@ class TranscriptionService:
         millis = int((seconds % 1) * 1000)
         
         return f"{hours:02d}:{minutes:02d}:{secs:02d},{millis:03d}"
+    
+    def _split_text_for_srt(self, text: str) -> list:
+        """Split text into manageable segments for SRT subtitles."""
+        if not text or len(text.strip()) == 0:
+            return ["Δεν υπάρχει κείμενο"]
+        
+        # Try to split by sentences first (Greek punctuation aware)
+        import re
+        sentences = re.split(r'[.!;·]\s+', text.strip())
+        
+        # If sentences are too long (>80 chars), split further
+        result = []
+        for sentence in sentences:
+            sentence = sentence.strip()
+            if not sentence:
+                continue
+                
+            if len(sentence) <= 80:
+                result.append(sentence)
+            else:
+                # Split long sentences by clauses or phrases
+                clauses = re.split(r'[,·]\s+', sentence)
+                current_segment = ""
+                
+                for clause in clauses:
+                    clause = clause.strip()
+                    if len(current_segment + " " + clause) <= 80:
+                        current_segment = current_segment + " " + clause if current_segment else clause
+                    else:
+                        if current_segment:
+                            result.append(current_segment)
+                        current_segment = clause
+                
+                if current_segment:
+                    result.append(current_segment)
+        
+        # Ensure we have at least one segment
+        if not result:
+            result = [text[:80] + "..." if len(text) > 80 else text]
+        
+        return result
     
     def _calculate_credits(self, duration_seconds: float) -> float:
         """Calculate credits used based on duration."""
