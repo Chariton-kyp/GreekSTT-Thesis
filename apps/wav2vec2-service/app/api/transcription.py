@@ -1,5 +1,5 @@
 """
-wav2vec2 ASR API endpoints for GreekSTT Research Platform
+wav2vec2 ASR API endpoints for GreekSTT Comparison Platform
 Handles only wav2vec2 transcription
 """
 import logging

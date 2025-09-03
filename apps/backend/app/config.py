@@ -58,7 +58,7 @@ class Config:
     
     SUPPORT_EMAIL = os.environ.get('SUPPORT_EMAIL', 'research@greekstt.local')
     
-    PLATFORM_NAME = 'GreekSTT Research Platform'
+    PLATFORM_NAME = 'GreekSTT Comparison Platform'
     ACADEMIC_MODE = True
     EMAIL_MODE = 'academic_demo'
     MAILHOG_HOST = os.environ.get('MAILHOG_HOST', 'mailhog')

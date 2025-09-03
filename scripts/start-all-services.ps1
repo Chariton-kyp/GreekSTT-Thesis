@@ -1,6 +1,6 @@
 # PowerShell script to start all GreekSTT services
 
-Write-Host "🚀 Starting GreekSTT Research Platform - All Services" -ForegroundColor Cyan
+Write-Host "🚀 Starting GreekSTT Comparison Platform - All Services" -ForegroundColor Cyan
 
 # Start infrastructure first
 Write-Host "📦 Starting infrastructure services..." -ForegroundColor Yellow

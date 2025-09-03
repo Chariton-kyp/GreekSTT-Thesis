@@ -1,4 +1,4 @@
-"""GreekSTT Research Platform email service for academic demo with MailHog."""
+"""GreekSTT Comparison Platform email service for academic demo with MailHog."""
 
 import time
 import uuid
@@ -93,7 +93,7 @@ class EmailLog(db.Model):
 
 
 class EmailService:
-    """GreekSTT Research Platform email service for academic demo with MailHog."""
+    """GreekSTT Comparison Platform email service for academic demo with MailHog."""
     
     def __init__(self):
         self.templates = None  # Load templates lazily when needed
@@ -108,7 +108,7 @@ class EmailService:
             'verification_code': code,
             'expiry_minutes': 10,
             'dashboard_url': f"{current_app.config['FRONTEND_URL']}/app/dashboard",
-            'company_name': 'GreekSTT Research Platform',
+            'company_name': 'GreekSTT Comparison Platform',
             'support_email': current_app.config.get('SUPPORT_EMAIL', 'research@greekstt.local'),
             'year': datetime.now().year
         }
@@ -131,7 +131,7 @@ class EmailService:
             'reset_code': code,
             'expiry_minutes': 10,
             'dashboard_url': f"{current_app.config['FRONTEND_URL']}/app/dashboard",
-            'company_name': 'GreekSTT Research Platform',
+            'company_name': 'GreekSTT Comparison Platform',
             'support_email': current_app.config.get('SUPPORT_EMAIL', 'research@greekstt.local'),
             'year': datetime.now().year
         }
@@ -153,7 +153,7 @@ class EmailService:
             'user_name': f"{user.first_name} {user.last_name}".strip() or user.username,
             'dashboard_url': f"{current_app.config['FRONTEND_URL']}/app/dashboard",
             'transcription_url': f"{current_app.config['FRONTEND_URL']}/app/transcription/create",
-            'company_name': 'GreekSTT Research Platform',
+            'company_name': 'GreekSTT Comparison Platform',
             'support_email': current_app.config.get('SUPPORT_EMAIL', 'research@greekstt.local'),
             'year': datetime.now().year
         }
@@ -181,7 +181,7 @@ class EmailService:
             'client_ip': client_ip,
             'user_agent': parsed_user_agent,
             'dashboard_url': f"{current_app.config['FRONTEND_URL']}/app/dashboard",
-            'company_name': 'GreekSTT Research Platform',
+            'company_name': 'GreekSTT Comparison Platform',
             'support_email': current_app.config.get('SUPPORT_EMAIL', 'research@greekstt.local'),
             'year': datetime.now().year
         }
@@ -210,7 +210,7 @@ class EmailService:
             'client_ip': client_ip,
             'user_agent': parsed_user_agent,
             'dashboard_url': f"{current_app.config['FRONTEND_URL']}/app/dashboard",
-            'company_name': 'GreekSTT Research Platform',
+            'company_name': 'GreekSTT Comparison Platform',
             'support_email': current_app.config.get('SUPPORT_EMAIL', 'research@greekstt.local'),
             'year': datetime.now().year
         }
@@ -603,7 +603,7 @@ class EmailService:
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>GreekSTT Research Platform Email</title>
+    <title>GreekSTT Comparison Platform Email</title>
 </head>
 <body>
     <h1>{{{{ company_name }}}}</h1>

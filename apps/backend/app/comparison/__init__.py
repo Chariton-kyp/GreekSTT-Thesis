@@ -1,1 +1,1 @@
-"""Academic model comparison module for GreekSTT Research Platform."""
+"""Academic model comparison module for GreekSTT Comparison Platform."""

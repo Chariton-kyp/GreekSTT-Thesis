@@ -1,5 +1,5 @@
 """
-Multilingual message system for GreekSTT Research Platform
+Multilingual message system for GreekSTT Comparison Platform
 Supports Greek (default) and English languages
 """
 

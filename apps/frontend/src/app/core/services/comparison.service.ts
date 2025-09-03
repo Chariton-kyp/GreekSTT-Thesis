@@ -39,7 +39,6 @@ export class ComparisonService {
   private readonly apiService = inject(ApiService);
   private readonly apiUrl = `${environment.apiUrl}/api`;
 
-
   /**
    * Export comparison results as JSON
    */
@@ -50,7 +49,7 @@ export class ComparisonService {
         exportFormat: 'json',
         exportTimestamp: new Date().toISOString(),
         platformVersion: '1.0.0',
-        academicPurpose: 'GreekSTT Research Platform - Master\'s Thesis'
+        academicPurpose: 'GreekSTT Comparison Platform - Master\'s Thesis'
       },
       comparisonResults: {
         whisper: results.whisperResult,
@@ -60,7 +59,7 @@ export class ComparisonService {
       academicNotes: {
         methodology: 'Side-by-side comparison of ASR models for Greek language',
         disclaimer: 'Results for academic research purposes only',
-        citation: 'GreekSTT Research Platform (2024). Master\'s Thesis, University of Athens'
+        citation: 'GreekSTT Comparison Platform (2024). Master\'s Thesis, University of Athens'
       }
     };
 
@@ -116,7 +115,6 @@ export class ComparisonService {
     csvRows.push(`File Size,${this.formatFileSize(results.metadata.fileSize)}`);
     csvRows.push(`Analysis Date,${new Date(results.metadata.timestamp).toLocaleString('el-GR')}`);
     
-
     const csvContent = csvRows.join('\n');
     return new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
   }
@@ -130,7 +128,7 @@ export class ComparisonService {
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>Αναφορά Σύγκρισης Μοντέλων ASR - GreekSTT Research Platform</title>
+    <title>Αναφορά Σύγκρισης Μοντέλων ASR - GreekSTT Comparison Platform</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -226,7 +224,7 @@ export class ComparisonService {
 <body>
     <div class="header">
         <h1>Αναφορά Σύγκρισης Μοντέλων ASR</h1>
-        <p>GreekSTT Research Platform - Ακαδημαϊκή Έρευνα</p>
+        <p>GreekSTT Comparison Platform - Ακαδημαϊκή Έρευνα</p>
         <p>Ημερομηνία: ${new Date().toLocaleDateString('el-GR', { 
             year: 'numeric', 
             month: 'long', 
@@ -289,7 +287,6 @@ export class ComparisonService {
         </div>
     </div>
 
-
     <div class="section">
         <h2>Ακαδημαϊκές Παρατηρήσεις</h2>
         ${results.comparisonMetrics?.academicInsights.map(insight => `
@@ -298,7 +295,7 @@ export class ComparisonService {
     </div>
 
     <div class="footer">
-        <p>GreekSTT Research Platform - Πλατφόρμα Ακαδημαϊκής Έρευνας</p>
+        <p>GreekSTT Comparison Platform - Πλατφόρμα Ακαδημαϊκής Έρευνας</p>
         <p>Διπλωματική Εργασία - Πανεπιστήμιο Αθηνών 2024</p>
         <p style="font-style: italic;">
             Τα αποτελέσματα προορίζονται αποκλειστικά για ακαδημαϊκούς και ερευνητικούς σκοπούς

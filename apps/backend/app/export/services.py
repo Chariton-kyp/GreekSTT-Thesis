@@ -111,7 +111,7 @@ class ExportService:
         )
         
         # Title
-        title = Paragraph("Αναφορά Μεταγραφών - GreekSTT Research Platform", title_style)
+        title = Paragraph("Αναφορά Μεταγραφών - GreekSTT Comparison Platform", title_style)
         story.append(title)
         story.append(Spacer(1, 20))
         
@@ -163,7 +163,7 @@ class ExportService:
         doc = Document()
         
         # Title
-        title = doc.add_heading('Αναφορά Μεταγραφών - GreekSTT Research Platform', 0)
+        title = doc.add_heading('Αναφορά Μεταγραφών - GreekSTT Comparison Platform', 0)
         title.alignment = WD_ALIGN_PARAGRAPH.CENTER
         
         # Date

@@ -1,5 +1,5 @@
 """
-wav2vec2 ASR Service for GreekSTT Research Platform
+wav2vec2 ASR Service for GreekSTT Comparison Platform
 Handles wav2vec2 models with transformers 4.36
 """
 import logging

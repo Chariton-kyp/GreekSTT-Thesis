@@ -1,5 +1,5 @@
 """
-Whisper ASR API endpoints for GreekSTT Research Platform
+Whisper ASR API endpoints for GreekSTT Comparison Platform
 """
 import logging
 import tempfile

@@ -1,4 +1,4 @@
-"""Clean email logging formatter για GreekSTT Research Platform."""
+"""Clean email logging formatter για GreekSTT Comparison Platform."""
 
 import logging
 import re

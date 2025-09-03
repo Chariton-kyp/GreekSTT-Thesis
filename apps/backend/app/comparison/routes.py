@@ -1,4 +1,4 @@
-"""Academic model comparison routes for GreekSTT Research Platform."""
+"""Academic model comparison routes for GreekSTT Comparison Platform."""
 
 import asyncio
 from datetime import datetime

@@ -65,7 +65,7 @@ import { AuthService } from '../../../core/services/auth.service';
                 <i class="pi pi-graduation-cap text-blue-500 dark:text-blue-400 text-2xl"></i>
                 <div class="text-center sm:text-left">
                   <h3 class="text-sm font-semibold text-blue-900 dark:text-blue-100">
-                    GreekSTT Research Platform
+                    GreekSTT Comparison Platform
                   </h3>
                   <p class="text-xs text-blue-700 dark:text-blue-200">
                     Ακαδημαϊκή πλατφόρμα για έρευνα στην ελληνική αναγνώριση ομιλίας

@@ -1,5 +1,5 @@
 """
-Greek language messages for the GreekSTT Research Platform application.
+Greek language messages for the GreekSTT Comparison Platform application.
 All user-facing messages should use these constants to ensure consistency.
 """
 

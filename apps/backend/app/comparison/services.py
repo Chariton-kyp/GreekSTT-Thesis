@@ -1,4 +1,4 @@
-"""Academic model comparison service for GreekSTT Research Platform."""
+"""Academic model comparison service for GreekSTT Comparison Platform."""
 
 import asyncio
 import logging

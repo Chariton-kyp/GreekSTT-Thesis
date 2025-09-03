@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Start all services for development
-echo "🚀 Starting GreekSTT Research Platform - All Services"
+echo "🚀 Starting GreekSTT Comparison Platform - All Services"
 
 # Start infrastructure first
 echo "📦 Starting infrastructure services..."

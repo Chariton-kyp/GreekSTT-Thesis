@@ -1,5 +1,5 @@
 """
-ASR Service Client for GreekSTT Research Platform
+ASR Service Client for GreekSTT Comparison Platform
 Communicates with separated Whisper and wav2vec2 services
 """
 import httpx

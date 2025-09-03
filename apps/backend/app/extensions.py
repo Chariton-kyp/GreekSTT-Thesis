@@ -25,10 +25,10 @@ socketio = SocketIO(cors_allowed_origins="*", async_mode=async_mode)
 
 # API Documentation (Flask-RESTX)
 api = Api(
-    title='GreekSTT Research Platform API',
+    title='GreekSTT Comparison Platform API',
     version='1.0.0',
     description='''
-    GreekSTT Research Platform Audio Transcription Service API
+    GreekSTT Comparison Platform Audio Transcription Service API
     
     ## Authentication
     Most endpoints require JWT authentication. Include the JWT token in the Authorization header:

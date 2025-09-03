@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Constants module for GreekSTT Research Platform application.
+Constants module for GreekSTT Comparison Platform application.
 """
 
 from .messages import (

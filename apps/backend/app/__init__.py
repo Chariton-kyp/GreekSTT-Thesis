@@ -196,7 +196,7 @@ def create_app(config_name=None):
         from .audio import models as audio_models
         from .transcription import models as transcription_models
         from .sessions import models as session_models
-        from .analytics import models as analytics_models
+        # Analytics models removed - no longer needed
         
         try:
             import os

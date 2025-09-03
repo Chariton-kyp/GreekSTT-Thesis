@@ -1,5 +1,5 @@
 """
-Whisper Service for GreekSTT Research Platform
+Whisper Service for GreekSTT Comparison Platform
 Handles Whisper model with faster-whisper library
 """
 import logging

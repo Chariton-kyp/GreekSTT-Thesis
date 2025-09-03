@@ -1,4 +1,4 @@
-# Multi-stage Dockerfile for GreekSTT Research Platform Frontend
+# Multi-stage Dockerfile for GreekSTT Comparison Platform Frontend
 # Built with Angular 19 and Nx
 
 # Build stage

@@ -106,7 +106,7 @@ def get_current_user():
         logger.user_journey("profile_access_success", {
             "user_type": "student",
             "email_verified": user.primary_email_verified,
-            "academic_platform": "GreekSTT Research Platform"
+            "academic_platform": "GreekSTT Comparison Platform"
         })
         
         logger.info(f"Profile retrieved successfully")

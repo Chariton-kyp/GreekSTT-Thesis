@@ -1,4 +1,4 @@
-"""Comprehensive correlation logging for GreekSTT Research Platform."""
+"""Comprehensive correlation logging for GreekSTT Comparison Platform."""
 
 import logging
 import json
