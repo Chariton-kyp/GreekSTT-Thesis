@@ -394,7 +394,18 @@ class Transcription(BaseModel):
         
         # Commit to database
         from app.extensions import db
+        
+        # Ensure the object is in the session (needed if it came from cache)
+        db.session.merge(self)
         db.session.commit()
+        
+        # Invalidate cache after evaluation is completed and committed
+        try:
+            from app.cache.redis_service import get_transcription_cache
+            cache = get_transcription_cache()
+            cache.invalidate_transcription(self.id, self.user_id)
+        except Exception as cache_error:
+            pass
         
         # Return enhanced evaluation results with all new metrics
         result = {

@@ -1055,6 +1055,7 @@ export class TranscriptionViewComponent implements OnInit, OnDestroy {
     const transcription = this.transcription();
     const groundTruth = this.groundTruthText().trim();
 
+
     if (!transcription?.text || !groundTruth) {
       this.notificationService.warning('Απαιτείται κείμενο μεταγραφής και σωστό κείμενο');
       return;

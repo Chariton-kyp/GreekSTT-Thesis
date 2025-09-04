@@ -621,6 +621,7 @@ def evaluate_transcription(transcription_id):
         ground_truth = data['ground_truth'].strip()
         notes = data.get('notes', '').strip()
         
+        
         if not ground_truth:
             return error_response(
                 message='Ground truth text cannot be empty',
