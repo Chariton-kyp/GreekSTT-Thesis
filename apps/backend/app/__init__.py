@@ -126,13 +126,13 @@ def create_app(config_name=None):
         )
         from .api_docs.health import HealthCheck, DetailedHealthCheck
         
-        # Add documentation namespaces with /docs prefix to avoid conflicts with real endpoints
+        # Add documentation namespaces to match real API endpoints
         api.add_namespace(health_ns, path='/health')
-        api.add_namespace(auth_ns, path='/docs/auth')
-        api.add_namespace(users_ns, path='/docs/users')
-        api.add_namespace(audio_ns, path='/docs/audio')
-        api.add_namespace(transcription_ns, path='/docs/transcriptions')
-        api.add_namespace(templates_ns, path='/docs/templates')
+        api.add_namespace(auth_ns, path='/auth')
+        api.add_namespace(users_ns, path='/users')
+        api.add_namespace(audio_ns, path='/audio')
+        api.add_namespace(transcription_ns, path='/transcriptions')
+        api.add_namespace(templates_ns, path='/templates')
     
     cors.init_app(app, resources={
         r"/api/*": {

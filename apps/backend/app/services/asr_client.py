@@ -9,7 +9,6 @@ from app.utils.correlation_logger import get_correlation_logger
 
 logger = get_correlation_logger(__name__)
 
-
 class ASRServiceClient:
     """Client for communicating with separated ASR services"""
     

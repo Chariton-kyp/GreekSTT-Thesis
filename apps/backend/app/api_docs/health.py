@@ -52,10 +52,13 @@ class HealthCheck(Resource):
             else:
                 ai_healthy = ai_status == 'available'
             
-            if any(status in ['unhealthy', 'unavailable'] for status in [
-                health_data['database'], 
-                health_data['cache']
-            ]) or not ai_healthy:
+            # Check for critical failures
+            if health_data['database'] == 'unhealthy' or not ai_healthy:
+                health_data['status'] = 'degraded'
+                return health_data, 503
+
+            # Cache is optional for core functionality
+            if health_data['cache'] in ['unhealthy']:
                 health_data['status'] = 'degraded'
                 return health_data, 503
             
@@ -97,41 +100,71 @@ class HealthCheck(Resource):
     def _check_cache(self):
         """Check cache functionality."""
         try:
-            # Test cache read/write with SimpleCache
+            # Check if cache is properly initialized
+            if not hasattr(cache, 'cache'):
+                current_app.logger.debug("Cache not initialized - using simple health check")
+                return 'not_configured'
+
+            # Test cache read/write
             cache.set('health_check', 'ok', timeout=5)
             result = cache.get('health_check')
             return 'connected' if result == 'ok' else 'degraded'
         except Exception as e:
-            current_app.logger.error(f"Cache health check failed: {str(e)}")
-            return 'unhealthy'
+            current_app.logger.debug(f"Cache health check failed: {str(e)}")
+            return 'not_configured'
     
     def _check_ai_service(self):
         """Check separated AI services availability."""
         try:
             # Import here to avoid circular imports
             import httpx
-            
-            asr_url = current_app.config.get('ASR_SERVICE_URL', 'http://asr-service:8001')
-            
-            asr_status = 'unavailable'
-            
-            # Check ASR service
+
+            # Get service URLs from environment variables
+            whisper_url = current_app.config.get('WHISPER_SERVICE_URL', 'http://whisper-service:8001')
+            wav2vec2_url = current_app.config.get('WAV2VEC2_SERVICE_URL', 'http://wav2vec2-service:8002')
+
+            whisper_status = 'unavailable'
+            wav2vec2_status = 'unavailable'
+
+            # Check Whisper service
             try:
                 with httpx.Client(timeout=5.0) as client:
-                    response = client.get(f"{asr_url}/api/v1/health")
+                    response = client.get(f"{whisper_url}/api/v1/health")
                     if response.status_code == 200:
-                        asr_status = 'available'
+                        whisper_status = 'available'
                     else:
-                        asr_status = 'degraded'
-            except Exception:
-                asr_status = 'unavailable'
-            
-            # Return ASR service status
+                        whisper_status = 'degraded'
+            except Exception as e:
+                current_app.logger.debug(f"Whisper service check failed: {str(e)}")
+                whisper_status = 'unavailable'
+
+            # Check wav2vec2 service
+            try:
+                with httpx.Client(timeout=5.0) as client:
+                    response = client.get(f"{wav2vec2_url}/api/v1/health")
+                    if response.status_code == 200:
+                        wav2vec2_status = 'available'
+                    else:
+                        wav2vec2_status = 'degraded'
+            except Exception as e:
+                current_app.logger.debug(f"wav2vec2 service check failed: {str(e)}")
+                wav2vec2_status = 'unavailable'
+
+            # Determine overall status
+            if whisper_status == 'available' and wav2vec2_status == 'available':
+                overall_status = 'available'
+            elif whisper_status == 'available' or wav2vec2_status == 'available':
+                overall_status = 'degraded'
+            else:
+                overall_status = 'unavailable'
+
+            # Return detailed service status
             return {
-                'asr_service': asr_status,
-                'overall': asr_status
+                'whisper_service': whisper_status,
+                'wav2vec2_service': wav2vec2_status,
+                'overall': overall_status
             }
-            
+
         except Exception as e:
             current_app.logger.warning(f"AI services health check failed: {str(e)}")
             return 'unavailable'

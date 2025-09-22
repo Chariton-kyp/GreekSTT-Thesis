@@ -252,25 +252,25 @@ class WhisperModel:
         
         try:
             settings = {
-                "language": "el",
+                "language": "el", # Ελληνική γλώσσα
                 "task": "transcribe",
-                "beam_size": 10,
+                "beam_size": 10, # Βελτιστοποιημένο για ελληνικά
                 "best_of": 1,
                 "patience": 1.0,
                 "length_penalty": 1.0,
-                "temperature": 0.0,
+                "temperature": 0.0, # Deterministic output
                 "compression_ratio_threshold": 2.0,
-                "no_speech_threshold": 0.2,
-                "hallucination_silence_threshold": 2.5,
-                "condition_on_previous_text": False,
+                "no_speech_threshold": 0.2, # Anti-hallucination για ελληνικό content
+                "hallucination_silence_threshold": 2.5, # Anti-hallucination για ελληνικό content
+                "condition_on_previous_text": False, # Αποφυγή hallucinations
                 
                 "vad_filter": True,
                 "vad_parameters": {
                     "threshold": 0.5,
-                    "min_speech_duration_ms": 500,
+                    "min_speech_duration_ms": 500, # Ελληνικό ρυθμό ομιλίας
                     "max_speech_duration_s": 30,
                     "min_silence_duration_ms": 2000,
-                    "speech_pad_ms": 400,
+                    "speech_pad_ms": 400, # Προστασία αρχής/τέλος λέξεων
                 },
                 "initial_prompt": "",
                 "word_timestamps": True,
