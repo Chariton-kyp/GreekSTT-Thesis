@@ -11,9 +11,12 @@ templates_ns = Namespace('templates', description='Template management operation
 research_ns = Namespace('research', description='Research analytics and usage operations')
 health_ns = Namespace('health', description='Health check operations')
 
-# Import the endpoint classes to register them
-from .health import *
-from .auth import *
-from .users import *
-from .audio import *
-from .transcriptions import *
+# IMPORTANT: Resource classes are commented out to prevent Flask-RESTX from creating
+# conflicting endpoints with the Blueprint routes. Flask-RESTX is used ONLY for Swagger
+# documentation models, NOT for actual endpoint implementation.
+#
+# from .health import *
+# from .auth import *
+# from .users import *
+# from .audio import *
+# from .transcriptions import *

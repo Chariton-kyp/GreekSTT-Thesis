@@ -121,18 +121,23 @@ def create_app(config_name=None):
         )
         
         from .api_docs import (
-            auth_ns, users_ns, audio_ns, transcription_ns, 
+            auth_ns, users_ns, audio_ns, transcription_ns,
             templates_ns, health_ns
         )
-        from .api_docs.health import HealthCheck, DetailedHealthCheck
-        
-        # Add documentation namespaces to match real API endpoints
-        api.add_namespace(health_ns, path='/health')
-        api.add_namespace(auth_ns, path='/auth')
-        api.add_namespace(users_ns, path='/users')
-        api.add_namespace(audio_ns, path='/audio')
-        api.add_namespace(transcription_ns, path='/transcriptions')
-        api.add_namespace(templates_ns, path='/templates')
+
+        # NOTE: Flask-RESTX namespaces are NOT added to prevent conflicting with Blueprint routes
+        # Swagger documentation is disabled to avoid endpoint conflicts
+        # The /docs/ endpoint will show "No operations defined in spec!" which is expected
+        #
+        # Future improvement: Implement proper OpenAPI spec generation from Blueprints
+        # or use Flask-RESTX Resources that delegate to Blueprint views
+        #
+        # api.add_namespace(health_ns, path='/api/health')
+        # api.add_namespace(auth_ns, path='/api/auth')
+        # api.add_namespace(users_ns, path='/api/users')
+        # api.add_namespace(audio_ns, path='/api/audio')
+        # api.add_namespace(transcription_ns, path='/api/transcriptions')
+        # api.add_namespace(templates_ns, path='/api/templates')
     
     cors.init_app(app, resources={
         r"/api/*": {

@@ -24,28 +24,30 @@ async_mode = 'threading' if running_under_debugpy else 'eventlet'
 socketio = SocketIO(cors_allowed_origins="*", async_mode=async_mode)
 
 # API Documentation (Flask-RESTX)
+# NOTE: prefix is intentionally empty to avoid conflicts with Blueprint routes
+# Flask-RESTX is used ONLY for Swagger documentation, not for actual endpoint implementation
 api = Api(
     title='GreekSTT Comparison Platform API',
     version='1.0.0',
     description='''
     GreekSTT Comparison Platform Audio Transcription Service API
-    
+
     ## Authentication
     Most endpoints require JWT authentication. Include the JWT token in the Authorization header:
     ```
     Authorization: Bearer <your-jwt-token>
     ```
-    
+
     ## Features
     - User authentication and management
     - Audio file upload and processing
     - AI-powered transcription with Greek optimization
     - Academic research features for model comparison
     - Research analytics and usage tracking
-    
+
     ''',
     doc='/docs/',  # Swagger UI endpoint
-    prefix='/api',
+    # prefix removed to prevent Flask-RESTX from creating conflicting routes with Blueprints
     security='JWT',
     authorizations={
         'JWT': {
