@@ -434,7 +434,7 @@ If you use this work, please cite:
   title={Comparative Analysis of ASR Models for the Greek Language: A Microservices Approach},
   author={Kypraios, Chariton},
   year={2025},
-  school={University of Piraeus, Department of Computer Science},
+  school={University of Piraeus, Department of Informatics},
   type={Master's Thesis},
   url={https://github.com/Chariton-kyp/GreekSTT-Thesis}
 }
@@ -446,7 +446,7 @@ If you use this work, please cite:
 
 ### Author
 **Chariton Kypraios**  
-MSc Student - Department of Computer Science  
+MSc Student - Department of Informatics 
 University of Piraeus  
 📧 haritos19@gmail.com  
 🔗 [GitHub](https://github.com/Chariton-kyp)
