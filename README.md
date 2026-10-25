@@ -37,9 +37,8 @@ This platform implements a comprehensive comparative analysis system for the two
 
 ### Key Findings
 
-- **No single model achieves >90% accuracy** on Greek without domain-specific fine-tuning
-- **Whisper-large-v3**: Superior general-purpose performance (2.5% WER on clean speech) but resource-intensive
-- **wav2vec2-greek**: Faster processing, domain-specific excellence, but lower general accuracy (61.4% WER on complex content)
+- **Whisper-large-v3**: clearly more robust than wav2vec2-greek on the real-world audio tested (in a demonstration on one YouTube video: WER 2.5% vs 61.4%, see "Demonstration results" below), but more resource-intensive
+- **wav2vec2-greek**: faster and lighter (greedy CTC), but degrades sharply on noisy, multi-speaker or out-of-domain content
 - **Greek Language Challenges**: Both models struggle with diacritics, morphological complexity, and dialectal variations
 - **Resource Requirements**: GPU acceleration essential for practical deployment
 
@@ -219,19 +218,18 @@ curl http://localhost:8002/health        # wav2vec2
 
 ## Performance Analysis
 
-### Benchmark Results
+### Demonstration results (not a benchmark)
 
 **Test Environment**: RTX 4080 Mobile (12GB), Intel i9-14900HX, 64GB RAM
 
-| Metric | Whisper-large-v3 | wav2vec2-greek | Notes |
-|--------|------------------|----------------|-------|
-| **Processing Speed** | ~10% audio duration | ~5% audio duration | GPU mode |
-| **VRAM Usage** | 4-5GB (60% allocation) | 2-3GB (40% allocation) | Peak usage |
-| **WER (Clean Speech)** | 2.5% | 3.1% | Studio recordings |
-| **WER (YouTube Content)** | 8.2% | 61.4% | Complex real-world audio |
-| **Greek Diacritics** | 94% accuracy | 87% accuracy | Accent preservation |
-| **Morphology Handling** | 89% accuracy | 92% accuracy | Inflection recognition |
-| **Real-time Factor** | 0.1x | 0.05x | Processing speed ratio |
+The platform compares models on user-supplied audio against a user-supplied reference; it does not include a fixed evaluation dataset. The figures below come from the thesis demonstration (§7.6.2) on **one YouTube video** scored through the platform. They illustrate the workflow and are not a statistically meaningful benchmark. They were also computed with the normalizer affected by the issue described under "Known issues and errata", so they are not comparable with published Greek WER figures.
+
+| Metric (single video, n = 1) | Whisper-large-v3 | wav2vec2-greek |
+|---|---:|---:|
+| WER | 2.5% | 61.4% |
+| CER | 1.3% | 39.9% |
+| Speed (thesis §9.4, approx.) | ~7x real time | ~16x real time |
+| VRAM (approx.) | 4-5 GB | 2-3 GB |
 
 ### Model Characteristics
 
@@ -261,10 +259,10 @@ curl http://localhost:8002/health        # wav2vec2
 ### Comparative Analysis Framework
 
 1. **Independent Processing**: Each model processes identical audio independently
-2. **Fair Resource Allocation**: GPU memory partitioned to prevent interference
+2. **Resource Allocation**: GPU memory fractions configured per service (60/40). In comparison mode both models run concurrently on the same GPU, so timings are measured under contention, and the fraction is not enforced for faster-whisper (CTranslate2)
 3. **Systematic Evaluation**: Standardized metrics (WER, CER, processing time)
 4. **Real-world Testing**: Diverse audio sources (studio, YouTube, live recordings)
-5. **Greek-specific Metrics**: Diacritic accuracy, morphology handling, dialect recognition
+5. **Greek-specific Analysis**: Greek text normalization and diacritic analysis (see "Known issues and errata")
 
 ### Evaluation Metrics
 
@@ -272,14 +270,13 @@ curl http://localhost:8002/health        # wav2vec2
 - **Character Error Rate (CER)**: Fine-grained accuracy at character level
 - **Processing Time**: Real-time factor calculation for efficiency analysis
 - **Resource Usage**: GPU memory, CPU utilization profiling
-- **Greek-specific Accuracy**: Diacritic preservation, morphological correctness
+- **Greek-specific Analysis**: Diacritic handling (see "Known issues and errata")
 
 ### Test Data Sources
 
 - **Studio Recordings**: High-quality controlled environment speech
 - **YouTube Content**: Real-world varied quality audio
 - **Live Recordings**: Direct microphone input via WebRTC
-- **Mozilla Common Voice**: Standardized Greek speech dataset
 - **Academic Content**: University lectures and presentations
 
 ---
@@ -395,7 +392,7 @@ No comprehensive comparison platform of state-of-the-art ASR models on real-worl
 - **Whisper**: OpenAI papers and model weights (Apache 2.0 License)
 - **wav2vec2-greek**: Facebook AI base + lighteternal Greek fine-tuning
 - **Greek Linguistic Resources**: University of Athens NLP work
-- **Test Data**: Mozilla Common Voice Greek dataset, audio recordings
+- **Test Data**: user-supplied recordings
 
 ### Technical Validation
 
@@ -458,6 +455,34 @@ University of Piraeus
 - **University of Piraeus** for academic guidance and computational resources
 - **Mozilla Foundation** for Common Voice Greek dataset
 - **lighteternal** for Greek-specific wav2vec2 fine-tuning
+
+## Known issues and errata (October 2026)
+
+A later review of the code found the following. They are documented here rather than silently fixed,
+because the thesis results were produced with this code.
+
+1. **The Greek text normalizer drops accented vowels.** `GreekTextNormalizer` keeps only the base Greek
+   ranges (U+0391-03A9, U+03B1-03C9, U+1F00-1FFF), so precomposed tonos/diaeresis vowels
+   (ά έ ή ί ό ύ ώ ϊ ϋ ΐ ΰ) are replaced by spaces. Words are split into fragments, the reference word
+   count is inflated, and WER/CER computed by the platform are not comparable with standard Greek ASR
+   scoring. Latin-script tokens are also removed.
+2. **Diacritic accuracy always reports 100%**, because the analyzer runs after the normalizer above.
+3. **Confidence-based "accuracy" is a heuristic, not a ground-truth metric.** For wav2vec2 it is the
+   mean max-softmax confidence clamped to 60-95. Only WER/CER against a reference are ground-truth
+   metrics.
+4. **`/comparison/detailed` returns fixed demonstration values** (morphology and error-pattern
+   figures), not computed results.
+5. **`apps/*/app/ai/models/*.py` are not used by the running services.** Live inference is in each
+   service's `app/main.py` and `app/api/transcription.py`. Settings in the unused modules, such as the
+   hallucination filters, did not run.
+6. **Timing.** Processing times come from a single `time.time()` measurement without warm-up. In
+   comparison mode both models share the GPU, and the stored per-model times in that mode can be 0
+   because of a key mismatch.
+7. **No automated tests** cover the metrics, the normalizer or the inference configuration.
+
+A follow-up project applies a held-out benchmark, corpus-level WER with meeting-level confidence
+intervals, a validated harness and a controlled timing protocol:
+[whisper-meeting-adaptation](https://github.com/Chariton-kyp/whisper-meeting-adaptation).
 
 ---
 

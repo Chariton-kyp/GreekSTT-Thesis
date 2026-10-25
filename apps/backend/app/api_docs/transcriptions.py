@@ -59,7 +59,7 @@ class TranscriptionComparisonAPI(Resource):
     @transcription_ns.expect(transcription_ns.model('ModelComparison', {
         'audio_id': fields.Integer(required=True, description='Audio file ID'),
         'models': fields.List(fields.String, required=True, 
-                            description='Models to compare: whisper (~7x realtime, WER ~2.5%), wav2vec2 (~16x realtime)',
+                            description='Models to compare: whisper (~7x realtime), wav2vec2 (~16x realtime)',
                             example=['whisper', 'wav2vec2']),
         'ground_truth': fields.String(description='Ground truth text for WER/CER calculation (optional)',
                                     example='Πώς θα φαντάζονταν την εκατόστη επετειό της μεταπολίτευσης...')
@@ -73,9 +73,10 @@ class TranscriptionComparisonAPI(Resource):
         
         Runs transcription with both Whisper and wav2vec2 models for comprehensive comparison.
         
-        Research Findings (Real-world Greek Audio - YouTube):
-        - **Whisper**: WER 2.5%, CER 1.3%, Accuracy 97.56%, Speed ~7x realtime
-        - **wav2vec2**: WER 61.4%, CER 30.9%, Accuracy 38.68%, Speed ~16x realtime
+        Single-video demonstration from the thesis (one YouTube video, not a benchmark; see README
+        "Known issues and errata"):
+        - **Whisper**: WER 2.5%, CER 1.3%, Speed ~7x realtime
+        - **wav2vec2**: WER 61.4%, CER 39.9%, Speed ~16x realtime
         
         Key Insights:
         - Whisper excels in accuracy for challenging, non-studio Greek audio
